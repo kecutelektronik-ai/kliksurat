@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #4A1525;    /* Dominan Burgundy Silk */
+  --color-accent: #334426;     /* Dominan Green Olive Silk */
+  --color-warning: #D4C2A3;    /* Champagne Silk Gold (Aksen Emas Mewah) */
+  --color-success: #334426;    /* Green Olive Silk (Status Selesai & Simpan) */
+  
+  /* Warna Netral Pendukung Mewah */
+  --bg-main: #FAF8F5;          /* Warm Pearl / Alabaster Silk */
+  --bg-card: #FFFFFF;
+  --text-main: #1C1618;        /* Espresso Noir */
+  --text-muted: #786F69;       /* Warm Taupe */
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+  }
+  .material-symbols-outlined.fill {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Print Styles */
+@media print {
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  .print-clean {
+    border: 1px solid #111 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+  }
+}
