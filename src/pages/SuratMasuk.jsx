@@ -1,10 +1,27 @@
 import React, { useState } from 'react';
 import { useSurat } from '../context/SuratContext';
 
+export const JENIS_SURAT_OPTIONS = [
+  'Surat Dinas',
+  'Nota Dinas',
+  'Memorandum',
+  'Surat Undangan',
+  'Surat Tugas',
+  'Surat Perintah',
+  'Surat Edaran',
+  'Surat Keterangan',
+  'Surat Pengantar',
+  'Berita Acara',
+  'Laporan',
+  'Lainnya',
+];
+
 export default function SuratMasuk() {
   const { suratMasuk, addSuratMasuk, navigateTo, showToast } = useSurat();
 
   const [form, setForm] = useState({
+    jenisSurat: 'Surat Dinas',
+    jenisSuratLainnya: '',
     nomorSurat: '',
     asalSurat: '',
     perihal: '',
@@ -16,6 +33,7 @@ export default function SuratMasuk() {
   });
 
   const [searchFilter, setSearchFilter] = useState('');
+  const [filterJenis, setFilterJenis] = useState('semua');
   const [showForm, setShowForm] = useState(true);
 
   const handleSubmit = (e) => {
@@ -25,8 +43,23 @@ export default function SuratMasuk() {
       return;
     }
 
-    const newId = addSuratMasuk(form);
+    if (form.jenisSurat === 'Lainnya' && !form.jenisSuratLainnya.trim()) {
+      showToast('Harap sebutkan nama jenis surat untuk pilihan Lainnya (*)', 'warning');
+      return;
+    }
+
+    const finalJenisSurat = form.jenisSurat === 'Lainnya' && form.jenisSuratLainnya.trim()
+      ? form.jenisSuratLainnya.trim()
+      : form.jenisSurat;
+
+    addSuratMasuk({
+      ...form,
+      jenisSurat: finalJenisSurat
+    });
+
     setForm({
+      jenisSurat: 'Surat Dinas',
+      jenisSuratLainnya: '',
       nomorSurat: '',
       asalSurat: '',
       perihal: '',
@@ -38,11 +71,17 @@ export default function SuratMasuk() {
     });
   };
 
-  const filteredSurat = suratMasuk.filter(s =>
-    s.nomorSurat.toLowerCase().includes(searchFilter.toLowerCase()) ||
-    s.asalSurat.toLowerCase().includes(searchFilter.toLowerCase()) ||
-    s.perihal.toLowerCase().includes(searchFilter.toLowerCase())
-  );
+  const filteredSurat = suratMasuk.filter(s => {
+    const q = searchFilter.toLowerCase();
+    const matchSearch =
+      s.nomorSurat.toLowerCase().includes(q) ||
+      s.asalSurat.toLowerCase().includes(q) ||
+      s.perihal.toLowerCase().includes(q) ||
+      (s.jenisSurat && s.jenisSurat.toLowerCase().includes(q));
+
+    const matchJenis = filterJenis === 'semua' || (s.jenisSurat || 'Surat Dinas') === filterJenis;
+    return matchSearch && matchJenis;
+  });
 
   return (
     <div className="space-y-6">
@@ -109,7 +148,48 @@ export default function SuratMasuk() {
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Grid 2 Kolom */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Nomor Surat */}
+              {/* Jenis Surat (Sesuai Lampiran 2 & 3) */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-on-surface-variant flex items-center justify-between">
+                  <span>Jenis Surat <span className="text-danger">*</span></span>
+                  <span className="text-[11px] font-normal text-outline">Tata Naskah Dinas MA-RI</span>
+                </label>
+                <div className="relative">
+                  <select
+                    required
+                    value={form.jenisSurat}
+                    onChange={(e) => setForm({ ...form, jenisSurat: e.target.value })}
+                    className="w-full h-10 pl-9 pr-8 rounded-btn bg-white border border-outline-subtle text-sm text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none cursor-pointer"
+                  >
+                    {JENIS_SURAT_OPTIONS.map((opsi) => (
+                      <option key={opsi} value={opsi}>
+                        {opsi}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-primary pointer-events-none">
+                    article
+                  </span>
+                  <span className="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-outline pointer-events-none">
+                    expand_more
+                  </span>
+                </div>
+                {form.jenisSurat === 'Lainnya' && (
+                  <div className="pt-1 animate-in fade-in">
+                    <input
+                      type="text"
+                      required
+                      value={form.jenisSuratLainnya}
+                      onChange={(e) => setForm({ ...form, jenisSuratLainnya: e.target.value })}
+                      placeholder="Sebutkan jenis surat (misal: Surat Kuasa, Maklumat)..."
+                      className="w-full h-9 px-3 rounded-btn bg-surface border border-primary/40 text-xs text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                    />
+                  </div>
+                )}
+                <p className="text-[11px] text-outline">Pilih kategori tata naskah dinas resmi sesuai fisik surat.</p>
+              </div>
+
+              {/* Nomor Surat Asal */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-on-surface-variant">
                   Nomor Surat Asal <span className="text-danger">*</span>
@@ -178,21 +258,6 @@ export default function SuratMasuk() {
                 />
               </div>
 
-              {/* Perihal Surat (Full span) */}
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="block text-xs font-bold text-on-surface-variant">
-                  Perihal / Urusan Naskah Dinas <span className="text-danger">*</span>
-                </label>
-                <textarea
-                  rows="2"
-                  required
-                  value={form.perihal}
-                  onChange={(e) => setForm({ ...form, perihal: e.target.value })}
-                  placeholder="Tuliskan ringkasan pokok perihal naskah dinas masuk..."
-                  className="w-full p-3 rounded-btn bg-white border border-outline-subtle text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all leading-relaxed"
-                ></textarea>
-              </div>
-
               {/* Jumlah Lampiran */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-on-surface-variant">
@@ -212,8 +277,23 @@ export default function SuratMasuk() {
                 </div>
               </div>
 
+              {/* Perihal Surat (Full span) */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="block text-xs font-bold text-on-surface-variant">
+                  Perihal / Urusan Naskah Dinas <span className="text-danger">*</span>
+                </label>
+                <textarea
+                  rows="2"
+                  required
+                  value={form.perihal}
+                  onChange={(e) => setForm({ ...form, perihal: e.target.value })}
+                  placeholder="Tuliskan ringkasan pokok perihal naskah dinas masuk..."
+                  className="w-full p-3 rounded-btn bg-white border border-outline-subtle text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all leading-relaxed"
+                ></textarea>
+              </div>
+
               {/* Nomor Agenda Otomatis */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 md:col-span-2">
                 <label className="block text-xs font-bold text-on-surface-variant">
                   Nomor Agenda Sistem (Otomatis & Terkunci)
                 </label>
@@ -402,7 +482,7 @@ export default function SuratMasuk() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="relative w-64">
+            <div className="relative w-56 md:w-64">
               <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-outline">
                 search
               </span>
@@ -413,6 +493,24 @@ export default function SuratMasuk() {
                 placeholder="Filter nomor, perihal, asal..."
                 className="w-full h-9 pl-9 pr-3 rounded-md bg-surface border border-outline-subtle text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
               />
+            </div>
+            {/* Filter Dropdown Jenis Surat */}
+            <div className="relative">
+              <select
+                value={filterJenis}
+                onChange={(e) => setFilterJenis(e.target.value)}
+                className="h-9 pl-3 pr-8 rounded-md bg-surface border border-outline-subtle text-xs font-semibold text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none"
+              >
+                <option value="semua">Semua Jenis Surat</option>
+                {JENIS_SURAT_OPTIONS.map((j) => (
+                  <option key={j} value={j}>
+                    {j}
+                  </option>
+                ))}
+              </select>
+              <span className="material-symbols-outlined absolute right-2 top-2.5 text-[16px] text-outline pointer-events-none">
+                expand_more
+              </span>
             </div>
             <button
               onClick={() => showToast('Filter tanggal aktif.', 'info')}
@@ -437,6 +535,7 @@ export default function SuratMasuk() {
             <thead>
               <tr className="bg-surface border-b border-outline-subtle text-on-surface-variant text-xs uppercase tracking-wider font-semibold">
                 <th className="py-3 px-4">Nomor & Agenda</th>
+                <th className="py-3 px-4">Jenis Surat</th>
                 <th className="py-3 px-4">Asal Surat</th>
                 <th className="py-3 px-4">Perihal</th>
                 <th className="py-3 px-4">Tanggal Diterima</th>
@@ -453,6 +552,12 @@ export default function SuratMasuk() {
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <div className="font-bold text-on-surface font-code text-xs">{item.nomorSurat}</div>
                       <div className="text-[11px] text-outline font-code">{item.agenda}</div>
+                    </td>
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-primary-light text-primary border border-primary/20">
+                        <span className="material-symbols-outlined text-[15px]">article</span>
+                        <span>{item.jenisSurat || 'Surat Dinas'}</span>
+                      </span>
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <div className="font-semibold text-on-surface">{item.asalSurat}</div>

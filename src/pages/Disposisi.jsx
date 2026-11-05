@@ -521,7 +521,7 @@ export default function Disposisi() {
                 <div className="flex">
                   <span className="w-14 font-semibold shrink-0">Jenis</span>
                   <span className="mr-1">:</span>
-                  <span>Surat Masuk</span>
+                  <span className="font-semibold">{currentSurat?.jenisSurat || 'Surat Dinas'}</span>
                 </div>
               </div>
 

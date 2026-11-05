@@ -225,6 +225,7 @@ export default function Laporan() {
       rows.push([
         'No',
         'Kode Klasifikasi',
+        'Jenis Naskah',
         'No Agenda',
         'Nomor Surat Asal',
         'Instansi Pengirim',
@@ -242,6 +243,7 @@ export default function Laporan() {
         rows.push([
           idx + 1,
           getKodeSurat(s),
+          s.jenisSurat || 'Surat Dinas',
           s.agenda || '-',
           s.nomorSurat,
           s.asalSurat,
@@ -801,8 +803,11 @@ export default function Laporan() {
                         <td className="py-3 px-4 font-code text-xs font-bold text-primary whitespace-nowrap">
                           {s.agenda || '-'}
                         </td>
-                        <td className="py-3 px-4 font-code font-bold text-on-surface whitespace-nowrap">
-                          {s.nomorSurat}
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <div className="font-code font-bold text-on-surface">{s.nomorSurat}</div>
+                          <div className="text-[10px] font-sans font-semibold text-primary">
+                            {s.jenisSurat || 'Surat Dinas'}
+                          </div>
                         </td>
                         <td className="py-3 px-4 font-semibold text-on-surface whitespace-nowrap">
                           {s.asalSurat}
@@ -910,8 +915,11 @@ export default function Laporan() {
                         <td className="py-3 px-4 font-code text-xs font-bold text-primary whitespace-nowrap">
                           {s.nomorUrut || 'Draft'}
                         </td>
-                        <td className="py-3 px-4 font-code font-bold text-on-surface whitespace-nowrap">
-                          {s.nomorSurat}
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <div className="font-code font-bold text-on-surface">{s.nomorSurat}</div>
+                          <div className="text-[10px] font-sans font-semibold text-primary">
+                            {s.jenisSurat || 'Surat Dinas'}
+                          </div>
                         </td>
                         <td className="py-3 px-4 font-semibold text-on-surface whitespace-nowrap">
                           {s.tujuanSurat}

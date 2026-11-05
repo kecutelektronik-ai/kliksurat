@@ -4,12 +4,16 @@
  */
 
 export function mapRowToSuratMasuk(row) {
+  const firstTrack = Array.isArray(row.tracking) && row.tracking[0];
+  const jenisSuratFromTrack = firstTrack?.metadata?.jenisSurat;
+
   return {
     id: row.id,
     nomorSurat: row.nomor_surat || '',
     agenda: row.agenda || '',
     asalSurat: row.asal_surat || '',
     perihal: row.perihal || '',
+    jenisSurat: row.jenis_naskah || jenisSuratFromTrack || 'Surat Dinas',
     tanggalSurat: row.tanggal_surat ? String(row.tanggal_surat).slice(0, 10) : '',
     tanggalTerima: row.tanggal_terima ? String(row.tanggal_terima).slice(0, 16) : '',
     sifat: row.sifat || 'biasa',
@@ -42,6 +46,16 @@ export function mapRowToSuratKeluar(row) {
 }
 
 export function mapSuratMasukToRow(item, initialTracking = []) {
+  const enrichedTracking = (initialTracking || []).map((t, idx) => {
+    if (idx === 0) {
+      return {
+        ...t,
+        metadata: { ...(t.metadata || {}), jenisSurat: item.jenisSurat || 'Surat Dinas' }
+      };
+    }
+    return t;
+  });
+
   return {
     id: item.id,
     jenis_surat: 'masuk',
@@ -58,7 +72,7 @@ export function mapSuratMasukToRow(item, initialTracking = []) {
     file_scan: item.fileScan || 'Naskah_Surat_Masuk.pdf',
     file_size: item.fileSize || '2.1 MB',
     prioritas_tinggi: Boolean(item.prioritasTinggi),
-    tracking: initialTracking,
+    tracking: enrichedTracking,
   };
 }
 
