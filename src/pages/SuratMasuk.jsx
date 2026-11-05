@@ -4,6 +4,7 @@ import {
   JENIS_SURAT_OPTIONS,
   STATUS_SURAT_MASUK_OPTIONS,
   getStatusBadge,
+  formatAgendaSuratMasuk,
 } from '../constants/suratOptions';
 
 export default function SuratMasuk() {
@@ -291,20 +292,25 @@ export default function SuratMasuk() {
 
               {/* Nomor Agenda Otomatis */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-on-surface-variant">
-                  Nomor Agenda Sistem (Otomatis & Terkunci)
+                <label className="block text-xs font-bold text-on-surface-variant flex items-center justify-between">
+                  <span>Nomor Agenda Sistem (Otomatis)</span>
+                  <span className="text-[11px] font-normal text-primary">0001/SM/XI/2026</span>
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     readOnly
-                    value={`AGD-2026/X/SM-${String(suratMasuk.length + 1).padStart(4, '0')}`}
-                    className="w-full h-10 px-3.5 rounded-btn bg-surface border border-outline-subtle text-xs font-code font-bold text-outline cursor-not-allowed"
+                    value={formatAgendaSuratMasuk(
+                      suratMasuk.length + 1,
+                      form.tanggalSurat || form.tanggalTerima || new Date()
+                    )}
+                    className="w-full h-10 px-3.5 rounded-btn bg-surface border border-outline-subtle text-xs font-code font-bold text-primary cursor-not-allowed"
                   />
                   <span className="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-outline">
                     lock
                   </span>
                 </div>
+                <p className="text-[11px] text-outline">Rumus: Nomor Urut / Surat Masuk / Bulan / Tahun</p>
               </div>
 
               {/* Status Surat Masuk (Sesuai Lampiran) */}

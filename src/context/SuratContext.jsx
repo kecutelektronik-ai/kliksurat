@@ -6,6 +6,10 @@ import {
   mapSuratMasukToRow,
   mapSuratKeluarToRow,
 } from '../lib/suratMapper';
+import {
+  formatAgendaSuratMasuk,
+  formatAgendaSuratKeluar,
+} from '../constants/suratOptions';
 
 const SuratContext = createContext();
 
@@ -88,7 +92,7 @@ const INITIAL_SURAT_MASUK = [
   {
     id: 'SM-001',
     nomorSurat: '012/PA.Lmg/X/2026',
-    agenda: 'AGD-2026/X/SM-0012',
+    agenda: '0001/SM/X/2026',
     asalSurat: 'PTA Surabaya (Pengadilan Tinggi Agama)',
     perihal: 'Undangan Rapat Koordinasi Pembinaan Wilayah Hukum Pengadilan Tinggi Agama Surabaya Semester II',
     jenisSurat: 'Surat Undangan',
@@ -105,7 +109,7 @@ const INITIAL_SURAT_MASUK = [
   {
     id: 'SM-002',
     nomorSurat: '047/UM.01/X/2026',
-    agenda: 'AGD-2026/X/SM-0047',
+    agenda: '0002/SM/X/2026',
     asalSurat: 'Pengadilan Tinggi Jawa Timur',
     perihal: 'Pemberitahuan Kegiatan Sosialisasi Standar Pelayanan Terpadu Satu Pintu (PTSP) Ramah Disabilitas',
     jenisSurat: 'Surat Dinas',
@@ -122,7 +126,7 @@ const INITIAL_SURAT_MASUK = [
   {
     id: 'SM-003',
     nomorSurat: '042/KP.02/X/2026',
-    agenda: 'AGD-2026/X/SM-0042',
+    agenda: '0003/SM/X/2026',
     asalSurat: 'Biro Kepegawaian & Ortala Mahkamah Agung RI',
     perihal: 'Verifikasi Berkas Usulan Kenaikan Pangkat Hakim & Aparatur Pegawai Negeri Sipil Periode April 2027',
     jenisSurat: 'Surat Dinas',
@@ -139,7 +143,7 @@ const INITIAL_SURAT_MASUK = [
   {
     id: 'SM-004',
     nomorSurat: '013/MA/HK.01/X/2026',
-    agenda: 'AGD-2026/X/SM-0013',
+    agenda: '0004/SM/X/2026',
     asalSurat: 'Kepaniteraan Mahkamah Agung RI',
     perihal: 'Petunjuk Teknis Audit Kepatuhan Aksesibilitas Layanan Peradilan Elektronik Tahun Anggaran 2026',
     jenisSurat: 'Surat Edaran',
@@ -156,7 +160,7 @@ const INITIAL_SURAT_MASUK = [
   {
     id: 'SM-005',
     nomorSurat: '014/PA.Jbr/X/2026',
-    agenda: 'AGD-2026/X/SM-0014',
+    agenda: '0005/SM/X/2026',
     asalSurat: 'Pengadilan Agama Jember Kelas I-A',
     perihal: 'Permohonan Bantuan Delegasi Panggilan Sidang Perkara Nomor 1245/Pdt.G/2026/PA.Jbr',
     jenisSurat: 'Surat Dinas',
@@ -176,6 +180,7 @@ const INITIAL_SURAT_KELUAR = [
   {
     id: 'SK-001',
     nomorSurat: 'W13-A12/1042/HK.01/X/2026',
+    agenda: '0001/SK/X/2026',
     unitPengusul: 'Kepaniteraan Perkara',
     pembuat: 'Ibu Dra. Hj. Nurjanah, M.H. (Panitera)',
     tujuanSurat: 'Mahkamah Agung Republik Indonesia',
@@ -192,6 +197,7 @@ const INITIAL_SURAT_KELUAR = [
   {
     id: 'SK-002',
     nomorSurat: 'W13-A12/1043/PL.01/X/2026',
+    agenda: '0002/SK/X/2026',
     unitPengusul: 'Kesekretariatan (Subbag Perencanaan)',
     pembuat: 'Bpk. H. M. Ridwan, S.H. (Sekretaris)',
     tujuanSurat: 'Badan Urusan Administrasi Mahkamah Agung RI',
@@ -208,6 +214,7 @@ const INITIAL_SURAT_KELUAR = [
   {
     id: 'SK-003',
     nomorSurat: 'Draft (Menunggu Nomor)',
+    agenda: '0003/SK/X/2026',
     unitPengusul: 'Kepaniteraan (Panmud Hukum)',
     pembuat: 'Ahmad Fauzi, S.H. (Panmud Hukum)',
     tujuanSurat: 'Pengadilan Tinggi Agama Surabaya',
@@ -224,6 +231,7 @@ const INITIAL_SURAT_KELUAR = [
   {
     id: 'SK-004',
     nomorSurat: 'Draft (Menunggu Paraf)',
+    agenda: '0004/SK/X/2026',
     unitPengusul: 'Kesekretariatan (Subbag TI & Pelaporan)',
     pembuat: 'Staf Subbag TI',
     tujuanSurat: 'Penyedia Layanan Jaringan Internet Telkom',
@@ -690,7 +698,7 @@ export function SuratProvider({ children }) {
   const addSuratMasuk = async (formData) => {
     const count = suratMasuk.length + 1;
     const newId = `SM-${String(count).padStart(3, '0')}`;
-    const agendaNo = `AGD-2026/X/SM-${String(count).padStart(4, '0')}`;
+    const agendaNo = formatAgendaSuratMasuk(count, formData.tanggalSurat || formData.tanggalTerima || new Date());
     const currentStatus = formData.status || 'Diregistrasi';
 
     const newLetter = {
@@ -756,10 +764,14 @@ export function SuratProvider({ children }) {
 
   // Add Surat Keluar Draft -> Simpan ke Supabase
   const addSuratKeluarDraft = async (draftData) => {
-    const newId = `SK-${String(suratKeluar.length + 1).padStart(3, '0')}`;
+    const count = suratKeluar.length + 1;
+    const newId = `SK-${String(count).padStart(3, '0')}`;
+    const agendaNo = formatAgendaSuratKeluar(count, draftData.tanggalSurat || new Date());
+
     const newDraft = {
       id: newId,
       nomorSurat: 'Draft (Menunggu Persetujuan Atasan)',
+      agenda: agendaNo,
       unitPengusul: draftData.unitPengusul || currentUser.department,
       pembuat: `${currentUser.name} (${currentUser.role})`,
       tujuanSurat: draftData.tujuanSurat,

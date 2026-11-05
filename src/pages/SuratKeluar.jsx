@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
+import { formatAgendaSuratKeluar } from '../constants/suratOptions';
 
 export default function SuratKeluar() {
   const {
@@ -200,6 +201,29 @@ export default function SuratKeluar() {
                   className="w-full h-10 px-3 rounded-btn bg-white border border-outline-subtle text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
                 />
               </div>
+
+              {/* Nomor Agenda Surat Keluar (Otomatis Sesuai Rumus) */}
+              <div className="space-y-1 md:col-span-2">
+                <label className="font-bold text-on-surface-variant flex items-center justify-between">
+                  <span>Nomor Agenda Surat Keluar (Otomatis & Terkunci)</span>
+                  <span className="text-[11px] font-normal text-primary">0001/SK/XI/2026</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    readOnly
+                    value={formatAgendaSuratKeluar(
+                      suratKeluar.length + 1,
+                      form.tanggalSurat || new Date()
+                    )}
+                    className="w-full h-10 px-3.5 rounded-btn bg-surface border border-outline-subtle text-xs font-code font-bold text-primary cursor-not-allowed"
+                  />
+                  <span className="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-outline">
+                    lock
+                  </span>
+                </div>
+                <p className="text-[11px] text-outline">Rumus: Nomor Urut / Surat Keluar / Bulan / Tahun</p>
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-outline-subtle">
@@ -248,7 +272,7 @@ export default function SuratKeluar() {
           <table className="w-full text-left border-collapse text-xs md:text-sm">
             <thead>
               <tr className="bg-surface border-b border-outline-subtle text-on-surface-variant text-xs uppercase tracking-wider font-semibold">
-                <th className="py-3 px-4">Nomor Surat Resmi</th>
+                <th className="py-3 px-4">Nomor & Agenda Resmi</th>
                 <th className="py-3 px-4">Tujuan Surat</th>
                 <th className="py-3 px-4">Perihal</th>
                 <th className="py-3 px-4">Pembuat & Unit</th>
@@ -258,7 +282,7 @@ export default function SuratKeluar() {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-subtle text-on-surface">
-              {filteredSurat.map((item) => {
+              {filteredSurat.map((item, idx) => {
                 const isApproved = item.status === 'Disetujui & Diterbitkan Nomor';
                 return (
                   <tr key={item.id} className="hover:bg-surface/50 transition-colors">
@@ -273,6 +297,9 @@ export default function SuratKeluar() {
                           <span>{item.nomorSurat}</span>
                         </div>
                       )}
+                      <div className="text-[11px] text-outline font-code">
+                        {item.agenda || formatAgendaSuratKeluar(idx + 1, item.tanggalSurat)}
+                      </div>
                       <div className="text-[10px] text-outline mt-0.5">Klasifikasi: {item.kodeKlasifikasi}</div>
                     </td>
                     <td className="py-3.5 px-4 font-semibold whitespace-nowrap">{item.tujuanSurat}</td>

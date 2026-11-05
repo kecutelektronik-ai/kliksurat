@@ -30,6 +30,7 @@ export function mapRowToSuratKeluar(row) {
   return {
     id: row.id,
     nomorSurat: row.nomor_surat || '',
+    agenda: row.agenda || '',
     unitPengusul: row.unit_pengusul || '',
     pembuat: row.pembuat || '',
     tujuanSurat: row.tujuan_surat || '',
@@ -81,6 +82,7 @@ export function mapSuratKeluarToRow(item) {
     id: item.id,
     jenis_surat: 'keluar',
     nomor_surat: item.nomorSurat,
+    agenda: item.agenda,
     unit_pengusul: item.unitPengusul,
     pembuat: item.pembuat,
     tujuan_surat: item.tujuanSurat,

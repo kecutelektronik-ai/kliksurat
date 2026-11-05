@@ -95,7 +95,7 @@ export default function Pelacakan() {
               type="text"
               value={searchLetter}
               onChange={(e) => setSearchLetter(e.target.value)}
-              placeholder="Masukkan Nomor Surat, Nomor Agenda (AGD-...), atau ID Surat..."
+              placeholder="Masukkan Nomor Surat, Nomor Agenda (misal: 0001/SM/XI/2026), atau ID Surat..."
               className="w-full h-11 pl-10 pr-4 rounded-btn border border-outline-subtle bg-surface text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
             />
           </div>

@@ -498,7 +498,7 @@ export default function WhatsApp() {
                     <div className="text-[#111B21] leading-relaxed space-y-1">
                       <p>Yth. Bapak/Ibu Pimpinan,</p>
                       <p>
-                        Terdapat <strong>Surat Masuk Baru</strong> dengan Nomor Agenda <span className="font-code text-primary font-bold">AGD-2026/X/SM-0012</span>:
+                        Terdapat <strong>Surat Masuk Baru</strong> dengan Nomor Agenda <span className="font-code text-primary font-bold">0001/SM/XI/2026</span>:
                       </p>
                       <div className="p-2 bg-gray-50 rounded border-l-2 border-primary text-[11px]">
                         <div><strong>No:</strong> 012/PA.Lmg/X/2026</div>

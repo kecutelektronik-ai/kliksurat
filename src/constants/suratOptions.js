@@ -81,3 +81,79 @@ export function getStatusBadge(status) {
       };
   }
 }
+
+/**
+ * Konversi Angka Bulan ke Angka Romawi
+ */
+export const ROMAN_MONTHS = {
+  1: 'I',
+  2: 'II',
+  3: 'III',
+  4: 'IV',
+  5: 'V',
+  6: 'VI',
+  7: 'VII',
+  8: 'VIII',
+  9: 'IX',
+  10: 'X',
+  11: 'XI',
+  12: 'XII',
+};
+
+export function getRomanMonth(dateInput) {
+  if (!dateInput) return 'XI';
+  let month = 11;
+  if (typeof dateInput === 'string' && dateInput.includes('-')) {
+    const parts = dateInput.split('-');
+    if (parts.length >= 2) {
+      month = parseInt(parts[1], 10);
+    }
+  } else {
+    const d = new Date(dateInput);
+    if (!isNaN(d.getTime())) {
+      month = d.getMonth() + 1;
+    }
+  }
+  return ROMAN_MONTHS[month] || 'XI';
+}
+
+export function getYearFromDate(dateInput) {
+  if (!dateInput) return '2026';
+  if (typeof dateInput === 'string' && dateInput.includes('-')) {
+    const parts = dateInput.split('-');
+    if (parts.length >= 1 && parts[0].length === 4) {
+      return parts[0];
+    }
+  }
+  const d = new Date(dateInput);
+  if (!isNaN(d.getTime())) {
+    return String(d.getFullYear());
+  }
+  return '2026';
+}
+
+/**
+ * Rumus Agenda Surat Masuk:
+ * {Nomor Urut 4 Digit}/SM/{Bulan Romawi}/{Tahun}
+ * Contoh: 0001/SM/XI/2026
+ */
+export function formatAgendaSuratMasuk(counter, dateInput = new Date()) {
+  const numStr = String(counter || 1).padStart(4, '0');
+  const roman = getRomanMonth(dateInput);
+  const year = getYearFromDate(dateInput);
+  return `${numStr}/SM/${roman}/${year}`;
+}
+
+/**
+ * Rumus Agenda Surat Keluar:
+ * {Nomor Urut 4 Digit}/SK/{Bulan Romawi}/{Tahun}
+ * Contoh: 0001/SK/XI/2026
+ */
+export function formatAgendaSuratKeluar(counter, dateInput = new Date()) {
+  const numStr = String(counter || 1).padStart(4, '0');
+  const roman = getRomanMonth(dateInput);
+  const year = getYearFromDate(dateInput);
+  return `${numStr}/SK/${roman}/${year}`;
+}
+
+

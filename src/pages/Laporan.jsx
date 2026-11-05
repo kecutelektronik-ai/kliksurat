@@ -260,7 +260,7 @@ export default function Laporan() {
       rows.push([
         'No',
         'Kode Klasifikasi',
-        'No Urut Agenda',
+        'No Agenda Surat Keluar',
         'Nomor Surat Resmi',
         'Tujuan Surat',
         'Tanggal Surat',
@@ -275,7 +275,7 @@ export default function Laporan() {
         rows.push([
           idx + 1,
           getKodeSurat(s),
-          s.nomorUrut || 'Draft',
+          s.agenda || (s.nomorUrut ? String(s.nomorUrut).padStart(4, '0') + '/SK/X/2026' : '-'),
           s.nomorSurat,
           s.tujuanSurat,
           s.tanggalSurat,
@@ -879,7 +879,7 @@ export default function Laporan() {
                 <tr className="bg-surface border-b border-outline-subtle text-on-surface-variant font-semibold text-xs uppercase">
                   <th className="py-3 px-3 w-12 text-center">No</th>
                   <th className="py-3 px-3 text-center">Kode</th>
-                  <th className="py-3 px-4">No. Urut</th>
+                  <th className="py-3 px-4">No. Agenda</th>
                   <th className="py-3 px-4">Nomor Naskah Keluar</th>
                   <th className="py-3 px-4">Tujuan Surat</th>
                   <th className="py-3 px-4">Tanggal Naskah</th>
@@ -913,7 +913,7 @@ export default function Laporan() {
                           </span>
                         </td>
                         <td className="py-3 px-4 font-code text-xs font-bold text-primary whitespace-nowrap">
-                          {s.nomorUrut || 'Draft'}
+                          {s.agenda || (s.nomorUrut ? String(s.nomorUrut).padStart(4, '0') + '/SK/X/2026' : '-')}
                         </td>
                         <td className="py-3 px-4 whitespace-nowrap">
                           <div className="font-code font-bold text-on-surface">{s.nomorSurat}</div>

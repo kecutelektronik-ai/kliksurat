@@ -728,7 +728,7 @@ export function generateWarkatHtml(surat) {
           </div>
           <div class="ptsp-receipt-row">
             <span>No. Agenda:</span>
-            <span class="ptsp-receipt-val">${surat.agenda || 'AGD-2026/SM-001'}</span>
+            <span class="ptsp-receipt-val">${surat.agenda || '0001/SM/XI/2026'}</span>
           </div>
           <div class="ptsp-receipt-row">
             <span>Tgl Terima:</span>
