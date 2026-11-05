@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
-import KopSurat from '../components/KopSurat';
+import logoInstansi from '../assets/logo-instansi.png';
 
 export default function Disposisi() {
   const {
@@ -20,32 +20,92 @@ export default function Disposisi() {
   const currentSurat = suratMasuk.find((s) => s.id === selectedLetterId) || suratMasuk[0];
   const existingDisposisi = disposisiList[selectedLetterId];
 
+  // 18 Petunjuk Resmi Mahkamah Agung (Gambar 26 Pedoman Tata Naskah Dinas MARI)
+  const OFFICIAL_PETUNJUK = [
+    'Setuju sesuai ketentuan yang berlaku',
+    'Tolak sesuai ketentuan yang berlaku',
+    'Selesaikan sesuai ketentuan yang berlaku',
+    'Jawab sesuai ketentuan yang berlaku',
+    'Perbaiki',
+    'Teliti & pendapat',
+    'Sesuai catatan',
+    'Untuk perhatian',
+    'Untuk diketahui',
+    'Edarkan',
+    'Bicarakan dengan saya',
+    'Bicarakan bersama dan laporkan hasilnya',
+    'Dijadwalkan',
+    'Simpan',
+    'Disiapkan',
+    'Ingatkan',
+    'Harap dihadiri/diwakili',
+    'Asli kepada',
+  ];
+
+  // 9 Jabatan Penerima Disposisi Pengadilan Agama Lumajang
+  const OFFICIAL_RECIPIENTS = [
+    'Wakil Ketua',
+    'Panitera',
+    'Sekretaris',
+    'Panitera Muda Permohonan',
+    'Panitera Muda Gugatan',
+    'Panitera Muda Hukum',
+    'Kasubbag Kepegawaian & Ortala',
+    'Kasubbag Perencanaan, TI & Pelaporan',
+    'Kasubbag Umum & Keuangan',
+  ];
+
+  // State Formulir Disposisi
   const [form, setForm] = useState({
-    sifatDisposisi: 'segera',
+    sifatDisposisi: 'segera', // 'sangat_segera' | 'segera'
     diteruskanKepada: ['Sekretaris', 'Panitera'],
-    instruksiPilihan: ['Tanggapi & tindak lanjuti', 'Hadiri / Wakili'],
+    petunjukPilihan: ['Selesaikan sesuai ketentuan yang berlaku', 'Harap dihadiri/diwakili'],
     isiArahan:
-      '1. Hadiri dan wakili pimpinan dalam agenda Rapat Koordinasi Wilayah PTA Surabaya tanggal 24 Oktober 2026.\n2. Siapkan rekapitulasi data perkara e-Court dan serapan anggaran DIPA 01 & 04 untuk bahan pemaparan resmi.',
-    catatanKhusus:
-      'Laporkan hasil rakor segera setelah kegiatan selesai dan koordinasikan penerbitan Surat Tugas (ST).',
+      '1. Hadiri dan wakili pimpinan dalam agenda koordinasi kedinasan.\n2. Siapkan data dukung teknis dan serapan anggaran untuk bahan konsinyir.',
+    catatanKhusus: 'Koordinasikan penerbitan Surat Tugas (ST) dan laporkan hasilnya segera.',
+    asliKepada: '',
+    tanggalKirim: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    diterimaOleh: 'Staf Bagian Umum / TU',
+    diajukanKembali: '',
+    diterimaTanggal: '',
+    tanggalKembali: '',
+    diterimaKembaliOleh: '',
   });
 
   useEffect(() => {
     if (existingDisposisi) {
       setForm({
-        sifatDisposisi: existingDisposisi.sifatDisposisi || 'segera',
+        sifatDisposisi: existingDisposisi.sifatDisposisi || currentSurat?.sifat || 'segera',
         diteruskanKepada: existingDisposisi.diteruskanKepada || ['Sekretaris'],
-        instruksiPilihan: existingDisposisi.instruksiPilihan || ['Tanggapi & tindak lanjuti'],
+        petunjukPilihan: existingDisposisi.instruksiPilihan || existingDisposisi.petunjukPilihan || [
+          'Selesaikan sesuai ketentuan yang berlaku',
+        ],
         isiArahan: existingDisposisi.isiArahan || '',
         catatanKhusus: existingDisposisi.catatanKhusus || '',
+        asliKepada: existingDisposisi.asliKepada || '',
+        tanggalKirim:
+          existingDisposisi.tanggalKirim ||
+          new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        diterimaOleh: existingDisposisi.diterimaOleh || 'Staf Bagian Umum / TU',
+        diajukanKembali: existingDisposisi.diajukanKembali || '',
+        diterimaTanggal: existingDisposisi.diterimaTanggal || '',
+        tanggalKembali: existingDisposisi.tanggalKembali || '',
+        diterimaKembaliOleh: existingDisposisi.diterimaKembaliOleh || '',
       });
     } else {
       setForm({
-        sifatDisposisi: currentSurat?.sifat || 'segera',
+        sifatDisposisi: currentSurat?.sifat === 'sangat_segera' ? 'sangat_segera' : 'segera',
         diteruskanKepada: ['Sekretaris'],
-        instruksiPilihan: ['Tanggapi & tindak lanjuti'],
-        isiArahan: `Mohon ditindaklanjuti sesuai ketentuan naskah dinas resmi terkait ${currentSurat?.perihal || ''}.`,
+        petunjukPilihan: ['Selesaikan sesuai ketentuan yang berlaku'],
+        isiArahan: `Mohon diteliti dan diselesaikan sesuai ketentuan naskah dinas resmi terkait ${currentSurat?.perihal || ''}.`,
         catatanKhusus: '',
+        asliKepada: '',
+        tanggalKirim: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        diterimaOleh: 'Staf Bagian Umum / TU',
+        diajukanKembali: '',
+        diterimaTanggal: '',
+        tanggalKembali: '',
+        diterimaKembaliOleh: '',
       });
     }
   }, [selectedLetterId, existingDisposisi, currentSurat]);
@@ -62,14 +122,14 @@ export default function Disposisi() {
     });
   };
 
-  const toggleInstruction = (instruction) => {
+  const togglePetunjuk = (petunjuk) => {
     setForm((prev) => {
-      const exists = prev.instruksiPilihan.includes(instruction);
+      const exists = prev.petunjukPilihan.includes(petunjuk);
       return {
         ...prev,
-        instruksiPilihan: exists
-          ? prev.instruksiPilihan.filter((x) => x !== instruction)
-          : [...prev.instruksiPilihan, instruction],
+        petunjukPilihan: exists
+          ? prev.petunjukPilihan.filter((x) => x !== petunjuk)
+          : [...prev.petunjukPilihan, petunjuk],
       };
     });
   };
@@ -77,29 +137,14 @@ export default function Disposisi() {
   const handleSave = (e) => {
     e.preventDefault();
     if (form.diteruskanKepada.length === 0) {
-      showToast('Pilih minimal satu pejabat penerima disposisi', 'warning');
+      showToast('Pilih minimal satu jabatan penerima disposisi', 'warning');
       return;
     }
-    saveDisposisi(selectedLetterId, form);
+    saveDisposisi(selectedLetterId, {
+      ...form,
+      instruksiPilihan: form.petunjukPilihan,
+    });
   };
-
-  const RECIPIENT_OPTIONS = [
-    { name: 'Sekretaris', official: 'Bpk. H. M. Ridwan, S.H.', unit: 'Kesekretariatan' },
-    { name: 'Panitera', official: 'Ibu Dra. Hj. Nurjanah, M.H.', unit: 'Kepaniteraan Perkara' },
-    { name: 'Wakil Ketua', official: 'Drs. H. Syamsul Hadi, M.H.', unit: 'Pimpinan / Pengawasan' },
-    { name: 'Panitera Muda Hukum', official: 'Ahmad Fauzi, S.H.', unit: 'Dokumentasi & Laporan' },
-    { name: 'Panitera Muda Gugatan', official: 'H. Suwandi, S.H.', unit: 'Administrasi Gugatan' },
-    { name: 'Kasubbag Kepegawaian', official: 'Siti Aminah, S.E.', unit: 'Kepegawaian & Ortala' },
-  ];
-
-  const STANDARD_INSTRUCTIONS = [
-    'Tanggapi & tindak lanjuti',
-    'Hadiri / Wakili',
-    'Koordinasikan',
-    'Teliti & siapkan bahan',
-    'Simpan / Arsipkan',
-    'Jadwalkan dalam agenda',
-  ];
 
   return (
     <div className="space-y-6">
@@ -109,18 +154,20 @@ export default function Disposisi() {
           <div className="flex items-center gap-1.5 text-xs text-outline mb-1">
             <span>Manajemen Persuratan</span>
             <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span className="text-primary font-semibold">Disposisi Surat</span>
+            <span className="text-primary font-semibold">Disposisi Surat Masuk</span>
             <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-            <span>Format Standar SEKMA RI</span>
+            <span>Standar Gambar 26 SEKMA RI</span>
           </div>
-          <h2 className="text-2xl font-bold text-on-surface tracking-tight">Disposisi Surat Masuk</h2>
+          <h2 className="text-2xl font-bold text-on-surface tracking-tight">
+            Lembar Disposisi Surat Masuk
+          </h2>
           <p className="text-xs md:text-sm text-outline">
-            Pemberian arahan pimpinan, lembar kendali disposisi resmi, dan penyerahan berkas naskah dinas yudisial.
+            Pemberian arahan pimpinan sesuai format baku Mahkamah Agung RI dengan Kop Surat resmi Pengadilan Agama Lumajang.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Surat Selector Dropdown */}
+          {/* Pilihan Surat */}
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-outline">Pilih Surat:</span>
             <select
@@ -133,7 +180,7 @@ export default function Disposisi() {
             >
               {suratMasuk.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.nomorSurat} - {s.asalSurat.slice(0, 20)}
+                  {s.nomorSurat} - {s.asalSurat?.slice(0, 24)}
                 </option>
               ))}
             </select>
@@ -141,7 +188,8 @@ export default function Disposisi() {
 
           <button
             onClick={() => window.print()}
-            className="h-10 px-4 rounded-btn bg-white border border-outline-subtle hover:bg-surface text-on-surface text-xs font-semibold flex items-center gap-2 shadow-2xs transition-colors"
+            className="h-10 px-4 rounded-btn bg-primary hover:bg-primary-dark text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all"
+            title="Cetak lembar disposisi resmi format A4"
           >
             <span className="material-symbols-outlined text-[18px]">print</span>
             <span>Cetak Lembar Disposisi</span>
@@ -169,11 +217,17 @@ export default function Disposisi() {
               {currentSurat?.perihal}
             </h3>
             <div className="flex flex-wrap items-center gap-4 text-xs text-outline">
-              <span>Pengirim: <strong className="text-on-surface">{currentSurat?.asalSurat}</strong></span>
+              <span>
+                Pengirim: <strong className="text-on-surface">{currentSurat?.asalSurat}</strong>
+              </span>
               <span>•</span>
-              <span>Tgl Surat: <strong className="text-on-surface">{currentSurat?.tanggalSurat}</strong></span>
+              <span>
+                Tgl Surat: <strong className="text-on-surface">{currentSurat?.tanggalSurat}</strong>
+              </span>
               <span>•</span>
-              <span>Lampiran: <strong className="text-on-surface">{currentSurat?.lampiran}</strong></span>
+              <span>
+                Lampiran: <strong className="text-on-surface">{currentSurat?.lampiran}</strong>
+              </span>
             </div>
           </div>
 
@@ -193,328 +247,456 @@ export default function Disposisi() {
         </div>
       </div>
 
-      {/* Bento Grid: Form Arahan (Left) & Pratinjau Lembar Disposisi SEKMA RI (Right) */}
+      {/* Grid: Formulir Arahan Disposisi (Kiri) & Pratinjau Standar Gambar 26 SEKMA (Kanan) */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        {/* Left: Form Arahan Disposisi (6 cols) */}
-        <section className="xl:col-span-6 bg-white rounded-card border border-outline-subtle shadow-2xs p-5 md:p-6 space-y-5 no-print">
+        {/* SISI KIRI: Formulir Arahan Disposisi (5 Kolom) */}
+        <section className="xl:col-span-5 bg-white rounded-card border border-outline-subtle shadow-2xs p-5 md:p-6 space-y-5 no-print">
           <div className="flex items-center justify-between border-b border-outline-subtle pb-3">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-[22px]">draw</span>
-              <h3 className="text-base font-bold text-on-surface">Formulir Arahan Disposisi Pimpinan</h3>
+              <h3 className="text-base font-bold text-on-surface">Formulir Disposisi Pimpinan</h3>
             </div>
             <span className="text-xs text-outline font-code">
-              Lembar Kendali No: {existingDisposisi?.nomorLembar || `LK-${currentSurat?.id.replace('SM-', '')}`}
+              Agenda: {currentSurat?.agenda}
             </span>
           </div>
 
           {plhConfig?.isActive && (
             <div className="p-3 rounded-lg bg-warning-light/80 border border-warning/50 text-amber-950 text-xs flex items-center justify-between gap-2 shadow-2xs">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px] text-amber-800 font-bold">how_to_reg</span>
+                <span className="material-symbols-outlined text-amber-700 text-[18px]">shield</span>
                 <span>
-                  <strong>Plh. Ketua Aktif:</strong> Mandat disposisi dijalankan oleh {plhConfig.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim yang Ditunjuk' : 'Wakil Ketua'} (<strong>{plhConfig.pejabatPlh?.name}</strong>) selama {plhConfig.tipePelimpahan === 'hakim_ditunjuk' ? 'Ketua & Wakil Ketua berhalangan bersamaan' : 'Ketua cuti'}.
+                  Penandatangan: <strong>{plhConfig.pejabatPlh.name}</strong> (
+                  {plhConfig.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim yang Ditunjuk' : 'Wakil Ketua'})
                 </span>
               </div>
-              <span className="font-code font-bold text-[10px] bg-warning px-1.5 py-0.5 rounded text-slate-950 shrink-0">
-                {plhConfig.nomorSK}
-              </span>
             </div>
           )}
 
-          <form onSubmit={handleSave} className="space-y-4 text-xs md:text-sm">
-            {/* Diteruskan Kepada */}
-            <div className="space-y-2">
-              <label className="block font-bold text-on-surface">
-                Diteruskan Kepada Yth:
-                <span className="text-xs font-normal text-outline ml-1">(Pilih satu atau lebih)</span>
+          <form onSubmit={handleSave} className="space-y-4 text-xs">
+            {/* Sifat Disposisi (SANGAT SEGERA vs SEGERA) */}
+            <div>
+              <label className="font-bold text-on-surface block mb-1.5">
+                Tingkat Kecepatan Disposisi:
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {RECIPIENT_OPTIONS.map((rec) => {
-                  const isChecked = form.diteruskanKepada.includes(rec.name);
-                  return (
-                    <label
-                      key={rec.name}
-                      onClick={() => toggleForwardRecipient(rec.name)}
-                      className={`p-2.5 rounded-btn border cursor-pointer flex items-start gap-2.5 transition-all ${
-                        isChecked
-                          ? 'border-primary bg-primary-light/50 text-primary font-semibold shadow-2xs'
-                          : 'border-outline-subtle bg-white hover:bg-surface text-on-surface'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => {}}
-                        className="mt-0.5 rounded text-primary focus:ring-primary"
-                      />
-                      <div className="text-xs">
-                        <div className="font-bold">{rec.name}</div>
-                        <div className="text-[11px] text-outline font-normal">{rec.official}</div>
-                      </div>
-                    </label>
-                  );
-                })}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, sifatDisposisi: 'sangat_segera' })}
+                  className={`h-9 px-3 rounded-btn border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+                    form.sifatDisposisi === 'sangat_segera'
+                      ? 'bg-danger text-white border-danger shadow-xs'
+                      : 'bg-surface text-on-surface border-outline-subtle hover:bg-surface-low'
+                  }`}
+                >
+                  <span>{form.sifatDisposisi === 'sangat_segera' ? '☑' : '☐'}</span>
+                  <span>SANGAT SEGERA</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, sifatDisposisi: 'segera' })}
+                  className={`h-9 px-3 rounded-btn border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+                    form.sifatDisposisi === 'segera'
+                      ? 'bg-primary text-white border-primary shadow-xs'
+                      : 'bg-surface text-on-surface border-outline-subtle hover:bg-surface-low'
+                  }`}
+                >
+                  <span>{form.sifatDisposisi === 'segera' ? '☑' : '☐'}</span>
+                  <span>SEGERA</span>
+                </button>
               </div>
             </div>
 
-            {/* Sifat Disposisi */}
-            <div className="space-y-1">
-              <label className="block font-bold text-on-surface">Sifat Disposisi</label>
-              <select
-                value={form.sifatDisposisi}
-                onChange={(e) => setForm({ ...form, sifatDisposisi: e.target.value })}
-                className="w-full h-10 px-3 rounded-btn border border-outline-subtle bg-white text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-              >
-                <option value="biasa">Biasa (Standar SOP)</option>
-                <option value="segera">Segera (2 x 24 Jam)</option>
-                <option value="sangat_segera">Sangat Segera (Hari Ini)</option>
-                <option value="rahasia">Rahasia (Terbatas)</option>
-              </select>
-            </div>
-
-            {/* Instruksi Standar MARI */}
-            <div className="space-y-2">
-              <label className="block font-bold text-on-surface">
-                Instruksi Standar Sekretaris Mahkamah Agung RI:
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                {STANDARD_INSTRUCTIONS.map((inst) => {
-                  const isSelected = form.instruksiPilihan.includes(inst);
+            {/* Disposisi Kepada (9 Jabatan Resmi) */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="font-bold text-on-surface">Disposisi Kepada:</label>
+                <span className="text-[11px] text-primary font-semibold">
+                  {form.diteruskanKepada.length} dipilih
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 p-2 rounded-lg border border-outline-subtle bg-surface/50 max-h-48 overflow-y-auto">
+                {OFFICIAL_RECIPIENTS.map((rec) => {
+                  const isChecked = form.diteruskanKepada.includes(rec);
                   return (
                     <button
-                      key={inst}
+                      key={rec}
                       type="button"
-                      onClick={() => toggleInstruction(inst)}
-                      className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                        isSelected
-                          ? 'bg-primary text-white shadow-2xs'
-                          : 'bg-surface border border-outline-subtle text-on-surface-variant hover:border-primary hover:text-primary'
+                      onClick={() => toggleForwardRecipient(rec)}
+                      className={`px-2.5 py-1.5 rounded text-left text-xs font-medium flex items-center gap-2 transition-all ${
+                        isChecked
+                          ? 'bg-primary text-white font-bold'
+                          : 'bg-white text-on-surface hover:bg-surface border border-outline-subtle'
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[14px]">
-                        {isSelected ? 'check' : 'add'}
-                      </span>
-                      <span>{inst}</span>
+                      <span className="text-xs">{isChecked ? '☑' : '☐'}</span>
+                      <span className="truncate">{rec}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Isi Arahan Pimpinan */}
-            <div className="space-y-1">
-              <label className="block font-bold text-on-surface">
-                Isi / Petunjuk Arahan Pimpinan:
-              </label>
-              <textarea
-                rows="4"
-                required
-                value={form.isiArahan}
-                onChange={(e) => setForm({ ...form, isiArahan: e.target.value })}
-                placeholder="Tuliskan petunjuk khusus pelaksanaan naskah dinas resmi..."
-                className="w-full p-3 rounded-btn border border-outline-subtle bg-white text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none leading-relaxed"
-              ></textarea>
+            {/* Petunjuk Resmi MARI (18 Petunjuk Gambar 26) */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="font-bold text-on-surface">Petunjuk Standar Mahkamah Agung:</label>
+                <span className="text-[11px] text-primary font-semibold">
+                  {form.petunjukPilihan.length} dipilih
+                </span>
+              </div>
+              <div className="space-y-1 p-2 rounded-lg border border-outline-subtle bg-surface/50 max-h-56 overflow-y-auto">
+                {OFFICIAL_PETUNJUK.map((petunjuk) => {
+                  const isChecked = form.petunjukPilihan.includes(petunjuk);
+                  const isAsli = petunjuk === 'Asli kepada';
+                  return (
+                    <div key={petunjuk} className="space-y-1">
+                      <button
+                        type="button"
+                        onClick={() => togglePetunjuk(petunjuk)}
+                        className={`w-full px-2.5 py-1.5 rounded text-left text-xs flex items-center gap-2 transition-all ${
+                          isChecked
+                            ? 'bg-primary-light text-primary font-bold border border-primary/40'
+                            : 'bg-white text-on-surface hover:bg-surface border border-outline-subtle'
+                        }`}
+                      >
+                        <span className="text-xs">{isChecked ? '☑' : '☐'}</span>
+                        <span className="flex-1">{petunjuk}</span>
+                      </button>
+                      {isAsli && isChecked && (
+                        <input
+                          type="text"
+                          placeholder="Ketik penerima naskah asli..."
+                          value={form.asliKepada}
+                          onChange={(e) => setForm({ ...form, asliKepada: e.target.value })}
+                          className="w-full h-8 px-2.5 text-xs rounded border border-primary/40 bg-white text-on-surface outline-none"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Catatan Khusus */}
-            <div className="space-y-1">
-              <label className="block font-bold text-on-surface">Catatan Tambahan:</label>
-              <input
-                type="text"
-                value={form.catatanKhusus}
-                onChange={(e) => setForm({ ...form, catatanKhusus: e.target.value })}
-                placeholder="misal: Laporkan hasil kegiatan segera setelah selesai..."
-                className="w-full h-10 px-3 rounded-btn border border-outline-subtle bg-white text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+            {/* Catatan Arahan Khusus Pimpinan */}
+            <div>
+              <label className="font-bold text-on-surface block mb-1">
+                Catatan / Arahan Tertulis Pimpinan:
+              </label>
+              <textarea
+                rows={4}
+                value={form.isiArahan}
+                onChange={(e) => setForm({ ...form, isiArahan: e.target.value })}
+                placeholder="Tuliskan arahan dan tindak lanjut konkret..."
+                className="w-full p-2.5 text-xs rounded border border-outline-subtle bg-surface text-on-surface focus:ring-2 focus:ring-primary/20 outline-none resize-none leading-relaxed"
               />
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-3 border-t border-outline-subtle flex justify-end gap-3">
+            {/* Bagian Pelacakan & Pengiriman Proses */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-outline-subtle">
+              <div>
+                <label className="text-[11px] font-semibold text-outline block mb-0.5">
+                  Tanggal Kirim:
+                </label>
+                <input
+                  type="text"
+                  value={form.tanggalKirim}
+                  onChange={(e) => setForm({ ...form, tanggalKirim: e.target.value })}
+                  className="w-full h-8 px-2 text-xs rounded border border-outline-subtle bg-surface"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-outline block mb-0.5">
+                  Diterima Oleh:
+                </label>
+                <input
+                  type="text"
+                  value={form.diterimaOleh}
+                  onChange={(e) => setForm({ ...form, diterimaOleh: e.target.value })}
+                  className="w-full h-8 px-2 text-xs rounded border border-outline-subtle bg-surface"
+                />
+              </div>
+            </div>
+
+            {/* Tombol Simpan & Tanda Tangani */}
+            <div className="pt-2">
               <button
                 type="submit"
-                className="w-full sm:w-auto h-11 px-6 rounded-btn bg-primary hover:bg-primary-dark text-white font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.99]"
+                className="w-full h-10 px-4 rounded-btn bg-primary hover:bg-primary-dark text-white font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-all"
               >
-                <span className="material-symbols-outlined text-[20px]">send</span>
-                <span>Teruskan Surat & Sahkan Disposisi</span>
+                <span className="material-symbols-outlined text-[18px]">verified</span>
+                <span>Simpan & Sahkan Disposisi (TTE)</span>
               </button>
             </div>
           </form>
         </section>
 
-        {/* Right: Pratinjau Lembar Disposisi Standar SEKMA RI (6 cols & print-area) */}
-        <section className="xl:col-span-6 space-y-3">
-          <div className="flex items-center justify-between no-print px-1">
-            <h3 className="text-sm font-bold text-on-surface flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-primary text-[18px]">description</span>
-              Pratinjau Lembar Disposisi Resmi (Format SEKMA RI)
+        {/* SISI KANAN: Pratinjau Lembar Disposisi Format Gambar 26 SEKMA RI (7 Kolom) */}
+        <section className="xl:col-span-7 space-y-3">
+          <div className="flex items-center justify-between no-print">
+            <h3 className="text-sm font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[20px]">description</span>
+              <span>Pratinjau Lembar Disposisi Resmi (Format Gambar 26 SEKMA RI)</span>
             </h3>
             <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-success-light text-success border border-success/30">
-              Dokumen Sah Digital
+              Format Standar Baku MARI
             </span>
           </div>
 
-          {/* DOCKET SHEET CONTAINER (Authentic Court Style) */}
-          <div className="print-clean bg-white rounded-card border-2 border-black/80 shadow-md p-6 sm:p-8 text-black relative font-sans text-xs">
-            {/* Watermark Logo Peradilan */}
-            <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] overflow-hidden select-none">
-              <span className="material-symbols-outlined text-[360px]">balance</span>
+          {/* DOCKET SHEET RESMI: REPRODUKSI PERSIS GAMBAR 26 */}
+          <div className="print-clean bg-white border-2 border-black text-black font-serif text-[11px] leading-tight shadow-md">
+            {/* 1. KOP SURAT PENGADILAN AGAMA LUMAJANG DENGAN LOGO */}
+            <div className="border-b border-black p-4 flex items-center justify-center gap-4">
+              <img
+                src={logoInstansi}
+                alt="Logo Pengadilan Agama Lumajang"
+                className="w-20 h-20 object-contain shrink-0"
+              />
+              <div className="flex-1 text-center text-black">
+                <div className="text-sm sm:text-base font-bold uppercase tracking-wider font-serif">
+                  MAHKAMAH AGUNG REPUBLIK INDONESIA
+                </div>
+                <div className="text-xs sm:text-sm font-bold uppercase tracking-wide mt-0.5 font-serif">
+                  DIREKTORAT JENDERAL BADAN PERADILAN AGAMA
+                </div>
+                <div className="text-xs sm:text-sm font-bold uppercase tracking-wide mt-0.5 font-serif">
+                  PENGADILAN TINGGI AGAMA SURABAYA
+                </div>
+                <div className="text-base sm:text-lg font-black uppercase tracking-wider mt-1 font-serif">
+                  PENGADILAN AGAMA LUMAJANG
+                </div>
+                <div className="text-[9.5px] sm:text-[10.5px] font-sans text-neutral-800 mt-1">
+                  Jalan Soekarno Hatta Nomor 11, Selokbesuki, Sukodono, Lumajang, Jawa Timur 67352
+                </div>
+                <div className="text-[9.5px] sm:text-[10.5px] font-sans text-neutral-800 mt-0.5">
+                  www.pa-lumajang.go.id, email: pa.lumajang@gmail.com, telepon (0334) 8781874
+                </div>
+              </div>
             </div>
 
-            {/* KOP RESMI PENGADILAN AGAMA LUMAJANG */}
-            <KopSurat compact={true} />
-            <div className="flex justify-center mb-4">
-              <span className="text-xs font-extrabold tracking-widest uppercase px-4 py-1 border border-black bg-gray-50 shadow-2xs">
-                {plhConfig?.isActive
-                  ? 'LEMBAR DISPOSISI PLH. KETUA PENGADILAN'
-                  : 'LEMBAR DISPOSISI KETUA PENGADILAN'}
-              </span>
+            {/* 2. JUDUL LEMBAR DISPOSISI */}
+            <div className="border-b border-black py-1.5 text-center font-bold text-sm sm:text-base tracking-widest uppercase font-serif">
+              LEMBAR DISPOSISI
             </div>
 
-            {/* GRID DOKUMEN RESMI MAHKAMAH AGUNG */}
-            <div className="border border-black rounded-xs overflow-hidden mb-4">
-              {/* Row 1: Nomor Agenda & Sifat */}
-              <div className="grid grid-cols-12 border-b border-black bg-gray-50">
-                <div className="col-span-6 p-2 border-r border-black">
-                  <span className="text-[10px] uppercase font-bold text-gray-600 block">Nomor Agenda / Registrasi:</span>
-                  <span className="font-code font-extrabold text-sm text-black">
-                    {currentSurat?.agenda}
-                  </span>
+            {/* 3. PERINGATAN / PERHATIAN */}
+            <div className="border-b border-black py-1 px-3 text-center font-bold text-[10px] sm:text-[10.5px] font-sans">
+              PERHATIAN: Dilarang memisahkan sehelai Naskah Dinas pun yang tergabung dalam berkas ini.
+            </div>
+
+            {/* 4. GRID METADATA NASKAH DINAS (3 Kolom Sesuai Format Referensi) */}
+            <div className="grid grid-cols-12 border-b border-black font-sans text-[11px]">
+              {/* Kolom 1 (Kiri) */}
+              <div className="col-span-5 p-2 border-r border-black space-y-1">
+                <div className="flex">
+                  <span className="w-36 font-semibold shrink-0">Nomor Naskah Dinas</span>
+                  <span className="mr-1.5">:</span>
+                  <span className="font-bold font-code break-all">{currentSurat?.nomorSurat}</span>
                 </div>
-                <div className="col-span-6 p-2">
-                  <span className="text-[10px] uppercase font-bold text-gray-600 block">Tingkat Keamanan / Sifat:</span>
-                  <span className="font-extrabold text-xs text-red-700 uppercase">
-                    {form.sifatDisposisi.toUpperCase()} / PRIORITAS
-                  </span>
+                <div className="flex">
+                  <span className="w-36 font-semibold shrink-0">Tanggal Naskah Dinas</span>
+                  <span className="mr-1.5">:</span>
+                  <span>{currentSurat?.tanggalSurat}</span>
+                </div>
+                <div className="flex">
+                  <span className="w-36 font-semibold shrink-0">Lampiran</span>
+                  <span className="mr-1.5">:</span>
+                  <span className="truncate">{currentSurat?.lampiran || '-'}</span>
                 </div>
               </div>
 
-              {/* Row 2: Tanggal Terima & Nomor Surat */}
-              <div className="grid grid-cols-12 border-b border-black">
-                <div className="col-span-6 p-2 border-r border-black">
-                  <span className="text-[10px] uppercase font-bold text-gray-600 block">Tanggal Penerimaan:</span>
-                  <span className="font-semibold text-black">{currentSurat?.tanggalTerima?.replace('T', ' ')} WIB</span>
+              {/* Kolom 2 (Tengah) */}
+              <div className="col-span-3 p-2 border-r border-black space-y-1">
+                <div className="flex">
+                  <span className="w-14 font-semibold shrink-0">Status</span>
+                  <span className="mr-1">:</span>
+                  <span>{currentSurat?.status || 'Didisposisi'}</span>
                 </div>
-                <div className="col-span-6 p-2">
-                  <span className="text-[10px] uppercase font-bold text-gray-600 block">Nomor Surat Asal:</span>
-                  <span className="font-bold text-black font-code">{currentSurat?.nomorSurat}</span>
+                <div className="flex">
+                  <span className="w-14 font-semibold shrink-0">Sifat</span>
+                  <span className="mr-1">:</span>
+                  <span className="uppercase font-semibold">{form.sifatDisposisi.replace('_', ' ')}</span>
                 </div>
-              </div>
-
-              {/* Row 3: Tanggal Surat & Asal Pengirim */}
-              <div className="grid grid-cols-12 border-b border-black">
-                <div className="col-span-6 p-2 border-r border-black">
-                  <span className="text-[10px] uppercase font-bold text-gray-600 block">Tanggal Surat Masuk:</span>
-                  <span className="font-semibold text-black">{currentSurat?.tanggalSurat}</span>
-                </div>
-                <div className="col-span-6 p-2">
-                  <span className="text-[10px] uppercase font-bold text-gray-600 block">Asal Instansi Pengirim:</span>
-                  <span className="font-bold text-black">{currentSurat?.asalSurat}</span>
+                <div className="flex">
+                  <span className="w-14 font-semibold shrink-0">Jenis</span>
+                  <span className="mr-1">:</span>
+                  <span>Surat Masuk</span>
                 </div>
               </div>
 
-              {/* Row 4: Perihal */}
-              <div className="p-2 border-b border-black bg-gray-50">
-                <span className="text-[10px] uppercase font-bold text-gray-600 block">Perihal / Ringkasan Isi Naskah:</span>
-                <p className="font-bold text-black mt-0.5 leading-snug">{currentSurat?.perihal}</p>
+              {/* Kolom 3 (Kanan) */}
+              <div className="col-span-4 p-2 space-y-1">
+                <div className="flex">
+                  <span className="w-32 font-semibold shrink-0">Diterima Tanggal</span>
+                  <span className="mr-1.5">:</span>
+                  <span>{currentSurat?.tanggalTerima?.slice(0, 10) || currentSurat?.tanggalSurat}</span>
+                </div>
+                <div className="flex">
+                  <span className="w-32 font-semibold shrink-0">Nomor Agenda</span>
+                  <span className="mr-1.5">:</span>
+                  <span className="font-bold font-code text-black">{currentSurat?.agenda}</span>
+                </div>
               </div>
+            </div>
 
-              {/* Row 5: Diteruskan Kepada Matriks */}
-              <div className="p-2.5 border-b border-black">
-                <span className="text-[10px] uppercase font-extrabold text-black block mb-1.5">
-                  DITERUSKAN KEPADA YTH:
+            {/* DARI & HAL */}
+            <div className="border-b border-black p-2 font-sans text-[11px] space-y-1">
+              <div className="flex">
+                <span className="w-16 font-semibold shrink-0">Dari</span>
+                <span className="mr-1.5">:</span>
+                <span className="font-bold">{currentSurat?.asalSurat}</span>
+              </div>
+              <div className="flex">
+                <span className="w-16 font-semibold shrink-0">Hal</span>
+                <span className="mr-1.5">:</span>
+                <span className="font-medium leading-snug">{currentSurat?.perihal}</span>
+              </div>
+            </div>
+
+            {/* 5. CHECKBOX SIFAT: SANGAT SEGERA vs SEGERA */}
+            <div className="grid grid-cols-2 border-b border-black font-sans text-xs font-bold text-center">
+              <div className="p-1.5 border-r border-black flex items-center justify-center gap-2">
+                <span className="inline-block w-4 h-4 border border-black text-xs leading-none text-center font-bold">
+                  {form.sifatDisposisi === 'sangat_segera' ? '✓' : ''}
                 </span>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  {RECIPIENT_OPTIONS.map((rec) => {
-                    const isChecked = form.diteruskanKepada.includes(rec.name);
+                <span>SANGAT SEGERA</span>
+              </div>
+              <div className="p-1.5 flex items-center justify-center gap-2">
+                <span className="inline-block w-4 h-4 border border-black text-xs leading-none text-center font-bold">
+                  {form.sifatDisposisi === 'segera' ? '✓' : ''}
+                </span>
+                <span>SEGERA</span>
+              </div>
+            </div>
+
+            {/* 6. MAIN BODY (Kiri: DISPOSISI KEPADA + CATATAN, Kanan: 18 PETUNJUK) */}
+            <div className="grid grid-cols-12 border-b border-black font-sans text-[11px]">
+              {/* Kolom Kiri: DISPOSISI KEPADA (Atas) & CATATAN (Bawah) */}
+              <div className="col-span-5 border-r border-black flex flex-col justify-between">
+                {/* DISPOSISI KEPADA */}
+                <div className="p-2.5 space-y-1.5">
+                  <div className="font-bold underline text-xs mb-2">DISPOSISI KEPADA:</div>
+                  {OFFICIAL_RECIPIENTS.map((rec) => {
+                    const isChecked = form.diteruskanKepada.includes(rec);
                     return (
-                      <div key={rec.name} className="flex items-center gap-1.5">
-                        <span className={`w-3.5 h-3.5 border border-black flex items-center justify-center text-[10px] font-bold ${isChecked ? 'bg-black text-white' : ''}`}>
+                      <div key={rec} className="flex items-center gap-2 leading-tight">
+                        <span className="w-3.5 h-3.5 border border-black flex items-center justify-center text-[10px] font-bold shrink-0">
                           {isChecked ? '✓' : ''}
                         </span>
-                        <span className={isChecked ? 'font-bold text-black' : 'text-gray-700'}>
-                          {rec.name}
+                        <span className={isChecked ? 'font-bold' : 'text-neutral-800'}>
+                          {rec}
                         </span>
                       </div>
                     );
                   })}
                 </div>
-              </div>
 
-              {/* Row 6: Instruksi Standar MARI */}
-              <div className="p-2.5 border-b border-black bg-gray-50">
-                <span className="text-[10px] uppercase font-extrabold text-black block mb-1.5">
-                  DISPOSISI / PETUNJUK STANDAR SEKMA RI:
-                </span>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  {STANDARD_INSTRUCTIONS.map((inst) => {
-                    const isChecked = form.instruksiPilihan.includes(inst);
-                    return (
-                      <div key={inst} className="flex items-center gap-1.5">
-                        <span className={`w-3.5 h-3.5 border border-black flex items-center justify-center text-[10px] font-bold ${isChecked ? 'bg-black text-white' : ''}`}>
-                          {isChecked ? '✓' : ''}
-                        </span>
-                        <span className={isChecked ? 'font-bold text-black' : 'text-gray-700'}>
-                          {inst}
-                        </span>
+                {/* CATATAN PIMPINAN */}
+                <div className="border-t border-black p-2.5 min-h-[140px] flex-1 flex flex-col">
+                  <div className="font-bold underline text-xs mb-1.5">CATATAN:</div>
+                  <div className="whitespace-pre-line text-[11px] font-medium text-black leading-relaxed flex-1">
+                    {form.isiArahan || 'Mohon ditindaklanjuti sesuai ketentuan yang berlaku.'}
+                    {form.catatanKhusus && (
+                      <div className="mt-2 text-neutral-700 italic border-t border-neutral-300 pt-1">
+                        Catatan: {form.catatanKhusus}
                       </div>
-                    );
-                  })}
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Row 7: Catatan Khusus & Arahan */}
-              <div className="p-3">
-                <span className="text-[10px] uppercase font-extrabold text-black block mb-1">
-                  CATATAN / ARAHAN KHUSUS PIMPINAN:
-                </span>
-                <div className="p-2 border border-dashed border-gray-400 bg-white min-h-[70px] whitespace-pre-line text-xs font-medium text-black leading-relaxed">
-                  {form.isiArahan || 'Belum ada catatan arahan.'}
-                  {form.catatanKhusus && (
-                    <div className="mt-2 pt-1 border-t border-gray-200 text-gray-700 font-normal italic">
-                      Catatan: {form.catatanKhusus}
+              {/* Kolom Kanan: PETUNJUK RESMI (18 Item Sesuai Format Gambar 26) */}
+              <div className="col-span-7 p-2.5 space-y-1.5">
+                <div className="font-bold underline text-xs mb-2">PETUNJUK:</div>
+                {OFFICIAL_PETUNJUK.map((petunjuk) => {
+                  const isChecked = form.petunjukPilihan.includes(petunjuk);
+                  const isAsli = petunjuk === 'Asli kepada';
+                  return (
+                    <div key={petunjuk} className="flex items-center gap-2 leading-tight">
+                      <span className="w-3.5 h-3.5 border border-black flex items-center justify-center text-[10px] font-bold shrink-0">
+                        {isChecked ? '✓' : ''}
+                      </span>
+                      <span className={isChecked ? 'font-bold' : 'text-neutral-800'}>
+                        {petunjuk}
+                        {isAsli && (
+                          <span className="ml-1 text-neutral-800 underline font-normal">
+                            {form.asliKepada ? ` ${form.asliKepada}` : ' .........................'}
+                          </span>
+                        )}
+                      </span>
                     </div>
-                  )}
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 7. KISI ALUR PROSES & PENERIMAAN (4 Kotak Bawah Sesuai Gambar 26) */}
+            {/* Baris Bawah 1 */}
+            <div className="grid grid-cols-2 border-b border-black font-sans text-[10.5px]">
+              <div className="p-2 border-r border-black space-y-1">
+                <div>
+                  Tanggal Kirim untuk Proses :{' '}
+                  <span className="font-semibold">{form.tanggalKirim || '-'}</span>
+                </div>
+                <div>
+                  Diterima Oleh :{' '}
+                  <span className="font-semibold">{form.diterimaOleh || '-'}</span>
+                </div>
+              </div>
+              <div className="p-2 space-y-1">
+                <div>
+                  Diajukan Kembali Tanggal :{' '}
+                  <span className="font-semibold">{form.diajukanKembali || '...........................'}</span>
+                </div>
+                <div>
+                  Diterima Tanggal :{' '}
+                  <span className="font-semibold">{form.diterimaTanggal || '...........................'}</span>
                 </div>
               </div>
             </div>
 
-            {/* TANDA TANGAN ELEKTRONIK & STEMPEL PERADILAN */}
-            <div className="pt-2 flex justify-between items-end">
-              <div className="text-[10px] text-gray-600">
-                <p>Dokumen ini disahkan secara elektronik melalui aplikasi KlikDispos (Kanal Layanan Instan Kendali Disposisi & Surat).</p>
-                <p className="font-code font-semibold">TTE ID: {existingDisposisi?.tandaTanganElektronik?.sha256 || '9F8A...2026-MARI'}</p>
+            {/* Baris Bawah 2: Tanggal Selesai & Pengesahan Pimpinan */}
+            <div className="grid grid-cols-2 font-sans text-[10.5px]">
+              <div className="p-2 border-r border-black space-y-1">
+                <div>
+                  Tanggal Kembali untuk Proses :{' '}
+                  <span className="font-semibold">{form.tanggalKembali || '...........................'}</span>
+                </div>
+                <div>
+                  Diterima Oleh :{' '}
+                  <span className="font-semibold">{form.diterimaKembaliOleh || '...........................'}</span>
+                </div>
               </div>
 
-              <div className="text-center w-64">
-                <p className="text-[11px] font-bold text-black">
-                  {existingDisposisi?.tandaTanganElektronik?.jabatan?.includes('Plh') || plhConfig?.isActive
-                    ? (plhConfig?.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim Senior selaku Plh. Ketua,' : 'Plh. Ketua Pengadilan Agama Lumajang,')
-                    : 'Ketua Pengadilan Agama Lumajang,'}
-                </p>
-                {/* Digital Stamp Simulation */}
-                <div className="my-2 p-1.5 border border-dashed border-primary rounded-md inline-block bg-primary-light/20">
-                  <div className="text-[10px] font-bold text-primary flex items-center justify-center gap-1">
-                    <span className="material-symbols-outlined text-[16px]">verified</span>
-                    <span>TERVERIFIKASI TTE</span>
-                  </div>
-                  <div className="text-[9px] text-gray-600 font-code">
-                    {existingDisposisi?.tandaTanganElektronik?.waktuSertifikasi || '04 Nov 2026 09:15 WIB'}
-                  </div>
+              <div className="p-2 flex flex-col justify-between">
+                <div>
+                  Tanggal selesai dari {plhConfig?.isActive ? 'Plh. Ketua' : 'Ketua'} :{' '}
+                  <span className="font-semibold">
+                    {existingDisposisi?.tanggalDisposisi?.slice(0, 10) || form.tanggalKirim}
+                  </span>
                 </div>
-                <p className="font-extrabold text-black underline text-xs">
-                  {existingDisposisi?.tandaTanganElektronik?.penandatangan ||
-                    (plhConfig?.isActive ? plhConfig.pejabatPlh.name : plhConfig.pejabatAsal.name)}
-                </p>
-                <p className="text-[10px] text-gray-700">
-                  NIP. {existingDisposisi?.tandaTanganElektronik?.penandatangan === plhConfig.pejabatAsal.name
-                    ? plhConfig.pejabatAsal.nip
-                    : (plhConfig?.isActive ? plhConfig.pejabatPlh.nip : plhConfig.pejabatAsal.nip)}
-                </p>
-                {plhConfig?.isActive && (
-                  <p className="text-[9px] text-gray-500 font-code mt-0.5">
-                    (SK Plh: {plhConfig.nomorSK})
+
+                {/* Box Pengesahan TTE Resmi */}
+                <div className="mt-2 text-center">
+                  <div className="inline-block px-2 py-0.5 border border-dashed border-primary bg-primary-light/20 rounded mb-1">
+                    <span className="text-[9px] font-bold text-primary flex items-center justify-center gap-1 font-sans">
+                      <span className="material-symbols-outlined text-[13px]">verified</span>
+                      <span>TERVERIFIKASI TTE MAHKAMAH AGUNG</span>
+                    </span>
+                  </div>
+                  <p className="font-bold underline text-xs font-serif">
+                    {existingDisposisi?.tandaTanganElektronik?.penandatangan ||
+                      (plhConfig?.isActive ? plhConfig.pejabatPlh.name : plhConfig.pejabatAsal.name)}
                   </p>
-                )}
+                  <p className="text-[10px] text-neutral-700 font-sans">
+                    {plhConfig?.isActive
+                      ? (plhConfig.tipePelimpahan === 'hakim_ditunjuk'
+                          ? 'Hakim Senior selaku Plh. Ketua'
+                          : 'Wakil Ketua selaku Plh. Ketua')
+                      : 'Ketua Pengadilan Agama Lumajang'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

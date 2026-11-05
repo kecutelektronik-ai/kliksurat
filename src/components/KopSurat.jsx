@@ -68,3 +68,4 @@ export default function KopSurat({ className = '', compact = false }) {
     </div>
   );
 }
+
