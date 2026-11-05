@@ -14,7 +14,7 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
     { id: 'pelacakan', label: 'Pelacakan Surat', icon: 'track_changes' },
     { id: 'arsip', label: 'Arsip Surat', icon: 'archive' },
     { id: 'pengaturan-nomor', label: 'Pengaturan Nomor Surat', icon: 'pin' },
-    { id: 'laporan', label: 'Laporan', icon: 'assessment' },
+    { id: 'laporan', label: 'Rekapitulasi & Laporan', icon: 'assessment' },
     { id: 'pimpinan', label: 'Halaman Pimpinan', icon: 'shield_person', badge: 'Khusus' },
     {
       id: 'kewenangan-plh',

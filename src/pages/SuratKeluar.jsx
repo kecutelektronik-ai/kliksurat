@@ -78,7 +78,15 @@ export default function SuratKeluar() {
           </p>
         </div>
 
-        <div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigateTo('laporan')}
+            className="h-10 px-3.5 rounded-btn bg-white border border-outline-subtle text-primary hover:bg-surface text-xs md:text-sm font-semibold flex items-center gap-1.5 shadow-2xs transition-all"
+            title="Buka buku agenda rekapitulasi surat keluar per bulan dan per kode surat"
+          >
+            <span className="material-symbols-outlined text-[18px]">assessment</span>
+            <span>Rekap Bulanan & Kode</span>
+          </button>
           <button
             onClick={() => setShowForm(!showForm)}
             className="h-10 px-4 rounded-btn bg-primary hover:bg-primary-dark text-white text-xs md:text-sm font-semibold flex items-center gap-2 shadow-xs transition-all"
