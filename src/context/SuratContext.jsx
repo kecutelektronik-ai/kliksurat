@@ -129,7 +129,7 @@ const INITIAL_SURAT_MASUK = [
     tanggalSurat: '2026-10-16',
     tanggalTerima: '2026-10-18T11:00',
     sifat: 'segera',
-    status: 'Diproses',
+    status: 'Dalam Tindak Lanjut',
     lampiran: '2 Berkas Excel & SK Formasi',
     fileScan: 'Verifikasi_Kenaikan_Pangkat_April2027.pdf',
     fileSize: '4.8 MB',
@@ -146,7 +146,7 @@ const INITIAL_SURAT_MASUK = [
     tanggalSurat: '2026-10-14',
     tanggalTerima: '2026-10-16T10:00',
     sifat: 'biasa',
-    status: 'Didisposisi',
+    status: 'Telah Didisposisi',
     lampiran: '1 Berkas PDF (Pedoman Mutu)',
     fileScan: 'Juknis_Audit_Aksesibilitas_MARI.pdf',
     fileSize: '1.9 MB',
@@ -163,7 +163,7 @@ const INITIAL_SURAT_MASUK = [
     tanggalSurat: '2026-10-17',
     tanggalTerima: '2026-10-18T13:45',
     sifat: 'biasa',
-    status: 'Selesai',
+    status: 'Selesai Ditindaklanjuti',
     lampiran: '1 Lembar Relaas Panggilan',
     fileScan: 'Delegasi_Panggilan_PA_Jember.pdf',
     fileSize: '820 KB',
@@ -691,6 +691,7 @@ export function SuratProvider({ children }) {
     const count = suratMasuk.length + 1;
     const newId = `SM-${String(count).padStart(3, '0')}`;
     const agendaNo = `AGD-2026/X/SM-${String(count).padStart(4, '0')}`;
+    const currentStatus = formData.status || 'Diregistrasi';
 
     const newLetter = {
       id: newId,
@@ -702,7 +703,7 @@ export function SuratProvider({ children }) {
       tanggalSurat: formData.tanggalSurat,
       tanggalTerima: formData.tanggalTerima || new Date().toISOString().slice(0, 16),
       sifat: formData.sifat || 'biasa',
-      status: 'Menunggu Disposisi',
+      status: currentStatus,
       lampiran: formData.lampiran || '1 Berkas PDF',
       fileScan: formData.fileScan || 'Naskah_Surat_Masuk.pdf',
       fileSize: '2.1 MB',
@@ -714,10 +715,10 @@ export function SuratProvider({ children }) {
       {
         waktu: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
         petugas: `${currentUser.name} (${currentUser.role})`,
-        tahap: 'Registrasi Surat Masuk',
-        status: `Surat dicatat dengan nomor agenda ${agendaNo} dan siap diajukan ke Ketua`,
+        tahap: `Registrasi Surat Masuk (${currentStatus})`,
+        status: `Surat dicatat dengan nomor agenda ${agendaNo} dan status '${currentStatus}'`,
         icon: 'inbox',
-        badge: 'Surat Terdaftar',
+        badge: currentStatus,
         badgeColor: 'bg-primary-light text-primary'
       }
     ];
@@ -942,7 +943,7 @@ export function SuratProvider({ children }) {
 
     setSuratMasuk(prev => prev.map(s => {
       if (s.id === suratId) {
-        return { ...s, status: 'Didisposisi' };
+        return { ...s, status: 'Telah Didisposisi' };
       }
       return s;
     }));
@@ -958,7 +959,7 @@ export function SuratProvider({ children }) {
         .from('kliksurat')
         .update({
           disposisi: newDisposisi,
-          status: 'Didisposisi',
+          status: 'Telah Didisposisi',
           tracking: updatedTracking,
         })
         .eq('id', suratId);
@@ -980,6 +981,49 @@ export function SuratProvider({ children }) {
           `Yth. ${penerima}, terdapat Disposisi Baru dari ${currentUser.name} untuk surat ${suratMasuk.find(s => s.id === suratId)?.nomorSurat}. Arahan: "${newDisposisi.isiArahan.slice(0, 100)}..."`
         );
       });
+    }
+  };
+
+  // Update status surat masuk dinamis (8 status sesuai pedoman)
+  const updateSuratMasukStatus = async (suratId, newStatus) => {
+    const newTrack = {
+      waktu: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
+      petugas: `${currentUser.name} (${currentUser.role})`,
+      tahap: `Pembaruan Status Naskah`,
+      status: `Status surat masuk diperbarui menjadi '${newStatus}'`,
+      icon: 'sync_alt',
+      badge: newStatus,
+      badgeColor: 'bg-primary-light text-primary'
+    };
+
+    const updatedTracking = [...(trackingList[suratId] || []), newTrack];
+
+    setSuratMasuk(prev => prev.map(s => {
+      if (s.id === suratId) {
+        return { ...s, status: newStatus };
+      }
+      return s;
+    }));
+
+    setTrackingList(prev => ({
+      ...prev,
+      [suratId]: updatedTracking
+    }));
+
+    try {
+      const { error } = await supabase
+        .from('kliksurat')
+        .update({
+          status: newStatus,
+          tracking: updatedTracking
+        })
+        .eq('id', suratId);
+
+      if (error) throw error;
+      showToast(`Status surat ${suratId} berhasil diubah ke: ${newStatus}`);
+    } catch (err) {
+      console.error('Gagal update status di Supabase:', err);
+      showToast(`Status diperbarui lokal (${err.message})`, 'info');
     }
   };
 
@@ -1005,6 +1049,7 @@ export function SuratProvider({ children }) {
         waSettings,
         setWaSettings,
         addSuratMasuk,
+        updateSuratMasukStatus,
         addSuratKeluarDraft,
         approveAndNumberSuratKeluar,
         saveDisposisi,

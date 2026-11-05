@@ -1,27 +1,18 @@
 import React, { useState } from 'react';
 import { useSurat } from '../context/SuratContext';
-
-export const JENIS_SURAT_OPTIONS = [
-  'Surat Dinas',
-  'Nota Dinas',
-  'Memorandum',
-  'Surat Undangan',
-  'Surat Tugas',
-  'Surat Perintah',
-  'Surat Edaran',
-  'Surat Keterangan',
-  'Surat Pengantar',
-  'Berita Acara',
-  'Laporan',
-  'Lainnya',
-];
+import {
+  JENIS_SURAT_OPTIONS,
+  STATUS_SURAT_MASUK_OPTIONS,
+  getStatusBadge,
+} from '../constants/suratOptions';
 
 export default function SuratMasuk() {
-  const { suratMasuk, addSuratMasuk, navigateTo, showToast } = useSurat();
+  const { suratMasuk, addSuratMasuk, updateSuratMasukStatus, navigateTo, showToast } = useSurat();
 
   const [form, setForm] = useState({
     jenisSurat: 'Surat Dinas',
     jenisSuratLainnya: '',
+    status: 'Diregistrasi',
     nomorSurat: '',
     asalSurat: '',
     perihal: '',
@@ -34,6 +25,8 @@ export default function SuratMasuk() {
 
   const [searchFilter, setSearchFilter] = useState('');
   const [filterJenis, setFilterJenis] = useState('semua');
+  const [filterStatus, setFilterStatus] = useState('semua');
+  const [editingStatusId, setEditingStatusId] = useState(null);
   const [showForm, setShowForm] = useState(true);
 
   const handleSubmit = (e) => {
@@ -54,12 +47,14 @@ export default function SuratMasuk() {
 
     addSuratMasuk({
       ...form,
-      jenisSurat: finalJenisSurat
+      jenisSurat: finalJenisSurat,
+      status: form.status || 'Diregistrasi'
     });
 
     setForm({
       jenisSurat: 'Surat Dinas',
       jenisSuratLainnya: '',
+      status: 'Diregistrasi',
       nomorSurat: '',
       asalSurat: '',
       perihal: '',
@@ -77,10 +72,12 @@ export default function SuratMasuk() {
       s.nomorSurat.toLowerCase().includes(q) ||
       s.asalSurat.toLowerCase().includes(q) ||
       s.perihal.toLowerCase().includes(q) ||
-      (s.jenisSurat && s.jenisSurat.toLowerCase().includes(q));
+      (s.jenisSurat && s.jenisSurat.toLowerCase().includes(q)) ||
+      (s.status && s.status.toLowerCase().includes(q));
 
     const matchJenis = filterJenis === 'semua' || (s.jenisSurat || 'Surat Dinas') === filterJenis;
-    return matchSearch && matchJenis;
+    const matchStatus = filterStatus === 'semua' || s.status === filterStatus;
+    return matchSearch && matchJenis && matchStatus;
   });
 
   return (
@@ -293,7 +290,7 @@ export default function SuratMasuk() {
               </div>
 
               {/* Nomor Agenda Otomatis */}
-              <div className="space-y-1.5 md:col-span-2">
+              <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-on-surface-variant">
                   Nomor Agenda Sistem (Otomatis & Terkunci)
                 </label>
@@ -308,6 +305,35 @@ export default function SuratMasuk() {
                     lock
                   </span>
                 </div>
+              </div>
+
+              {/* Status Surat Masuk (Sesuai Lampiran) */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-on-surface-variant flex items-center justify-between">
+                  <span>Status Surat <span className="text-danger">*</span></span>
+                  <span className="text-[11px] font-normal text-outline">Alur Tata Naskah</span>
+                </label>
+                <div className="relative">
+                  <select
+                    required
+                    value={form.status}
+                    onChange={(e) => setForm({ ...form, status: e.target.value })}
+                    className="w-full h-10 pl-9 pr-8 rounded-btn bg-white border border-outline-subtle text-sm text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none cursor-pointer"
+                  >
+                    {STATUS_SURAT_MASUK_OPTIONS.map((st) => (
+                      <option key={st} value={st}>
+                        {st}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-primary pointer-events-none">
+                    flag
+                  </span>
+                  <span className="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-outline pointer-events-none">
+                    expand_more
+                  </span>
+                </div>
+                <p className="text-[11px] text-outline">Pilih tahapan status awal surat masuk saat registrasi warkat.</p>
               </div>
             </div>
 
@@ -512,6 +538,25 @@ export default function SuratMasuk() {
                 expand_more
               </span>
             </div>
+
+            {/* Filter Dropdown Status Surat (8 Pilihan Sesuai Pedoman) */}
+            <div className="relative">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="h-9 pl-3 pr-8 rounded-md bg-surface border border-outline-subtle text-xs font-semibold text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none"
+              >
+                <option value="semua">Semua Status Surat</option>
+                {STATUS_SURAT_MASUK_OPTIONS.map((st) => (
+                  <option key={st} value={st}>
+                    {st}
+                  </option>
+                ))}
+              </select>
+              <span className="material-symbols-outlined absolute right-2 top-2.5 text-[16px] text-outline pointer-events-none">
+                expand_more
+              </span>
+            </div>
             <button
               onClick={() => showToast('Filter tanggal aktif.', 'info')}
               className="h-9 px-3 rounded-md border border-outline-subtle text-on-surface-variant text-xs font-semibold flex items-center gap-1.5 hover:bg-surface transition-colors"
@@ -587,17 +632,61 @@ export default function SuratMasuk() {
                       </span>
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold ${
-                          item.status === 'Selesai'
-                            ? 'bg-success-light text-success border border-success/30'
-                            : isMenunggu
-                            ? 'bg-danger-light text-danger'
-                            : 'bg-warning-light text-amber-900 border border-warning/40'
-                        }`}
-                      >
-                        {item.status}
-                      </span>
+                      {(() => {
+                        const badge = getStatusBadge(item.status);
+                        const isEditing = editingStatusId === item.id;
+                        return (
+                          <div className="relative inline-block text-left">
+                            <button
+                              type="button"
+                              onClick={() => setEditingStatusId(isEditing ? null : item.id)}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all ${badge.bg} hover:shadow-2xs cursor-pointer`}
+                              title="Klik untuk mengubah status surat masuk"
+                            >
+                              <span className="material-symbols-outlined text-[15px]">{badge.icon}</span>
+                              <span>{item.status || 'Diregistrasi'}</span>
+                              <span className="material-symbols-outlined text-[13px] opacity-60">arrow_drop_down</span>
+                            </button>
+
+                            {/* Dropdown Menu Cepat Pengubah Status (8 Pilihan) */}
+                            {isEditing && (
+                              <div className="absolute left-0 mt-1 w-52 bg-white border border-outline-subtle rounded-lg shadow-lg z-30 py-1.5 text-xs animate-in fade-in">
+                                <div className="px-3 py-1 font-bold text-outline text-[10px] uppercase tracking-wider border-b border-outline-subtle mb-1 flex items-center justify-between">
+                                  <span>Ubah Status Surat:</span>
+                                  <span className="material-symbols-outlined text-[14px]">flag</span>
+                                </div>
+                                {STATUS_SURAT_MASUK_OPTIONS.map((st) => {
+                                  const stBadge = getStatusBadge(st);
+                                  const isCurrent = item.status === st;
+                                  return (
+                                    <button
+                                      key={st}
+                                      type="button"
+                                      onClick={() => {
+                                        updateSuratMasukStatus(item.id, st);
+                                        setEditingStatusId(null);
+                                      }}
+                                      className={`w-full text-left px-3 py-1.5 flex items-center justify-between transition-colors ${
+                                        isCurrent
+                                          ? 'font-bold text-primary bg-primary-light/60'
+                                          : 'text-on-surface hover:bg-surface'
+                                      }`}
+                                    >
+                                      <span className="flex items-center gap-1.5">
+                                        <span className="material-symbols-outlined text-[14px]">{stBadge.icon}</span>
+                                        <span>{st}</span>
+                                      </span>
+                                      {isCurrent && (
+                                        <span className="material-symbols-outlined text-[15px] text-primary">check</span>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap text-right">
                       <div className="inline-flex items-center gap-1.5">
