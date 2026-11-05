@@ -14,38 +14,44 @@ export default function KopSurat({ className = '', compact = false }) {
           />
         </div>
 
-        {/* Teks Identitas Naskah Dinas Peradilan (Ukuran Font 13pt) */}
-        <div className="text-center flex-1">
-          <h3
-            style={{ fontSize: '13pt' }}
-            className="font-bold uppercase tracking-wider text-black leading-snug font-serif"
+        {/* Teks Identitas Naskah Dinas Peradilan (Font 13pt, Spasi Paragraf Single) */}
+        <div className="text-center flex-1" style={{ lineHeight: '1.15' }}>
+          <div
+            style={{ fontSize: '13pt', lineHeight: '1.15', margin: 0, padding: 0 }}
+            className="font-bold uppercase tracking-wide text-black font-serif"
           >
             MAHKAMAH AGUNG REPUBLIK INDONESIA
-          </h3>
-          <h4
-            style={{ fontSize: '13pt' }}
-            className="font-bold uppercase tracking-wide text-black leading-snug mt-0.5 font-serif"
+          </div>
+          <div
+            style={{ fontSize: '13pt', lineHeight: '1.15', margin: 0, padding: 0 }}
+            className="font-bold uppercase tracking-wide text-black font-serif"
           >
             DIREKTORAT JENDERAL BADAN PERADILAN AGAMA
-          </h4>
-          <h4
-            style={{ fontSize: '13pt' }}
-            className="font-bold uppercase tracking-wide text-black leading-snug mt-0.5 font-serif"
+          </div>
+          <div
+            style={{ fontSize: '13pt', lineHeight: '1.15', margin: 0, padding: 0 }}
+            className="font-bold uppercase tracking-wide text-black font-serif"
           >
             PENGADILAN TINGGI AGAMA SURABAYA
-          </h4>
-          <h2
-            style={{ fontSize: '13pt' }}
-            className="font-bold uppercase tracking-wider text-black leading-snug mt-0.5 font-serif"
+          </div>
+          <div
+            style={{ fontSize: '13pt', lineHeight: '1.15', margin: 0, padding: 0 }}
+            className="font-bold uppercase tracking-wide text-black font-serif"
           >
             PENGADILAN AGAMA LUMAJANG
-          </h2>
-          <p className="text-[10px] sm:text-[11px] text-neutral-800 leading-tight mt-1.5 font-sans">
+          </div>
+          <div
+            style={{ fontSize: '9.5pt', lineHeight: '1.2', margin: '3px 0 0 0', padding: 0 }}
+            className="text-neutral-900 font-sans"
+          >
             Jalan Soekarno Hatta Nomor 11, Selokbesuki, Sukodono, Lumajang, Jawa Timur 67352
-          </p>
-          <p className="text-[10px] sm:text-[11px] text-neutral-800 leading-tight mt-0.5 font-sans">
+          </div>
+          <div
+            style={{ fontSize: '9.5pt', lineHeight: '1.2', margin: 0, padding: 0 }}
+            className="text-neutral-900 font-sans"
+          >
             www.pa-lumajang.go.id, email: pa.lumajang@gmail.com, telepon (0334) 8781874
-          </p>
+          </div>
         </div>
       </div>
 

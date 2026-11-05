@@ -453,23 +453,23 @@ export default function Disposisi() {
                 alt="Logo Pengadilan Agama Lumajang"
                 className="w-20 h-20 object-contain shrink-0"
               />
-              <div className="flex-1 text-center text-black">
-                <div style={{ fontSize: '13pt' }} className="font-bold uppercase tracking-wider font-serif leading-snug">
+              <div className="flex-1 text-center text-black" style={{ lineHeight: '1.15' }}>
+                <div style={{ fontSize: '13pt', lineHeight: '1.15', margin: 0, padding: 0 }} className="font-bold uppercase tracking-wide font-serif">
                   MAHKAMAH AGUNG REPUBLIK INDONESIA
                 </div>
-                <div style={{ fontSize: '13pt' }} className="font-bold uppercase tracking-wide mt-0.5 font-serif leading-snug">
+                <div style={{ fontSize: '13pt', lineHeight: '1.15', margin: 0, padding: 0 }} className="font-bold uppercase tracking-wide font-serif">
                   DIREKTORAT JENDERAL BADAN PERADILAN AGAMA
                 </div>
-                <div style={{ fontSize: '13pt' }} className="font-bold uppercase tracking-wide mt-0.5 font-serif leading-snug">
+                <div style={{ fontSize: '13pt', lineHeight: '1.15', margin: 0, padding: 0 }} className="font-bold uppercase tracking-wide font-serif">
                   PENGADILAN TINGGI AGAMA SURABAYA
                 </div>
-                <div style={{ fontSize: '13pt' }} className="font-bold uppercase tracking-wider mt-0.5 font-serif leading-snug">
+                <div style={{ fontSize: '13pt', lineHeight: '1.15', margin: 0, padding: 0 }} className="font-bold uppercase tracking-wide font-serif">
                   PENGADILAN AGAMA LUMAJANG
                 </div>
-                <div className="text-[9.5px] sm:text-[10.5px] font-sans text-neutral-800 mt-1">
+                <div style={{ fontSize: '9.5pt', lineHeight: '1.2', margin: '3px 0 0 0', padding: 0 }} className="text-neutral-900 font-sans">
                   Jalan Soekarno Hatta Nomor 11, Selokbesuki, Sukodono, Lumajang, Jawa Timur 67352
                 </div>
-                <div className="text-[9.5px] sm:text-[10.5px] font-sans text-neutral-800 mt-0.5">
+                <div style={{ fontSize: '9.5pt', lineHeight: '1.2', margin: 0, padding: 0 }} className="text-neutral-900 font-sans">
                   www.pa-lumajang.go.id, email: pa.lumajang@gmail.com, telepon (0334) 8781874
                 </div>
               </div>
