@@ -454,16 +454,16 @@ export default function Disposisi() {
                 className="w-20 h-20 object-contain shrink-0"
               />
               <div className="flex-1 text-center text-black">
-                <div className="text-sm sm:text-base font-bold uppercase tracking-wider font-serif">
+                <div style={{ fontSize: '13pt' }} className="font-bold uppercase tracking-wider font-serif leading-snug">
                   MAHKAMAH AGUNG REPUBLIK INDONESIA
                 </div>
-                <div className="text-xs sm:text-sm font-bold uppercase tracking-wide mt-0.5 font-serif">
+                <div style={{ fontSize: '13pt' }} className="font-bold uppercase tracking-wide mt-0.5 font-serif leading-snug">
                   DIREKTORAT JENDERAL BADAN PERADILAN AGAMA
                 </div>
-                <div className="text-xs sm:text-sm font-bold uppercase tracking-wide mt-0.5 font-serif">
+                <div style={{ fontSize: '13pt' }} className="font-bold uppercase tracking-wide mt-0.5 font-serif leading-snug">
                   PENGADILAN TINGGI AGAMA SURABAYA
                 </div>
-                <div className="text-base sm:text-lg font-black uppercase tracking-wider mt-1 font-serif">
+                <div style={{ fontSize: '13pt' }} className="font-bold uppercase tracking-wider mt-0.5 font-serif leading-snug">
                   PENGADILAN AGAMA LUMAJANG
                 </div>
                 <div className="text-[9.5px] sm:text-[10.5px] font-sans text-neutral-800 mt-1">

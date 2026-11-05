@@ -662,10 +662,10 @@ export function generateWarkatHtml(surat) {
       <div class="kop-header-lumajang" style="display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 6px;">
         <img src="/logo-instansi.png" alt="Logo Pengadilan Agama Lumajang" style="width: 86px; height: 86px; object-fit: contain; flex-shrink: 0;" />
         <div style="flex: 1; text-align: center; color: #000;">
-          <div style="font-family: 'Tinos', serif; font-size: 13.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">MAHKAMAH AGUNG REPUBLIK INDONESIA</div>
-          <div style="font-family: 'Tinos', serif; font-size: 11.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; margin-top: 1px;">DIREKTORAT JENDERAL BADAN PERADILAN AGAMA</div>
-          <div style="font-family: 'Tinos', serif; font-size: 11.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; margin-top: 1px;">PENGADILAN TINGGI AGAMA SURABAYA</div>
-          <div style="font-family: 'Tinos', serif; font-size: 14pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2; margin-top: 2px;">PENGADILAN AGAMA LUMAJANG</div>
+          <div style="font-family: 'Tinos', serif; font-size: 13pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.25;">MAHKAMAH AGUNG REPUBLIK INDONESIA</div>
+          <div style="font-family: 'Tinos', serif; font-size: 13pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.25; margin-top: 1px;">DIREKTORAT JENDERAL BADAN PERADILAN AGAMA</div>
+          <div style="font-family: 'Tinos', serif; font-size: 13pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.25; margin-top: 1px;">PENGADILAN TINGGI AGAMA SURABAYA</div>
+          <div style="font-family: 'Tinos', serif; font-size: 13pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.25; margin-top: 2px;">PENGADILAN AGAMA LUMAJANG</div>
           <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8.5pt; color: #222; margin-top: 4px; line-height: 1.3;">Jalan Soekarno Hatta Nomor 11, Selokbesuki, Sukodono, Lumajang, Jawa Timur 67352</div>
           <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8.5pt; color: #222; margin-top: 1px; line-height: 1.3;">www.pa-lumajang.go.id, email: pa.lumajang@gmail.com, telepon (0334) 8781874</div>
         </div>
