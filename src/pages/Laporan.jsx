@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
+import KopSurat from '../components/KopSurat';
 
 export default function Laporan() {
   const { suratMasuk, suratKeluar, disposisiList, nomorConfig, plhConfig, showToast } = useSurat();
@@ -730,22 +731,9 @@ export default function Laporan() {
 
       {/* Tabel Rekapitulasi (Siap Cetak PDF Standar Mahkamah Agung) */}
       <div className="print-clean bg-white rounded-card border border-outline-subtle shadow-2xs overflow-hidden">
-        {/* Kop Cetak PDF Resmi (Selalu tampil di cetak dan pratinjau) */}
+        {/* Kop Cetak PDF Resmi Pengadilan Agama Lumajang */}
         <div className="p-6 border-b border-outline-subtle text-center">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <span className="material-symbols-outlined text-primary text-[28px] no-print">
-              account_balance
-            </span>
-            <div>
-              <h4 className="text-base font-black uppercase text-on-surface tracking-wide">
-                PENGADILAN AGAMA LAMONGAN KELAS I-A
-              </h4>
-              <p className="text-[11px] text-outline font-medium">
-                Jl. Kolonel Sugiono No. 89 Lamongan, Jawa Timur 62217 • Telp. (0322) 321289
-              </p>
-            </div>
-          </div>
-          <div className="h-0.5 bg-on-surface mx-auto my-2 max-w-xl"></div>
+          <KopSurat />
           <h5 className="text-sm font-bold uppercase text-primary tracking-wider">
             {activeTab === 'masuk'
               ? 'BUKU AGENDA REKAPITULASI SURAT MASUK'
@@ -1142,7 +1130,7 @@ export default function Laporan() {
                 ? plhConfig.tipePelimpahan === 'hakim_ditunjuk'
                   ? 'Plh. Ketua (Hakim yang Ditunjuk)'
                   : 'Plh. Ketua (Wakil Ketua)'
-                : 'Sekretaris Pengadilan Agama Lamongan'}
+                : 'Sekretaris Pengadilan Agama Lumajang'}
             </p>
             <div className="h-14 flex items-center justify-center text-primary text-[10px] font-semibold italic">
               [Tanda Tangan Elektronik Sah Mahkamah Agung]

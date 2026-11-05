@@ -98,7 +98,7 @@ const INITIAL_SURAT_MASUK = [
     lampiran: '1 Berkas (18 Lembar PDF)',
     fileScan: 'Undangan_Rakor_PTA_Surabaya_2026.pdf',
     fileSize: '2.4 MB',
-    tujuanAwal: 'Ketua Pengadilan Agama Lamongan Kelas I-A',
+    tujuanAwal: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
     prioritasTinggi: true,
   },
   {
@@ -114,7 +114,7 @@ const INITIAL_SURAT_MASUK = [
     lampiran: '1 Berkas (4 Dokumen Juknis)',
     fileScan: 'Sosialisasi_PTSP_Ramah_Disabilitas.pdf',
     fileSize: '3.1 MB',
-    tujuanAwal: 'Ketua Pengadilan Agama Lamongan Kelas I-A',
+    tujuanAwal: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
     prioritasTinggi: true,
   },
   {
@@ -249,7 +249,7 @@ const INITIAL_DISPOSISI = {
     tandaTanganElektronik: {
       status: 'TERVERIFIKASI',
       penandatangan: 'Dr. H. Ahmad Zainuddin, S.H., M.H.',
-      jabatan: 'Ketua Pengadilan Agama Lamongan Kelas I-A',
+      jabatan: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
       sha256: '9F8A...2026-MARI-ID',
       waktuSertifikasi: '20 Okt 2026 10:15:32 WIB'
     }
@@ -318,32 +318,32 @@ const INITIAL_PLH_CONFIG = {
     name: 'Dr. H. Ahmad Zainuddin, S.H., M.H.',
     role: 'Ketua Pengadilan Agama',
     nip: '19690110 199403 1 002',
-    jabatan: 'Ketua Pengadilan Agama Lamongan Kelas I-A'
+    jabatan: 'Ketua Pengadilan Agama Lumajang Kelas I-A'
   },
   pejabatWakil: {
     name: 'Drs. H. Syamsul Hadi, M.H.',
     role: 'Wakil Ketua (Selaku Plh. Ketua)',
     nip: '19720516 199803 1 004',
-    jabatan: 'Wakil Ketua Pengadilan Agama Lamongan Kelas I-A'
+    jabatan: 'Wakil Ketua Pengadilan Agama Lumajang Kelas I-A'
   },
   pejabatHakim: {
     name: 'Drs. H. M. Arifin, S.H., M.Hum.',
     role: 'Hakim Senior / Hakim Pengawas (Selaku Plh. Ketua)',
     nip: '19700612 199603 1 001',
-    jabatan: 'Hakim Tingkat Pertama PA Lamongan Kelas I-A'
+    jabatan: 'Hakim Tingkat Pertama PA Lumajang Kelas I-A'
   },
   pejabatPlh: {
     name: 'Drs. H. Syamsul Hadi, M.H.',
     role: 'Wakil Ketua (Selaku Plh. Ketua)',
     nip: '19720516 199803 1 004',
-    jabatan: 'Wakil Ketua Pengadilan Agama Lamongan Kelas I-A'
+    jabatan: 'Wakil Ketua Pengadilan Agama Lumajang Kelas I-A'
   },
   nomorSK: 'W13-A12/128/KP.04.1/XI/2026',
   jenisCuti: 'Cuti Tahunan',
   tanggalMulai: '2026-11-03',
   tanggalSelesai: '2026-11-17',
   dasarHukum: 'SEMA No. 2 Tahun 2020 & Perma No. 7 Tahun 2016 tentang Penunjukan Pelaksana Harian (Plh) Pimpinan Pengadilan',
-  keterangan: 'Ketua Pengadilan Agama Lamongan melaksanakan Cuti Tahunan. Segala wewenang pimpinan kedinasan, disposisi surat masuk, dan persetujuan surat keluar dilimpahkan kepada Pelaksana Harian (Plh. Ketua).',
+  keterangan: 'Ketua Pengadilan Agama Lumajang melaksanakan Cuti Tahunan. Segala wewenang pimpinan kedinasan, disposisi surat masuk, dan persetujuan surat keluar dilimpahkan kepada Pelaksana Harian (Plh. Ketua).',
   wewenang: [
     'Pemberian Instruksi & Pengesahan Lembar Disposisi Surat Masuk',
     'Persetujuan & Penerbitan Nomor Resmi Surat Keluar',
@@ -435,7 +435,7 @@ export function SuratProvider({ children }) {
           recipient: 'Bpk. H. M. Ridwan, S.H. (Sekretaris)',
           type: 'Disposisi Surat',
           nomorSurat: '012/PA.Lmg/X/2026',
-          text: 'Yth. Bpk. H. M. Ridwan, S.H., terdapat Disposisi Baru dari Ketua PA Lamongan untuk surat No. 012/PA.Lmg/X/2026. Arahan: Hadiri dan wakili pimpinan dalam Rakor PTA Surabaya.',
+          text: 'Yth. Bpk. H. M. Ridwan, S.H., terdapat Disposisi Baru dari Ketua PA Lumajang untuk surat No. 012/PA.Lmg/X/2026. Arahan: Hadiri dan wakili pimpinan dalam Rakor PTA Surabaya.',
           status: 'Terkirim (Centang Dua)'
         },
         {
@@ -444,7 +444,7 @@ export function SuratProvider({ children }) {
           recipient: 'Ibu Dra. Hj. Nurjanah, M.H. (Panitera)',
           type: 'Disposisi Surat',
           nomorSurat: '012/PA.Lmg/X/2026',
-          text: 'Yth. Ibu Dra. Hj. Nurjanah, M.H., terdapat Disposisi Baru dari Ketua PA Lamongan untuk surat No. 012/PA.Lmg/X/2026. Arahan: Siapkan bahan pemaparan e-Court.',
+          text: 'Yth. Ibu Dra. Hj. Nurjanah, M.H., terdapat Disposisi Baru dari Ketua PA Lumajang untuk surat No. 012/PA.Lmg/X/2026. Arahan: Siapkan bahan pemaparan e-Court.',
           status: 'Terkirim (Centang Dua)'
         },
         {
@@ -700,7 +700,7 @@ export function SuratProvider({ children }) {
       lampiran: formData.lampiran || '1 Berkas PDF',
       fileScan: formData.fileScan || 'Naskah_Surat_Masuk.pdf',
       fileSize: '2.1 MB',
-      tujuanAwal: 'Ketua Pengadilan Agama Lamongan Kelas I-A',
+      tujuanAwal: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
       prioritasTinggi: formData.sifat === 'sangat_segera' || formData.sifat === 'segera',
     };
 
@@ -875,7 +875,7 @@ export function SuratProvider({ children }) {
     let pemberiName = currentUser.name;
     let pemberiRole = currentUser.role;
     let penandatanganName = currentUser.name;
-    let jabatanTte = `${currentUser.role} Pengadilan Agama Lamongan Kelas I-A`;
+    let jabatanTte = `${currentUser.role} Pengadilan Agama Lumajang Kelas I-A`;
 
     // Pelimpahan ke Plh (Wakil Ketua ATAU Hakim yang Ditunjuk)
     if (plhConfig.isActive) {
@@ -884,14 +884,14 @@ export function SuratProvider({ children }) {
           pemberiName = `${plhConfig.pejabatPlh.name} (Plh. Ketua)`;
           pemberiRole = 'Hakim yang Ditunjuk selaku Plh. Ketua Pengadilan';
           penandatanganName = plhConfig.pejabatPlh.name;
-          jabatanTte = `Hakim Senior selaku Plh. Ketua PA Lamongan (SK No. ${plhConfig.nomorSK})`;
+          jabatanTte = `Hakim Senior selaku Plh. Ketua PA Lumajang (SK No. ${plhConfig.nomorSK})`;
         }
       } else {
         if (currentUser.roleKey === 'wakil_ketua' || currentUser.roleKey === 'ketua') {
           pemberiName = `${USERS.wakil_ketua.name} (Plh. Ketua)`;
           pemberiRole = 'Plh. Ketua Pengadilan Agama';
           penandatanganName = USERS.wakil_ketua.name;
-          jabatanTte = `Plh. Ketua Pengadilan Agama Lamongan (SK No. ${plhConfig.nomorSK})`;
+          jabatanTte = `Plh. Ketua Pengadilan Agama Lumajang (SK No. ${plhConfig.nomorSK})`;
         }
       }
     }

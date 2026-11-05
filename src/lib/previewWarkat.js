@@ -28,7 +28,7 @@ function getLetterBody(surat) {
         Dalam rangka meningkatkan efektivitas pembinaan, pengawasan yudisial, serta akselerasi penyelesaian perkara dan optimalisasi serapan anggaran Triwulan IV Tahun Anggaran 2026, dengan ini disampaikan bahwa Pengadilan Tinggi Agama Surabaya akan menyelenggarakan <strong>Rapat Koordinasi Pembinaan Wilayah Hukum Semester II</strong>.
       </p>
       <p style="margin-bottom: 14px;">
-        Sehubungan dengan hal tersebut, diminta kepada Saudara Ketua Pengadilan Agama Lamongan untuk menugaskan aparatur pimpinan guna menghadiri kegiatan koordinasi kedinasan dengan ketentuan sebagai berikut:
+        Sehubungan dengan hal tersebut, diminta kepada Saudara Ketua Pengadilan Agama Lumajang untuk menugaskan aparatur pimpinan guna menghadiri kegiatan koordinasi kedinasan dengan ketentuan sebagai berikut:
       </p>
       <div style="margin-left: 24px; margin-bottom: 16px; line-height: 1.8;">
         <table>
@@ -101,7 +101,7 @@ function getLetterBody(surat) {
         Dalam rangka implementasi Peraturan Mahkamah Agung Nomor 1 Tahun 2019 tentang Administrasi Perkara dan Persidangan di Pengadilan Secara Elektronik juncto Keputusan KMA No. 129/KMA/SK/VIII/2019, Kepaniteraan Mahkamah Agung RI melaksanakan Audit Kepatuhan Aksesibilitas Sistem Informasi Perkara.
       </p>
       <p style="text-indent: 36px; margin-bottom: 14px;">
-        Pengadilan Agama Lamongan Kelas I-A ditunjuk sebagai salah satu satker sampling monitoring berkala kepatuhan sinkronisasi data e-Court ke Sistem Informasi Penelusuran Perkara (SIPP) Mahkamah Agung. Diharapkan Tim IT dan Panitera mempersiapkan log sinkronisasi dan data dukung terlampir.
+        Pengadilan Agama Lumajang Kelas I-A ditunjuk sebagai salah satu satker sampling monitoring berkala kepatuhan sinkronisasi data e-Court ke Sistem Informasi Penelusuran Perkara (SIPP) Mahkamah Agung. Diharapkan Tim IT dan Panitera mempersiapkan log sinkronisasi dan data dukung terlampir.
       </p>
       <p style="text-indent: 36px; margin-bottom: 24px;">
         Atas perhatian dan kerja sama jajaran pimpinan satuan kerja, kami ucapkan terima kasih.
@@ -115,7 +115,7 @@ function getLetterBody(surat) {
         Menunjuk ketentuan Pasal 390 ayat (1) HIR juncto SEMA No. 6 Tahun 2014 tentang Penanganan Delegasi Bantuan Panggilan/Pemberitahuan, Ketua Majelis Hakim Pengadilan Agama Jember dalam perkara Nomor <strong>1245/Pdt.G/2026/PA.Jbr</strong> dengan ini memohon bantuan delegasi pemanggilan sidang.
       </p>
       <p style="margin-bottom: 14px;">
-        Adapun data pihak yang dipanggil berdomisili di wilayah hukum Pengadilan Agama Lamongan Kelas I-A, dengan rincian jadwal persidangan:
+        Adapun data pihak yang dipanggil berdomisili di wilayah hukum Pengadilan Agama Lumajang Kelas I-A, dengan rincian jadwal persidangan:
       </p>
       <div style="margin-left: 24px; margin-bottom: 16px; line-height: 1.8;">
         <table>
@@ -513,7 +513,7 @@ export function generateWarkatHtml(surat) {
       page-break-inside: avoid;
     }
 
-    /* Cap Penerimaan PTSP PA Lamongan */
+    /* Cap Penerimaan PTSP PA Lumajang */
     .ptsp-receipt-box {
       border: 2px solid #0b62a4;
       background: #f0f7fc;
@@ -658,18 +658,20 @@ export function generateWarkatHtml(surat) {
     <article class="a4-sheet" id="docSheet">
       <div class="scan-stamp-bg">PINDAIAN ASLI</div>
 
-      <!-- Kop Resmi Instansi Pengirim -->
-      <div class="kop-header">
-        <div class="kop-logo">
-          LOGO RESMI
-        </div>
-        <div class="kop-text">
-          <div class="kop-instansi1">${header.instansi1}</div>
-          <div class="kop-instansi2">${header.instansi2}</div>
-          <div class="kop-instansi3">${header.instansi3}</div>
-          <div class="kop-alamat">${header.alamat}</div>
+      <!-- Kop Resmi Pengadilan Agama Lumajang -->
+      <div class="kop-header-lumajang" style="display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 6px;">
+        <img src="/logo-instansi.png" alt="Logo Pengadilan Agama Lumajang" style="width: 86px; height: 86px; object-fit: contain; flex-shrink: 0;" />
+        <div style="flex: 1; text-align: center; color: #000;">
+          <div style="font-family: 'Tinos', serif; font-size: 13.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">MAHKAMAH AGUNG REPUBLIK INDONESIA</div>
+          <div style="font-family: 'Tinos', serif; font-size: 11.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; margin-top: 1px;">DIREKTORAT JENDERAL BADAN PERADILAN AGAMA</div>
+          <div style="font-family: 'Tinos', serif; font-size: 11.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; margin-top: 1px;">PENGADILAN TINGGI AGAMA SURABAYA</div>
+          <div style="font-family: 'Tinos', serif; font-size: 14pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2; margin-top: 2px;">PENGADILAN AGAMA LUMAJANG</div>
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8.5pt; color: #222; margin-top: 4px; line-height: 1.3;">Jalan Soekarno Hatta Nomor 11, Selokbesuki, Sukodono, Lumajang, Jawa Timur 67352</div>
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8.5pt; color: #222; margin-top: 1px; line-height: 1.3;">www.pa-lumajang.go.id, email: pa.lumajang@gmail.com, telepon (0334) 8781874</div>
         </div>
       </div>
+      <!-- Garis Ganda Kop Surat Resmi -->
+      <div style="border-top: 2.5px solid #000000; border-bottom: 1px solid #000000; height: 4px; margin-top: 4px; margin-bottom: 20px;"></div>
 
       <!-- Meta Baris Nomor & Tanggal -->
       <div class="letter-meta">
@@ -705,7 +707,7 @@ export function generateWarkatHtml(surat) {
       <div class="recipient-block">
         <div>Kepada Yth.</div>
         <div style="font-weight: 700; margin-top: 2px;">
-          ${surat.tujuanAwal || 'Ketua Pengadilan Agama Lamongan Kelas I-A'}
+          ${surat.tujuanAwal || 'Ketua Pengadilan Agama Lumajang Kelas I-A'}
         </div>
         <div>di -</div>
         <div style="margin-left: 24px; text-decoration: underline;">TEMPAT</div>
@@ -718,10 +720,10 @@ export function generateWarkatHtml(surat) {
 
       <!-- Footer: Cap Penerimaan PTSP + TTD Pengirim -->
       <div class="letter-footer">
-        <!-- Cap Agenda PTSP PA Lamongan -->
+        <!-- Cap Agenda PTSP PA Lumajang -->
         <div class="ptsp-receipt-box">
           <div class="ptsp-receipt-title">
-            PENGADILAN AGAMA LAMONGAN<br>
+            PENGADILAN AGAMA LUMAJANG<br>
             <span style="font-size: 7.5pt; font-weight: 500;">Diterima Loket Persuratan PTSP</span>
           </div>
           <div class="ptsp-receipt-row">

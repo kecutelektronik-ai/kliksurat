@@ -17,7 +17,7 @@ export function mapRowToSuratMasuk(row) {
     lampiran: row.lampiran || '',
     fileScan: row.file_scan || '',
     fileSize: row.file_size || '',
-    tujuanAwal: row.tujuan_surat || 'Ketua Pengadilan Agama Lamongan Kelas I-A',
+    tujuanAwal: row.tujuan_surat || 'Ketua Pengadilan Agama Lumajang Kelas I-A',
     prioritasTinggi: Boolean(row.prioritas_tinggi),
   };
 }
@@ -48,7 +48,7 @@ export function mapSuratMasukToRow(item, initialTracking = []) {
     nomor_surat: item.nomorSurat,
     agenda: item.agenda,
     asal_surat: item.asalSurat,
-    tujuan_surat: item.tujuanAwal || 'Ketua Pengadilan Agama Lamongan Kelas I-A',
+    tujuan_surat: item.tujuanAwal || 'Ketua Pengadilan Agama Lumajang Kelas I-A',
     perihal: item.perihal,
     tanggal_surat: item.tanggalSurat,
     tanggal_terima: item.tanggalTerima ? new Date(item.tanggalTerima).toISOString() : new Date().toISOString(),

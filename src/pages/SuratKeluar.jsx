@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSurat } from '../context/SuratContext';
+import { openWarkatPreview } from '../lib/previewWarkat';
 
 export default function SuratKeluar() {
   const {
@@ -316,7 +317,7 @@ export default function SuratKeluar() {
                         </button>
                       ) : (
                         <button
-                          onClick={() => showToast(`Mencetak warkat ${item.nomorSurat}...`, 'info')}
+                          onClick={() => { showToast(`Membuka naskah dinas resmi: ${item.nomorSurat}...`, 'info'); openWarkatPreview(item); }}
                           className="h-8 px-3 rounded-btn bg-white border border-outline-subtle text-primary hover:bg-primary-light text-xs font-semibold inline-flex items-center gap-1 transition-colors"
                         >
                           <span className="material-symbols-outlined text-[16px]">print</span>

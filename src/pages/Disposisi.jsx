@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
+import KopSurat from '../components/KopSurat';
 
 export default function Disposisi() {
   const {
@@ -359,29 +360,14 @@ export default function Disposisi() {
               <span className="material-symbols-outlined text-[360px]">balance</span>
             </div>
 
-            {/* KOP RESMI */}
-            <div className="border-b-2 border-black pb-3 mb-4 text-center">
-              <div className="flex items-center justify-center gap-3 mb-1">
-                <span className="material-symbols-outlined text-black text-[34px]">balance</span>
-                <div>
-                  <h4 className="text-sm sm:text-base font-extrabold uppercase tracking-wide text-black">
-                    Mahkamah Agung Republik Indonesia
-                  </h4>
-                  <h5 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-black">
-                    Pengadilan Agama Lamongan Kelas I-A
-                  </h5>
-                  <p className="text-[10px] text-gray-700">
-                    Jl. Panglima Sudirman No. 42, Telp. (0322) 321154, Lamongan - Jawa Timur
-                  </p>
-                </div>
-              </div>
-              <div className="mt-2 pt-1 border-t border-black/40 flex justify-center">
-                <span className="text-xs font-extrabold tracking-widest uppercase px-4 py-0.5 border border-black bg-gray-50">
-                  {plhConfig?.isActive
-                    ? 'LEMBAR DISPOSISI PLH. KETUA PENGADILAN'
-                    : 'LEMBAR DISPOSISI KETUA PENGADILAN'}
-                </span>
-              </div>
+            {/* KOP RESMI PENGADILAN AGAMA LUMAJANG */}
+            <KopSurat compact={true} />
+            <div className="flex justify-center mb-4">
+              <span className="text-xs font-extrabold tracking-widest uppercase px-4 py-1 border border-black bg-gray-50 shadow-2xs">
+                {plhConfig?.isActive
+                  ? 'LEMBAR DISPOSISI PLH. KETUA PENGADILAN'
+                  : 'LEMBAR DISPOSISI KETUA PENGADILAN'}
+              </span>
             </div>
 
             {/* GRID DOKUMEN RESMI MAHKAMAH AGUNG */}
@@ -502,8 +488,8 @@ export default function Disposisi() {
               <div className="text-center w-64">
                 <p className="text-[11px] font-bold text-black">
                   {existingDisposisi?.tandaTanganElektronik?.jabatan?.includes('Plh') || plhConfig?.isActive
-                    ? (plhConfig?.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim Senior selaku Plh. Ketua,' : 'Plh. Ketua Pengadilan Agama Lamongan,')
-                    : 'Ketua Pengadilan Agama Lamongan,'}
+                    ? (plhConfig?.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim Senior selaku Plh. Ketua,' : 'Plh. Ketua Pengadilan Agama Lumajang,')
+                    : 'Ketua Pengadilan Agama Lumajang,'}
                 </p>
                 {/* Digital Stamp Simulation */}
                 <div className="my-2 p-1.5 border border-dashed border-primary rounded-md inline-block bg-primary-light/20">

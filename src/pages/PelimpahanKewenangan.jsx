@@ -23,13 +23,13 @@ export default function PelimpahanKewenangan() {
       name: 'Drs. H. M. Arifin, S.H., M.Hum.',
       role: 'Hakim Senior / Hakim Pengawas (Selaku Plh. Ketua)',
       nip: '19700612 199603 1 001',
-      jabatan: 'Hakim Tingkat Pertama PA Lamongan Kelas I-A'
+      jabatan: 'Hakim Tingkat Pertama PA Lumajang Kelas I-A'
     },
     pejabatWakil: plhConfig.pejabatWakil || {
       name: 'Drs. H. Syamsul Hadi, M.H.',
       role: 'Wakil Ketua (Selaku Plh. Ketua)',
       nip: '19720516 199803 1 004',
-      jabatan: 'Wakil Ketua Pengadilan Agama Lamongan Kelas I-A'
+      jabatan: 'Wakil Ketua Pengadilan Agama Lumajang Kelas I-A'
     },
     keterangan: plhConfig.keterangan,
     wewenang: plhConfig.wewenang || [
@@ -713,26 +713,8 @@ export default function PelimpahanKewenangan() {
 
           {/* DOKUMEN CETAK KOP PERADILAN */}
           <div className="bg-white rounded-card border-2 border-black/80 shadow-md p-8 sm:p-12 text-black font-serif text-xs leading-relaxed max-w-4xl mx-auto">
-            {/* Kop Resmi */}
-            <div className="border-b-2 border-black pb-4 mb-6 text-center">
-              <div className="flex items-center justify-center gap-4 mb-2">
-                <span className="material-symbols-outlined text-black text-[42px]">balance</span>
-                <div>
-                  <h4 className="text-base sm:text-lg font-bold uppercase tracking-wider text-black">
-                    MAHKAMAH AGUNG REPUBLIK INDONESIA
-                  </h4>
-                  <h5 className="text-sm sm:text-base font-bold uppercase tracking-wide text-black">
-                    PENGADILAN TINGGI AGAMA SURABAYA
-                  </h5>
-                  <h6 className="text-xs sm:text-sm font-extrabold uppercase tracking-widest text-black">
-                    PENGADILAN AGAMA LAMONGAN KELAS I-A
-                  </h6>
-                  <p className="text-[10px] text-gray-700 font-sans mt-0.5">
-                    Jl. Panglima Sudirman No. 42 Lamongan - Jawa Timur, Telp. (0322) 321154 • Website: pa-lamongan.go.id
-                  </p>
-                </div>
-              </div>
-            </div>
+            {/* Kop Resmi Pengadilan Agama Lumajang */}
+            <KopSurat />
 
             {/* Judul Surat Perintah */}
             <div className="text-center space-y-1 mb-6">
@@ -751,10 +733,10 @@ export default function PelimpahanKewenangan() {
                 <span className="col-span-1 text-center">:</span>
                 <div className="col-span-9 space-y-1">
                   <p>
-                    a. Bahwa sehubungan dengan pelaksanaan <strong>{formData.jenisCuti}</strong> oleh {formData.tipePelimpahan === 'hakim_ditunjuk' ? 'Ketua dan Wakil Ketua Pengadilan Agama Lamongan Kelas I-A secara bersamaan' : 'Ketua Pengadilan Agama Lamongan Kelas I-A'} terhitung mulai tanggal <strong>{formData.tanggalMulai}</strong> sampai dengan <strong>{formData.tanggalSelesai}</strong>;
+                    a. Bahwa sehubungan dengan pelaksanaan <strong>{formData.jenisCuti}</strong> oleh {formData.tipePelimpahan === 'hakim_ditunjuk' ? 'Ketua dan Wakil Ketua Pengadilan Agama Lumajang Kelas I-A secara bersamaan' : 'Ketua Pengadilan Agama Lumajang Kelas I-A'} terhitung mulai tanggal <strong>{formData.tanggalMulai}</strong> sampai dengan <strong>{formData.tanggalSelesai}</strong>;
                   </p>
                   <p>
-                    b. Bahwa guna menjamin kelancaran jalannya roda organisasi peradilan, pelayanan penanganan persuratan kedinasan, pemberian disposisi naskah, serta administrasi yudisial, dipandang perlu menunjuk {formData.tipePelimpahan === 'hakim_ditunjuk' ? 'seorang Hakim Senior' : 'Wakil Ketua'} sebagai Pelaksana Harian (Plh) Ketua Pengadilan Agama Lamongan Kelas I-A;
+                    b. Bahwa guna menjamin kelancaran jalannya roda organisasi peradilan, pelayanan penanganan persuratan kedinasan, pemberian disposisi naskah, serta administrasi yudisial, dipandang perlu menunjuk {formData.tipePelimpahan === 'hakim_ditunjuk' ? 'seorang Hakim Senior' : 'Wakil Ketua'} sebagai Pelaksana Harian (Plh) Ketua Pengadilan Agama Lumajang Kelas I-A;
                   </p>
                 </div>
               </div>
@@ -784,7 +766,7 @@ export default function PelimpahanKewenangan() {
                     NIP. {formData.tipePelimpahan === 'hakim_ditunjuk' ? formData.pejabatHakim.nip : formData.pejabatWakil.nip}
                   </p>
                   <p>
-                    Jabatan: {formData.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim Tingkat Pertama / Hakim Senior Pengadilan Agama Lamongan' : 'Wakil Ketua Pengadilan Agama Lamongan Kelas I-A'}
+                    Jabatan: {formData.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim Tingkat Pertama / Hakim Senior Pengadilan Agama Lumajang' : 'Wakil Ketua Pengadilan Agama Lumajang Kelas I-A'}
                   </p>
                 </div>
               </div>
@@ -794,10 +776,10 @@ export default function PelimpahanKewenangan() {
                 <span className="col-span-1 text-center">:</span>
                 <div className="col-span-9 space-y-2">
                   <p>
-                    1. Di samping jabatannya sebagai {formData.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim' : 'Wakil Ketua'}, ditugaskan untuk bertindak dan melaksanakan wewenang kedinasan sehari-hari sebagai <strong>Pelaksana Harian (Plh.) Ketua Pengadilan Agama Lamongan Kelas I-A</strong> terhitung sejak tanggal <strong>{formData.tanggalMulai}</strong> sampai dengan <strong>{formData.tanggalSelesai}</strong>.
+                    1. Di samping jabatannya sebagai {formData.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim' : 'Wakil Ketua'}, ditugaskan untuk bertindak dan melaksanakan wewenang kedinasan sehari-hari sebagai <strong>Pelaksana Harian (Plh.) Ketua Pengadilan Agama Lumajang Kelas I-A</strong> terhitung sejak tanggal <strong>{formData.tanggalMulai}</strong> sampai dengan <strong>{formData.tanggalSelesai}</strong>.
                   </p>
                   <p>
-                    2. Menandatangani lembar kendali disposisi surat masuk, persetujuan surat keluar kedinasan, pengesahan berkas perkara elektronik, dan tanda tangan elektronik (TTE) resmi atas nama Plh. Ketua Pengadilan Agama Lamongan.
+                    2. Menandatangani lembar kendali disposisi surat masuk, persetujuan surat keluar kedinasan, pengesahan berkas perkara elektronik, dan tanda tangan elektronik (TTE) resmi atas nama Plh. Ketua Pengadilan Agama Lumajang.
                   </p>
                   <p>
                     3. Melaporkan pelaksanaan tugas kedinasan yang telah diselesaikan kepada Ketua Pengadilan Agama setelah masa berhalangan berakhir.
@@ -809,10 +791,10 @@ export default function PelimpahanKewenangan() {
             {/* Penutup & Tanda Tangan */}
             <div className="pt-8 flex justify-end font-sans">
               <div className="text-center w-64 space-y-1">
-                <p>Ditetapkan di Lamongan</p>
+                <p>Ditetapkan di Lumajang</p>
                 <p>Pada tanggal: {formData.tanggalMulai}</p>
                 <p className="font-bold pt-1">
-                  Ketua Pengadilan Agama Lamongan,
+                  Ketua Pengadilan Agama Lumajang,
                 </p>
                 <div className="py-4">
                   <span className="px-3 py-1 border border-dashed border-gray-400 text-[10px] text-gray-500 rounded">
