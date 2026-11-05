@@ -669,33 +669,12 @@ export default function Disposisi() {
                 </div>
               </div>
 
-              <div className="p-2 flex flex-col justify-between">
+              <div className="p-2 space-y-1">
                 <div>
                   Tanggal selesai dari {plhConfig?.isActive ? 'Plh. Ketua' : 'Ketua'} :{' '}
                   <span className="font-semibold">
-                    {existingDisposisi?.tanggalDisposisi?.slice(0, 10) || form.tanggalKirim}
+                    {existingDisposisi?.tanggalDisposisi?.slice(0, 10) || form.tanggalKirim || '...........................'}
                   </span>
-                </div>
-
-                {/* Box Pengesahan TTE Resmi */}
-                <div className="mt-2 text-center">
-                  <div className="inline-block px-2 py-0.5 border border-dashed border-primary bg-primary-light/20 rounded mb-1">
-                    <span className="text-[9px] font-bold text-primary flex items-center justify-center gap-1 font-sans">
-                      <span className="material-symbols-outlined text-[13px]">verified</span>
-                      <span>TERVERIFIKASI TTE MAHKAMAH AGUNG</span>
-                    </span>
-                  </div>
-                  <p className="font-bold underline text-xs font-serif">
-                    {existingDisposisi?.tandaTanganElektronik?.penandatangan ||
-                      (plhConfig?.isActive ? plhConfig.pejabatPlh.name : plhConfig.pejabatAsal.name)}
-                  </p>
-                  <p className="text-[10px] text-neutral-700 font-sans">
-                    {plhConfig?.isActive
-                      ? (plhConfig.tipePelimpahan === 'hakim_ditunjuk'
-                          ? 'Hakim Senior selaku Plh. Ketua'
-                          : 'Wakil Ketua selaku Plh. Ketua')
-                      : 'Ketua Pengadilan Agama Lumajang'}
-                  </p>
                 </div>
               </div>
             </div>
