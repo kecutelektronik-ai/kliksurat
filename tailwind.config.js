@@ -22,12 +22,12 @@ export default {
           espresso: '#161113',
         },
         primary: {
-          DEFAULT: '#4A1525',        // Dominan Burgundy Silk (Kemewahan Marun Kerajaan)
-          dark: '#340D19',
-          light: '#F8EDF0',
-          container: '#5E1B30',
-          fixed: '#E6C9D1',
-          dim: '#D1A3B0',
+          DEFAULT: '#26331C',        // Dominan Green Olive Silk
+          dark: '#1A2413',
+          light: '#EFF4EC',
+          container: '#334426',
+          fixed: '#D3DFCA',
+          dim: '#A6BE97',
         },
         accent: {
           DEFAULT: '#334426',         // Dominan Green Olive Silk (Keanggunan Zaitun Mewah)

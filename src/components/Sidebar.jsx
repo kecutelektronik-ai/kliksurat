@@ -17,7 +17,7 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
     { id: 'arsip', label: 'Arsip Surat', icon: 'archive' },
     { id: 'pengaturan-nomor', label: 'Pengaturan Nomor Surat', icon: 'pin' },
     { id: 'laporan', label: 'Rekapitulasi & Laporan', icon: 'assessment' },
-    { id: 'pimpinan', label: 'Halaman Pimpinan', icon: 'shield_person', badge: 'Khusus' },
+    { id: 'pimpinan', label: 'Halaman Pimpinan', icon: 'shield_person' },
     {
       id: 'kewenangan-plh',
       label: 'Kewenangan Plh Ketua',
@@ -52,9 +52,10 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-[280px] flex flex-col shrink-0 bg-primary text-white border-r border-primary-dark shadow-md z-50 transition-transform duration-300 ease-in-out ${
+        className={`fixed lg:sticky top-0 left-0 h-screen w-[280px] flex flex-col shrink-0 text-white shadow-md z-50 transition-transform duration-300 ease-in-out ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
+        style={{ backgroundColor: '#212B18', borderRight: '1px solid #161D10' }}
       >
         <div className="h-full flex flex-col justify-between p-4">
           {/* Upper Section */}
@@ -73,7 +74,7 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
                   <h1 className="text-base font-extrabold text-white tracking-wide leading-tight">
                     KlikDispos
                   </h1>
-                  <p className="text-[10.5px] text-amber-100/80 font-medium leading-tight mt-0.5">
+                  <p className="text-[10.5px] text-emerald-100/80 font-medium leading-tight mt-0.5">
                     <span className="block">Kanal Layanan Instan</span>
                     <span className="block">Kendali Disposisi & Surat</span>
                   </p>
@@ -82,7 +83,7 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
 
               {/* Close button on mobile */}
               <button
-                className="lg:hidden p-1 rounded-lg text-amber-100/80 hover:text-white hover:bg-white/10"
+                className="lg:hidden p-1 rounded-lg text-emerald-100/80 hover:text-white hover:bg-white/10"
                 onClick={() => setIsOpenMobile(false)}
                 title="Tutup Menu"
               >
@@ -94,7 +95,8 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
             <div className="pt-1">
               <button
                 onClick={handleCreateNew}
-                className="w-full h-10 px-4 rounded-btn bg-warning hover:bg-warning-dark text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2 shadow-md transition-all duration-150 active:scale-[0.99]"
+                className="w-full h-10 px-4 rounded-btn text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md transition-all duration-150 active:scale-[0.99] hover:brightness-110"
+                style={{ backgroundColor: '#3A4C28', border: '1px solid #4D6435' }}
               >
                 <span className="material-symbols-outlined text-[20px] font-bold">add</span>
                 <span>Buat Surat Baru</span>
@@ -111,9 +113,10 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
                     onClick={() => handleNavClick(item.id)}
                     className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-left transition-all duration-150 ${
                       isActive
-                        ? 'bg-accent text-white font-bold border border-accent-dark shadow-sm'
+                        ? 'text-white font-bold shadow-sm'
                         : 'text-stone-200/90 font-medium hover:bg-white/10 hover:text-white'
                     }`}
+                    style={isActive ? { backgroundColor: '#334426', border: '1px solid #485E37' } : {}}
                   >
                     <div className="flex items-center gap-3">
                       <span
@@ -128,7 +131,7 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
 
                     {item.badge && (
                       <span
-                        className="text-[10px] px-1.5 py-0.5 rounded font-extrabold uppercase bg-warning text-slate-950 shadow-2xs"
+                        className="text-[10px] px-1.5 py-0.5 rounded font-extrabold uppercase bg-white/20 text-white shadow-2xs border border-white/20"
                       >
                         {item.badge}
                       </span>

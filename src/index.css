@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #4A1525;    /* Dominan Burgundy Silk */
+  --color-primary: #26331C;    /* Dominan Green Olive Silk */
   --color-accent: #334426;     /* Dominan Green Olive Silk */
   --color-warning: #D4C2A3;    /* Champagne Silk Gold (Aksen Emas Mewah) */
   --color-success: #334426;    /* Green Olive Silk (Status Selesai & Simpan) */
