@@ -1214,9 +1214,10 @@ export default function Disposisi() {
             })()}
 
             {/* 6. MAIN BODY (Kiri: DISPOSISI KEPADA + CATATAN ALUR LENGKAP, Kanan: 18 PETUNJUK) */}
-            <div className="grid grid-cols-12 border-b border-black font-sans text-[11px]">
+            {/* Garis tengah 50%-50% lurus tersambung dari bagian atas (Sifat), tengah (Body), dan bawah (Kisi Proses) */}
+            <div className="grid grid-cols-2 border-b border-black font-sans text-[11px]">
               {/* Kolom Kiri: DISPOSISI KEPADA (Atas) & CATATAN ALUR (Bawah) */}
-              <div className="col-span-5 border-r border-black flex flex-col justify-between">
+              <div className="border-r border-black flex flex-col justify-between">
                 {/* DISPOSISI KEPADA */}
                 <div className="p-2.5 space-y-1.5">
                   <div className="font-bold underline text-xs mb-2">DISPOSISI KEPADA:</div>
@@ -1291,7 +1292,7 @@ export default function Disposisi() {
               </div>
 
               {/* Kolom Kanan: PETUNJUK RESMI (18 Item Sesuai Format Gambar 26) */}
-              <div className="col-span-7 p-2.5 space-y-1.5">
+              <div className="p-2.5 space-y-1.5">
                 <div className="font-bold underline text-xs mb-2">PETUNJUK:</div>
                 {OFFICIAL_PETUNJUK.map((petunjuk) => {
                   const isChecked = form.petunjukPilihan.includes(petunjuk);
