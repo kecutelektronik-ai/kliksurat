@@ -135,8 +135,11 @@ export default function Disposisi() {
       showToast('Pilih minimal satu jabatan penerima disposisi', 'warning');
       return;
     }
+    const prioritasIsSangatSegera =
+      currentSurat?.prioritas === 'Sangat Segera' || currentSurat?.sifat === 'sangat_segera';
     saveDisposisi(selectedLetterId, {
       ...form,
+      sifatDisposisi: prioritasIsSangatSegera ? 'sangat_segera' : 'segera',
       instruksiPilihan: form.petunjukPilihan,
     });
   };
@@ -272,40 +275,6 @@ export default function Disposisi() {
           )}
 
           <form onSubmit={handleSave} className="space-y-4 text-xs">
-            {/* Sifat Disposisi (SANGAT SEGERA vs SEGERA) */}
-            <div>
-              <label className="font-bold text-on-surface block mb-1.5">
-                Tingkat Kecepatan Disposisi:
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, sifatDisposisi: 'sangat_segera' })}
-                  className={`h-9 px-3 rounded-btn border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-                    form.sifatDisposisi === 'sangat_segera'
-                      ? 'bg-danger text-white border-danger shadow-xs'
-                      : 'bg-surface text-on-surface border-outline-subtle hover:bg-surface-low'
-                  }`}
-                >
-                  <span>{form.sifatDisposisi === 'sangat_segera' ? '☑' : '☐'}</span>
-                  <span>SANGAT SEGERA</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setForm({ ...form, sifatDisposisi: 'segera' })}
-                  className={`h-9 px-3 rounded-btn border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-                    form.sifatDisposisi === 'segera'
-                      ? 'bg-primary text-white border-primary shadow-xs'
-                      : 'bg-surface text-on-surface border-outline-subtle hover:bg-surface-low'
-                  }`}
-                >
-                  <span>{form.sifatDisposisi === 'segera' ? '☑' : '☐'}</span>
-                  <span>SEGERA</span>
-                </button>
-              </div>
-            </div>
-
             {/* Disposisi Kepada (9 Jabatan Resmi) */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
@@ -554,21 +523,29 @@ export default function Disposisi() {
               </div>
             </div>
 
-            {/* 5. CHECKBOX SIFAT: SANGAT SEGERA vs SEGERA */}
-            <div className="grid grid-cols-2 border-b border-black font-sans text-xs font-bold text-center">
-              <div className="p-1.5 border-r border-black flex items-center justify-center gap-2">
-                <span className="inline-block w-4 h-4 border border-black text-xs leading-none text-center font-bold">
-                  {form.sifatDisposisi === 'sangat_segera' ? '✓' : ''}
-                </span>
-                <span>SANGAT SEGERA</span>
-              </div>
-              <div className="p-1.5 flex items-center justify-center gap-2">
-                <span className="inline-block w-4 h-4 border border-black text-xs leading-none text-center font-bold">
-                  {form.sifatDisposisi === 'segera' ? '✓' : ''}
-                </span>
-                <span>SEGERA</span>
-              </div>
-            </div>
+            {/* 5. CHECKBOX SIFAT: SANGAT SEGERA vs SEGERA (Diambil dari Prioritas Surat Masuk) */}
+            {(() => {
+              const isSangatSegera =
+                currentSurat?.prioritas === 'Sangat Segera' ||
+                currentSurat?.sifat === 'sangat_segera' ||
+                form.sifatDisposisi === 'sangat_segera';
+              return (
+                <div className="grid grid-cols-2 border-b border-black font-sans text-xs font-bold text-center">
+                  <div className="p-1.5 border-r border-black flex items-center justify-center gap-2">
+                    <span className="inline-block w-4 h-4 border border-black text-xs leading-none text-center font-bold">
+                      {isSangatSegera ? '✓' : ''}
+                    </span>
+                    <span>SANGAT SEGERA</span>
+                  </div>
+                  <div className="p-1.5 flex items-center justify-center gap-2">
+                    <span className="inline-block w-4 h-4 border border-black text-xs leading-none text-center font-bold">
+                      {!isSangatSegera ? '✓' : ''}
+                    </span>
+                    <span>SEGERA</span>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* 6. MAIN BODY (Kiri: DISPOSISI KEPADA + CATATAN, Kanan: 18 PETUNJUK) */}
             <div className="grid grid-cols-12 border-b border-black font-sans text-[11px]">
