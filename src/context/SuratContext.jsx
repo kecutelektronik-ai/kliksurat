@@ -363,11 +363,36 @@ const INITIAL_NOMOR_CONFIG = {
   tahun: 2026,
   format: '[PREFIX]/[NO]/[KODE]/[BULAN]/[TAHUN]',
   klasifikasi: [
-    { kode: 'HK.01', nama: 'Kepaniteraan Perkara / Administrasi Hukum', counter: 1043 },
-    { kode: 'PL.01', nama: 'Perencanaan, TI & Pelaporan', counter: 215 },
-    { kode: 'UM.01', nama: 'Umum & Tata Persuratan Kedinasan', counter: 531 },
-    { kode: 'KP.02', nama: 'Kepegawaian, Organisasi & Tata Laksana', counter: 189 },
-    { kode: 'KU.01', nama: 'Keuangan & Pengelolaan DIPA', counter: 304 },
+    {
+      kode: 'HK.01',
+      nama: 'Kepaniteraan Perkara / Administrasi Hukum',
+      penjelasan: 'Naskah dinas terkait administrasi perkara peradilan, pemanggilan para pihak, pemberitahuan putusan, delegasi sidang, permohonan kasasi/PK, dan laporan perkara.',
+      counter: 1043
+    },
+    {
+      kode: 'PL.01',
+      nama: 'Perencanaan, TI & Pelaporan',
+      penjelasan: 'Naskah dinas terkait usulan rencana kerja operasional, anggaran DIPA, implementasi teknologi informasi, laporan kinerja instansi (LKjIP), SAKIP, dan evaluasi berkala.',
+      counter: 215
+    },
+    {
+      kode: 'UM.01',
+      nama: 'Umum & Tata Persuratan Kedinasan',
+      penjelasan: 'Naskah dinas urusan dinas umum, koordinasi lintas satker, permohonan fasilitas sarpras, pengadaan barang dan jasa, rumah tangga, serta tata persuratan dinas.',
+      counter: 531
+    },
+    {
+      kode: 'KP.02',
+      nama: 'Kepegawaian, Organisasi & Tata Laksana',
+      penjelasan: 'Naskah dinas usulan kenaikan pangkat/golongan, mutasi dan promosi jabatan, permohonan cuti dinas, disiplin pegawai/aparatur, dan pembaruan struktur organisasi.',
+      counter: 189
+    },
+    {
+      kode: 'KU.01',
+      nama: 'Keuangan & Pengelolaan DIPA',
+      penjelasan: 'Naskah dinas pertanggungjawaban realisasi anggaran, pengajuan SPM/SP2D ke KPPN, laporan bulanan bendahara, rekonsiliasi keuangan DIPA 01 & 04, dan urusan pajak.',
+      counter: 304
+    },
   ]
 };
 
@@ -465,7 +490,21 @@ export function SuratProvider({ children }) {
 
   const [nomorConfig, setNomorConfig] = useState(() => {
     const saved = localStorage.getItem('surat_nomor_config');
-    return saved ? JSON.parse(saved) : INITIAL_NOMOR_CONFIG;
+    if (!saved) return INITIAL_NOMOR_CONFIG;
+    try {
+      const parsed = JSON.parse(saved);
+      const defaultMap = {};
+      INITIAL_NOMOR_CONFIG.klasifikasi.forEach((k) => {
+        defaultMap[k.kode] = k.penjelasan;
+      });
+      parsed.klasifikasi = (parsed.klasifikasi || []).map((k) => ({
+        ...k,
+        penjelasan: k.penjelasan || defaultMap[k.kode] || `Naskah dinas resmi terkait bidang ${k.nama}.`,
+      }));
+      return parsed;
+    } catch {
+      return INITIAL_NOMOR_CONFIG;
+    }
   });
 
   // Pelimpahan Kewenangan (Plh Ketua saat Cuti / Dinas Luar)
@@ -1150,11 +1189,83 @@ export function SuratProvider({ children }) {
     }
   };
 
+  // Hak Akses Admin Pengelolaan Klasifikasi & Sistem
+  const isAdmin =
+    currentUser.roleKey === 'petugas' ||
+    currentUser.roleKey === 'sekretaris' ||
+    currentUser.roleKey === 'kasubag_umum' ||
+    currentUser.roleKey === 'admin' ||
+    Boolean(currentUser.permissions?.includes('settings')) ||
+    Boolean(currentUser.permissions?.includes('all_letters'));
+
+  const addKlasifikasi = (item) => {
+    const code = item.kode?.toUpperCase().trim();
+    if (!code || !item.nama?.trim()) {
+      showToast('Kode dan nama klasifikasi wajib diisi', 'warning');
+      return false;
+    }
+    const exists = (nomorConfig.klasifikasi || []).some((k) => k.kode === code);
+    if (exists) {
+      showToast(`Kode klasifikasi ${code} sudah terdaftar`, 'warning');
+      return false;
+    }
+    const updated = [
+      ...(nomorConfig.klasifikasi || []),
+      {
+        kode: code,
+        nama: item.nama.trim(),
+        penjelasan: item.penjelasan?.trim() || `Naskah dinas resmi terkait bidang ${item.nama.trim()}.`,
+        counter: Number(item.counter) || 0,
+      },
+    ];
+    setNomorConfig((prev) => ({ ...prev, klasifikasi: updated }));
+    showToast(`Kode klasifikasi ${code} berhasil ditambahkan oleh Admin.`, 'success');
+    return true;
+  };
+
+  const updateKlasifikasi = (oldKode, updatedItem) => {
+    const newCode = updatedItem.kode ? updatedItem.kode.toUpperCase().trim() : oldKode;
+    if (newCode !== oldKode) {
+      const exists = (nomorConfig.klasifikasi || []).some((k) => k.kode === newCode);
+      if (exists) {
+        showToast(`Kode klasifikasi ${newCode} sudah digunakan`, 'warning');
+        return false;
+      }
+    }
+    const updated = (nomorConfig.klasifikasi || []).map((k) => {
+      if (k.kode === oldKode) {
+        return {
+          ...k,
+          kode: newCode,
+          nama: updatedItem.nama ? updatedItem.nama.trim() : k.nama,
+          penjelasan: updatedItem.penjelasan !== undefined ? updatedItem.penjelasan.trim() : k.penjelasan,
+          counter: updatedItem.counter !== undefined ? Number(updatedItem.counter) : k.counter,
+        };
+      }
+      return k;
+    });
+    setNomorConfig((prev) => ({ ...prev, klasifikasi: updated }));
+    showToast(`Kode klasifikasi ${oldKode} berhasil diperbarui.`, 'success');
+    return true;
+  };
+
+  const deleteKlasifikasi = (targetKode) => {
+    if ((nomorConfig.klasifikasi || []).length <= 1) {
+      showToast('Minimal harus ada satu kode klasifikasi aktif', 'warning');
+      return false;
+    }
+    const updated = (nomorConfig.klasifikasi || []).filter((k) => k.kode !== targetKode);
+    setNomorConfig((prev) => ({ ...prev, klasifikasi: updated }));
+    showToast(`Kode klasifikasi ${targetKode} berhasil dihapus.`, 'info');
+    return true;
+  };
+
   return (
     <SuratContext.Provider
       value={{
         USERS,
         currentUser,
+        isAdmin,
         switchUser,
         isLoggedIn,
         login,
@@ -1169,6 +1280,9 @@ export function SuratProvider({ children }) {
         trackingList,
         nomorConfig,
         setNomorConfig,
+        addKlasifikasi,
+        updateKlasifikasi,
+        deleteKlasifikasi,
         waSettings,
         setWaSettings,
         addSuratMasuk,

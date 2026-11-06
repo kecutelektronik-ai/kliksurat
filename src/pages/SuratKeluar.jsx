@@ -10,6 +10,10 @@ export default function SuratKeluar() {
     approveAndNumberSuratKeluar,
     nomorConfig,
     currentUser,
+    isAdmin,
+    addKlasifikasi,
+    updateKlasifikasi,
+    deleteKlasifikasi,
     plhConfig,
     showToast,
   } = useSurat();
@@ -31,6 +35,78 @@ export default function SuratKeluar() {
   const [showForm, setShowForm] = useState(false);
   const [filterQuery, setFilterQuery] = useState('');
   const [filterUnit, setFilterUnit] = useState('semua');
+
+  // State Modal Admin Kelola Kode Klasifikasi
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [editingKode, setEditingKode] = useState(null); // kode string if editing, null if not
+  const [modalForm, setModalForm] = useState({
+    kode: '',
+    nama: '',
+    penjelasan: '',
+    counter: 1,
+  });
+
+  const selectedKlasifikasi = (nomorConfig.klasifikasi || []).find(
+    (k) => k.kode === form.kodeKlasifikasi
+  ) || nomorConfig.klasifikasi?.[0];
+
+  const handleOpenAddKlasifikasi = () => {
+    setEditingKode(null);
+    setModalForm({
+      kode: '',
+      nama: '',
+      penjelasan: '',
+      counter: 1,
+    });
+    setShowAdminModal(true);
+  };
+
+  const handleOpenEditKlasifikasi = (item) => {
+    setEditingKode(item.kode);
+    setModalForm({
+      kode: item.kode,
+      nama: item.nama,
+      penjelasan: item.penjelasan || '',
+      counter: item.counter || 0,
+    });
+    setShowAdminModal(true);
+  };
+
+  const handleSaveModalKlasifikasi = (e) => {
+    e.preventDefault();
+    if (!modalForm.kode.trim() || !modalForm.nama.trim()) {
+      showToast('Kode dan nama klasifikasi wajib diisi', 'warning');
+      return;
+    }
+
+    if (editingKode) {
+      const ok = updateKlasifikasi(editingKode, modalForm);
+      if (ok) {
+        if (form.kodeKlasifikasi === editingKode) {
+          setForm((prev) => ({ ...prev, kodeKlasifikasi: modalForm.kode.toUpperCase().trim() }));
+        }
+        setShowAdminModal(false);
+      }
+    } else {
+      const ok = addKlasifikasi(modalForm);
+      if (ok) {
+        setForm((prev) => ({ ...prev, kodeKlasifikasi: modalForm.kode.toUpperCase().trim() }));
+        setShowAdminModal(false);
+      }
+    }
+  };
+
+  const handleDeleteItem = (targetKode) => {
+    if (window.confirm(`Yakin ingin menghapus kode klasifikasi "${targetKode}"?`)) {
+      const ok = deleteKlasifikasi(targetKode);
+      if (ok && form.kodeKlasifikasi === targetKode) {
+        const remaining = (nomorConfig.klasifikasi || []).filter((k) => k.kode !== targetKode);
+        if (remaining.length > 0) {
+          setForm((prev) => ({ ...prev, kodeKlasifikasi: remaining[0].kode }));
+        }
+      }
+    }
+  };
 
   const handleCreateDraft = (e) => {
     e.preventDefault();
@@ -161,9 +237,22 @@ export default function SuratKeluar() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-on-surface-variant">
-                  Kode Klasifikasi Tata Persuratan <span className="text-danger">*</span>
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-on-surface-variant">
+                    Kode Klasifikasi Tata Persuratan <span className="text-danger">*</span>
+                  </label>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={handleOpenAddKlasifikasi}
+                      className="text-[11px] text-primary hover:underline font-bold flex items-center gap-1"
+                      title="Hak Akses Admin: Tambah, Edit, Hapus Kode Klasifikasi"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+                      <span>+ Tambah / Kelola Kode (Admin)</span>
+                    </button>
+                  )}
+                </div>
                 <select
                   value={form.kodeKlasifikasi}
                   onChange={(e) => setForm({ ...form, kodeKlasifikasi: e.target.value })}
@@ -175,6 +264,46 @@ export default function SuratKeluar() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* KOLOM PENJELASAN SINGKAT KODE KLASIFIKASI SURAT (Sesuai Permintaan User) */}
+              <div className="space-y-1 md:col-span-2">
+                <div className="p-3.5 rounded-card bg-primary-light/40 border border-primary/30 flex flex-col sm:flex-row items-start gap-3 transition-all">
+                  <div className="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0 shadow-2xs font-bold font-code text-xs">
+                    {selectedKlasifikasi?.kode || form.kodeKlasifikasi}
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="font-bold text-primary text-xs flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[16px]">verified</span>
+                        <span>Ruang Lingkup & Penjelasan Kode: {selectedKlasifikasi?.nama}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white text-primary border border-primary/20">
+                          Nomor Berikutnya: {(selectedKlasifikasi?.counter || 0) + 1}
+                        </span>
+                        {isAdmin && selectedKlasifikasi && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditKlasifikasi(selectedKlasifikasi)}
+                            className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
+                            title="Edit kode klasifikasi ini"
+                          >
+                            <span className="material-symbols-outlined text-[13px]">edit</span>
+                            <span>Edit Penjelasan</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-on-surface leading-relaxed font-medium">
+                      {selectedKlasifikasi?.penjelasan || `Naskah dinas resmi terkait bidang ${selectedKlasifikasi?.nama}.`}
+                    </p>
+                    <div className="text-[11px] text-outline flex items-center gap-1 pt-0.5">
+                      <span className="material-symbols-outlined text-[14px] text-amber-600">help_outline</span>
+                      <span><strong>Tujuan Penjelasan:</strong> Pastikan perihal naskah dinas Anda sesuai dengan ruang lingkup klasifikasi di atas sebelum diajukan.</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1 md:col-span-2">
@@ -417,6 +546,186 @@ export default function SuratKeluar() {
           </table>
         </div>
       </div>
+
+      {/* Modal Admin: Tambah & Edit Kode Klasifikasi Surat */}
+      {showAdminModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-card shadow-2xl border border-outline-subtle max-w-2xl w-full p-5 md:p-6 space-y-4 my-8 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-outline-subtle">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[22px]">admin_panel_settings</span>
+                <div>
+                  <h3 className="text-base font-bold text-on-surface">
+                    {editingKode ? `Edit Kode Klasifikasi: ${editingKode}` : 'Kelola & Tambah Kode Klasifikasi Surat'}
+                  </h3>
+                  <p className="text-[11px] text-outline">
+                    Hak Akses Admin: Tambah baru, edit nama & penjelasan ruang lingkup, serta hapus kode.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAdminModal(false)}
+                className="w-8 h-8 rounded-full hover:bg-surface flex items-center justify-center text-outline hover:text-on-surface"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Form Tambah / Edit */}
+            <form onSubmit={handleSaveModalKlasifikasi} className="p-4 rounded-lg bg-surface/50 border border-outline-subtle space-y-3 text-xs">
+              <div className="font-bold text-primary flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[16px]">
+                  {editingKode ? 'edit_note' : 'add_circle'}
+                </span>
+                <span>{editingKode ? 'Formulir Perubahan Kode Klasifikasi' : 'Formulir Tambah Kode Klasifikasi Baru'}</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="font-bold text-on-surface block mb-1">
+                    Kode Klasifikasi <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={modalForm.kode}
+                    onChange={(e) => setModalForm({ ...modalForm, kode: e.target.value.toUpperCase() })}
+                    placeholder="Contoh: OT.01"
+                    className="w-full h-9 px-2.5 rounded border border-outline-subtle bg-white font-code font-bold uppercase text-on-surface"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-on-surface block mb-1">
+                    Nama / Bidang Administrasi <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={modalForm.nama}
+                    onChange={(e) => setModalForm({ ...modalForm, nama: e.target.value })}
+                    placeholder="Contoh: Organisasi dan Tata Laksana"
+                    className="w-full h-9 px-2.5 rounded border border-outline-subtle bg-white font-semibold text-on-surface"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-on-surface block mb-1">
+                  Penjelasan Singkat & Ruang Lingkup Surat: <span className="text-danger">*</span>
+                </label>
+                <textarea
+                  rows={2}
+                  required
+                  value={modalForm.penjelasan}
+                  onChange={(e) => setModalForm({ ...modalForm, penjelasan: e.target.value })}
+                  placeholder="Jelaskan jenis surat yang termasuk dalam kode ini agar pengguna dapat memastikan kecocokan kode..."
+                  className="w-full p-2.5 text-xs rounded border border-outline-subtle bg-white text-on-surface focus:ring-2 focus:ring-primary/20 outline-none resize-none leading-relaxed"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                <div>
+                  <label className="font-bold text-on-surface block mb-1">
+                    Counter Nomor Urut Terakhir:
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={modalForm.counter}
+                    onChange={(e) => setModalForm({ ...modalForm, counter: Number(e.target.value) })}
+                    className="w-full h-9 px-2.5 rounded border border-outline-subtle bg-white font-code font-bold text-on-surface"
+                  />
+                </div>
+                <div className="flex items-center justify-end gap-2">
+                  {editingKode && (
+                    <button
+                      type="button"
+                      onClick={handleOpenAddKlasifikasi}
+                      className="h-9 px-3 rounded border border-outline-subtle bg-white text-xs font-semibold hover:bg-surface"
+                    >
+                      Batal Edit
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="h-9 px-4 rounded bg-primary hover:bg-primary-dark text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">save</span>
+                    <span>{editingKode ? 'Simpan Perubahan' : 'Tambahkan Kode'}</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            {/* Tabel Daftar Kode yang Ada dengan Aksi Edit & Hapus */}
+            <div className="space-y-2">
+              <div className="text-xs font-bold text-on-surface flex items-center justify-between">
+                <span>Daftar Kode Klasifikasi Terdaftar ({nomorConfig.klasifikasi.length}):</span>
+                <span className="text-[10px] text-outline font-normal">Klik tombol Edit atau Hapus di setiap baris</span>
+              </div>
+              <div className="border border-outline-subtle rounded-lg max-h-56 overflow-y-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-surface border-b border-outline-subtle font-bold text-outline sticky top-0">
+                    <tr>
+                      <th className="p-2">Kode</th>
+                      <th className="p-2">Nama & Penjelasan Singkat</th>
+                      <th className="p-2 text-center">Counter</th>
+                      <th className="p-2 text-right">Aksi Admin</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-subtle">
+                    {nomorConfig.klasifikasi.map((k) => (
+                      <tr key={k.kode} className="hover:bg-surface/50">
+                        <td className="p-2 font-bold font-code text-primary align-top whitespace-nowrap">
+                          {k.kode}
+                        </td>
+                        <td className="p-2 align-top">
+                          <div className="font-semibold text-on-surface">{k.nama}</div>
+                          <div className="text-[11px] text-outline line-clamp-2 mt-0.5">
+                            {k.penjelasan || '-'}
+                          </div>
+                        </td>
+                        <td className="p-2 text-center font-code font-bold align-top">
+                          {k.counter}
+                        </td>
+                        <td className="p-2 text-right align-top whitespace-nowrap space-x-1">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditKlasifikasi(k)}
+                            className="px-2 py-1 rounded bg-surface hover:bg-primary-light hover:text-primary border border-outline-subtle text-[11px] font-semibold"
+                            title="Edit kode klasifikasi ini"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteItem(k.kode)}
+                            className="px-2 py-1 rounded bg-rose-50 hover:bg-danger hover:text-white border border-rose-200 text-danger text-[11px] font-semibold transition-colors"
+                            title="Hapus kode klasifikasi ini"
+                          >
+                            Hapus
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-outline-subtle flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowAdminModal(false)}
+                className="h-9 px-4 rounded-btn bg-surface border border-outline-subtle text-xs font-semibold hover:bg-surface-low"
+              >
+                Selesai & Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
