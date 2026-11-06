@@ -206,9 +206,10 @@ const INITIAL_SURAT_MASUK = [
 const INITIAL_SURAT_KELUAR = [
   {
     id: 'SK-001',
-    nomorSurat: 'W13-A12/1042/HK.01/X/2026',
+    nomorSurat: '1042/PAN.PA/HK.01/X/2026',
     agenda: '0001/SK/X/2026',
     unitPengusul: 'Kepaniteraan Perkara',
+    kodePenandatangan: 'PAN.PA',
     pembuat: 'Ibu Dra. Hj. Nurjanah, M.H. (Panitera)',
     tujuanSurat: 'Mahkamah Agung Republik Indonesia',
     perihal: 'Penyampaian Laporan Triwulan III Kinerja Perkara Elektronik (e-Court) & Mediasi Yudisial',
@@ -223,9 +224,10 @@ const INITIAL_SURAT_KELUAR = [
   },
   {
     id: 'SK-002',
-    nomorSurat: 'W13-A12/1043/PL.01/X/2026',
+    nomorSurat: '1043/SEK.PA/PL.01/X/2026',
     agenda: '0002/SK/X/2026',
     unitPengusul: 'Kesekretariatan (Subbag Perencanaan)',
+    kodePenandatangan: 'SEK.PA',
     pembuat: 'Bpk. H. M. Ridwan, S.H. (Sekretaris)',
     tujuanSurat: 'Badan Urusan Administrasi Mahkamah Agung RI',
     perihal: 'Usulan Alokasi Anggaran Tambahan Pemeliharaan Gedung & Pengadaan Ruang Server TA 2027',
@@ -243,6 +245,7 @@ const INITIAL_SURAT_KELUAR = [
     nomorSurat: 'Draft (Menunggu Nomor)',
     agenda: '0003/SK/X/2026',
     unitPengusul: 'Kepaniteraan (Panmud Hukum)',
+    kodePenandatangan: 'KPA',
     pembuat: 'Ahmad Fauzi, S.H. (Panmud Hukum)',
     tujuanSurat: 'Pengadilan Tinggi Agama Surabaya',
     perihal: 'Surat Tugas Delegasi Pendampingan Rapat Koordinasi Pembinaan Wilayah Semester II',
@@ -260,6 +263,7 @@ const INITIAL_SURAT_KELUAR = [
     nomorSurat: 'Draft (Menunggu Paraf)',
     agenda: '0004/SK/X/2026',
     unitPengusul: 'Kesekretariatan (Subbag TI & Pelaporan)',
+    kodePenandatangan: 'SEK.PA',
     pembuat: 'Staf Subbag TI',
     tujuanSurat: 'Penyedia Layanan Jaringan Internet Telkom',
     perihal: 'Permohonan Peningkatan Bandwidth VPN Peradilan Terintegrasi Mahkamah Agung',
@@ -361,7 +365,8 @@ const INITIAL_TRACKING = {
 const INITIAL_NOMOR_CONFIG = {
   kodePrefix: 'W13-A12',
   tahun: 2026,
-  format: '[PREFIX]/[NO]/[KODE]/[BULAN]/[TAHUN]',
+  format: '[NO]/[KODE_PENANDATANGAN]/[KODE_KLASIFIKASI]/[BULAN]/[TAHUN]',
+  rumus: '(nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)',
   klasifikasi: [
     {
       kode: 'HK.01',
@@ -861,12 +866,14 @@ export function SuratProvider({ children }) {
     const count = suratKeluar.length + 1;
     const newId = `SK-${String(count).padStart(3, '0')}`;
     const agendaNo = formatAgendaSuratKeluar(count, draftData.tanggalSurat || new Date());
+    const kodePenandatangan = draftData.kodePenandatangan || 'KPA';
 
     const newDraft = {
       id: newId,
       nomorSurat: 'Draft (Menunggu Persetujuan Atasan)',
       agenda: agendaNo,
       unitPengusul: draftData.unitPengusul || currentUser.department,
+      kodePenandatangan: kodePenandatangan,
       pembuat: `${currentUser.name} (${currentUser.role})`,
       tujuanSurat: draftData.tujuanSurat,
       perihal: draftData.perihal,
@@ -898,19 +905,21 @@ export function SuratProvider({ children }) {
   // Roman numeral helper
   const getRomanMonth = (monthNumber) => {
     const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
-    return roman[monthNumber] || 'X';
+    return roman[monthNumber] || 'XI';
   };
 
   // Approve Surat Keluar & generate official number -> Update Supabase
   const approveAndNumberSuratKeluar = async (letterId) => {
-    const targetKlasifikasi = suratKeluar.find(s => s.id === letterId)?.kodeKlasifikasi || 'HK.01';
+    const targetItem = suratKeluar.find(s => s.id === letterId);
+    const targetKlasifikasi = targetItem?.kodeKlasifikasi || 'HK.01';
+    const kodePenandatangan = targetItem?.kodePenandatangan || 'KPA';
     
     // Increment counter in config
     let nextNum = 1044;
     setNomorConfig(prev => {
       const updated = prev.klasifikasi.map(k => {
         if (k.kode === targetKlasifikasi) {
-          nextNum = k.counter + 1;
+          nextNum = (k.counter || 0) + 1;
           return { ...k, counter: nextNum };
         }
         return k;
@@ -918,8 +927,13 @@ export function SuratProvider({ children }) {
       return { ...prev, klasifikasi: updated };
     });
 
-    const romanMonth = getRomanMonth(new Date().getMonth());
-    const generatedNo = `${nomorConfig.kodePrefix}/${nextNum}/${targetKlasifikasi}/${romanMonth}/${nomorConfig.tahun}`;
+    const dateObj = targetItem?.tanggalSurat ? new Date(targetItem.tanggalSurat) : new Date();
+    const monthIdx = isNaN(dateObj.getTime()) ? new Date().getMonth() : dateObj.getMonth();
+    const romanMonth = getRomanMonth(monthIdx);
+    const tahunSurat = isNaN(dateObj.getTime()) ? (nomorConfig.tahun || 2026) : dateObj.getFullYear();
+    
+    // Rumus: (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
+    const generatedNo = `${nextNum}/${kodePenandatangan}/${targetKlasifikasi}/${romanMonth}/${tahunSurat}`;
     
     // Penentuan nama pejabat yang menyetujui (Ketua / Plh Wakil Ketua / Plh Hakim Ditunjuk)
     let approvedByName = currentUser.name;
@@ -942,6 +956,7 @@ export function SuratProvider({ children }) {
         return {
           ...item,
           nomorSurat: generatedNo,
+          kodePenandatangan: kodePenandatangan,
           status: 'Disetujui & Diterbitkan Nomor',
           disetujuiOleh: approvedByName,
           waktuPersetujuan: waktuPersetujuanIso,

@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
-import { formatAgendaSuratKeluar, UNIT_PENGUSUL_OPTIONS } from '../constants/suratOptions';
+import {
+  formatAgendaSuratKeluar,
+  UNIT_PENGUSUL_OPTIONS,
+  PENANDATANGAN_OPTIONS,
+  formatNomorSuratKeluar,
+  getPenandatanganByKode,
+  getRomanMonth,
+  getYearFromDate,
+} from '../constants/suratOptions';
 
 export default function SuratKeluar() {
   const {
@@ -26,6 +34,7 @@ export default function SuratKeluar() {
     tujuanSurat: '',
     perihal: '',
     unitPengusul: defaultUnit,
+    kodePenandatangan: 'KPA', // Default Ketua: KPA
     kodeKlasifikasi: 'HK.01',
     tanggalSurat: new Date().toISOString().slice(0, 10),
     sifat: 'biasa',
@@ -49,6 +58,18 @@ export default function SuratKeluar() {
   const selectedKlasifikasi = (nomorConfig.klasifikasi || []).find(
     (k) => k.kode === form.kodeKlasifikasi
   ) || nomorConfig.klasifikasi?.[0];
+
+  const selectedPenandatangan = getPenandatanganByKode(form.kodePenandatangan);
+
+  // Perhitungan Pratinjau Nomor Surat Keluar Berdasarkan Rumus
+  // (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
+  const nextEstimatedNum = (selectedKlasifikasi?.counter || 0) + 1;
+  const previewNomorSuratKeluar = formatNomorSuratKeluar(
+    nextEstimatedNum,
+    form.kodePenandatangan,
+    form.kodeKlasifikasi,
+    form.tanggalSurat
+  );
 
   const handleOpenAddKlasifikasi = () => {
     setEditingKode(null);
@@ -120,6 +141,7 @@ export default function SuratKeluar() {
       tujuanSurat: '',
       perihal: '',
       unitPengusul: defaultUnit,
+      kodePenandatangan: 'KPA',
       kodeKlasifikasi: 'HK.01',
       tanggalSurat: new Date().toISOString().slice(0, 10),
       sifat: 'biasa',
@@ -138,6 +160,7 @@ export default function SuratKeluar() {
   const filteredSurat = suratKeluar.filter((s) => {
     const matchQuery =
       s.nomorSurat.toLowerCase().includes(filterQuery.toLowerCase()) ||
+      (s.kodePenandatangan || '').toLowerCase().includes(filterQuery.toLowerCase()) ||
       s.tujuanSurat.toLowerCase().includes(filterQuery.toLowerCase()) ||
       s.perihal.toLowerCase().includes(filterQuery.toLowerCase()) ||
       s.pembuat.toLowerCase().includes(filterQuery.toLowerCase()) ||
@@ -162,7 +185,7 @@ export default function SuratKeluar() {
           </div>
           <h2 className="text-2xl font-bold text-on-surface tracking-tight">Manajemen Surat Keluar</h2>
           <p className="text-xs md:text-sm text-outline">
-            Pengajuan naskah dinas, alur persetujuan atasan, penomoran otomatis, dan register surat keluar peradilan.
+            Pengajuan naskah dinas, penomoran resmi rumus SOP MARI, pilihan pejabat penandatangan, dan register surat keluar.
           </p>
         </div>
 
@@ -187,24 +210,39 @@ export default function SuratKeluar() {
         </div>
       </div>
 
-      {/* Information Banner: Aturan Penomoran Otomatis */}
-      <div className="p-4 rounded-card bg-primary-light/40 border border-primary/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
+      {/* Information Banner: Rumus Baku Penomoran Surat Keluar & Kode Penandatangan */}
+      <div className="p-4 rounded-card bg-primary-light/40 border border-primary/20 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 text-xs">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 shadow-2xs">
             <span className="material-symbols-outlined text-[22px]">format_list_numbered</span>
           </div>
           <div>
-            <div className="font-bold text-on-surface text-sm">
-              SOP Penomoran Surat Keluar Otomatis
+            <div className="font-bold text-on-surface text-sm flex items-center gap-2">
+              <span>SOP Rumus Penomoran Surat Keluar Resmi</span>
+              <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-primary text-white font-bold">
+                (No. Urut / TTD / Klasifikasi / Bulan / Tahun)
+              </span>
             </div>
-            <p className="text-on-surface-variant">
-              Nomor urut resmi diterbitkan sistem secara otomatis setelah naskah dinas disetujui atasan/pimpinan.
+            <p className="text-on-surface-variant text-xs mt-0.5">
+              Rumus Baku: <code>[Nomor Urut]/[Kode Penandatangan]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]</code>
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-code font-bold bg-white px-2.5 py-1 rounded border border-outline-subtle text-primary">
-            Prefix: {nomorConfig.kodePrefix}
+
+        {/* Pilihan Kode Penandatangan Resmi */}
+        <div className="flex flex-wrap items-center gap-1.5 self-stretch lg:self-auto">
+          <span className="text-[11px] font-bold text-outline mr-1">Kode TTD:</span>
+          <span className="px-2 py-1 rounded bg-blue-50 text-blue-800 border border-blue-200 font-mono font-bold text-[11px]" title="Ketua Pengadilan Agama">
+            Ketua: <strong>KPA</strong>
+          </span>
+          <span className="px-2 py-1 rounded bg-purple-50 text-purple-800 border border-purple-200 font-mono font-bold text-[11px]" title="Wakil Ketua Pengadilan Agama">
+            Wakil Ketua: <strong>WKPA</strong>
+          </span>
+          <span className="px-2 py-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-[11px]" title="Panitera Pengadilan Agama">
+            Panitera: <strong>PAN.PA</strong>
+          </span>
+          <span className="px-2 py-1 rounded bg-amber-50 text-amber-900 border border-amber-300 font-mono font-bold text-[11px]" title="Sekretaris Pengadilan Agama">
+            Sekretaris: <strong>SEK.PA</strong>
           </span>
         </div>
       </div>
@@ -266,7 +304,7 @@ export default function SuratKeluar() {
                 </select>
               </div>
 
-              {/* KOLOM PENJELASAN SINGKAT KODE KLASIFIKASI SURAT (Sesuai Permintaan User) */}
+              {/* KOLOM PENJELASAN SINGKAT KODE KLASIFIKASI SURAT */}
               <div className="space-y-1 md:col-span-2">
                 <div className="p-3.5 rounded-card bg-primary-light/40 border border-primary/30 flex flex-col sm:flex-row items-start gap-3 transition-all">
                   <div className="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0 shadow-2xs font-bold font-code text-xs">
@@ -320,6 +358,7 @@ export default function SuratKeluar() {
                 ></textarea>
               </div>
 
+              {/* Unit Kerja Pengusul */}
               <div className="space-y-1">
                 <label className="font-bold text-on-surface-variant flex items-center justify-between">
                   <span>Unit Kerja Pengusul <span className="text-danger">*</span></span>
@@ -362,6 +401,64 @@ export default function SuratKeluar() {
                 </div>
               </div>
 
+              {/* Pejabat Penandatangan Surat & Kode Penandatangan (KPA / WKPA / PAN.PA / SEK.PA) */}
+              <div className="space-y-1">
+                <label className="font-bold text-on-surface-variant flex items-center justify-between">
+                  <span>Pejabat Penandatangan Surat <span className="text-danger">*</span></span>
+                  <span className="text-[11px] font-mono text-primary font-bold">
+                    Kode TTD: {form.kodePenandatangan}
+                  </span>
+                </label>
+                <div className="relative">
+                  <select
+                    required
+                    value={form.kodePenandatangan}
+                    onChange={(e) => setForm({ ...form, kodePenandatangan: e.target.value })}
+                    className="w-full h-10 pl-3 pr-8 rounded-btn bg-white border border-outline-subtle text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none appearance-none cursor-pointer"
+                  >
+                    {PENANDATANGAN_OPTIONS.map((p) => (
+                      <option key={p.kode} value={p.kode}>
+                        {p.nama} : {p.kode} ({p.deskripsi})
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-outline pointer-events-none">
+                    expand_more
+                  </span>
+                </div>
+                {/* Pilihan Cepat 4 Tombol Kode Penandatangan */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1">
+                  {PENANDATANGAN_OPTIONS.map((p) => (
+                    <button
+                      key={p.kode}
+                      type="button"
+                      onClick={() => setForm({ ...form, kodePenandatangan: p.kode })}
+                      className={`h-8 px-1.5 rounded text-[11px] font-semibold flex items-center justify-center gap-1 transition-all ${
+                        form.kodePenandatangan === p.kode
+                          ? 'bg-primary text-white shadow-2xs font-bold border border-primary'
+                          : 'bg-surface text-on-surface hover:bg-primary-light hover:text-primary border border-outline-subtle'
+                      }`}
+                      title={`${p.nama} (${p.kode})`}
+                    >
+                      <span>{form.kodePenandatangan === p.kode ? '☑' : '☐'}</span>
+                      <span className="truncate">{p.nama}</span>
+                      <span className="font-mono text-[10px] font-bold opacity-90">({p.kode})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tanggal Surat & Lampiran */}
+              <div className="space-y-1">
+                <label className="font-bold text-on-surface-variant">Tanggal Surat Keluar</label>
+                <input
+                  type="date"
+                  value={form.tanggalSurat}
+                  onChange={(e) => setForm({ ...form, tanggalSurat: e.target.value })}
+                  className="w-full h-10 px-3 rounded-btn bg-white border border-outline-subtle text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-medium"
+                />
+              </div>
+
               <div className="space-y-1">
                 <label className="font-bold text-on-surface-variant">Lampiran Berkas</label>
                 <input
@@ -373,11 +470,67 @@ export default function SuratKeluar() {
                 />
               </div>
 
-              {/* Nomor Agenda Surat Keluar (Otomatis Sesuai Rumus) */}
+              {/* KOLOM NOMOR SURAT KELUAR DENGAN RUMUS:
+                  (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun) */}
+              <div className="space-y-1 md:col-span-2">
+                <div className="p-4 rounded-card bg-primary-light/50 border border-primary/30 space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                    <label className="font-bold text-primary text-xs flex items-center gap-1.5 uppercase tracking-wide">
+                      <span className="material-symbols-outlined text-[18px]">pin</span>
+                      <span>Kolom Nomor Surat Keluar (Rumus Baku SOP MARI)</span>
+                    </label>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white text-primary border border-primary/20 font-bold">
+                      Format Otomatis Sesuai Rumus
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-white rounded-btn border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-3 shadow-2xs">
+                    <div className="text-center md:text-left">
+                      <div className="text-[11px] text-outline font-medium">Estimasi Nomor Surat Keluar Resmi:</div>
+                      <div className="font-code text-lg sm:text-2xl font-black text-primary tracking-wide">
+                        {previewNomorSuratKeluar}
+                      </div>
+                    </div>
+
+                    {/* Breakdown 5 Parameter Rumus */}
+                    <div className="flex flex-wrap items-center justify-center gap-1 text-[11px]">
+                      <span className="px-2 py-0.5 rounded bg-surface border border-outline-subtle font-mono text-on-surface" title="Nomor Urut Surat Keluar">
+                        No: <strong>{nextEstimatedNum}</strong>
+                      </span>
+                      <span className="text-outline font-bold">/</span>
+                      <span className="px-2 py-0.5 rounded bg-primary-light text-primary border border-primary/30 font-mono font-bold" title={`Kode Penandatangan: ${selectedPenandatangan.nama}`}>
+                        TTD: <strong>{form.kodePenandatangan}</strong>
+                      </span>
+                      <span className="text-outline font-bold">/</span>
+                      <span className="px-2 py-0.5 rounded bg-surface border border-outline-subtle font-mono text-on-surface" title="Kode Klasifikasi Surat">
+                        Klas: <strong>{form.kodeKlasifikasi}</strong>
+                      </span>
+                      <span className="text-outline font-bold">/</span>
+                      <span className="px-2 py-0.5 rounded bg-surface border border-outline-subtle font-mono text-on-surface" title="Bulan (Angka Romawi)">
+                        Bulan: <strong>{getRomanMonth(form.tanggalSurat)}</strong>
+                      </span>
+                      <span className="text-outline font-bold">/</span>
+                      <span className="px-2 py-0.5 rounded bg-surface border border-outline-subtle font-mono text-on-surface" title="Tahun">
+                        Tahun: <strong>{getYearFromDate(form.tanggalSurat)}</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] text-on-surface-variant flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-0.5">
+                    <div className="flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[15px] text-primary">info</span>
+                      <span><strong>Rumus:</strong> (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)</span>
+                    </div>
+                    <span className="text-[10px] text-outline italic">Diterbitkan otomatis saat naskah disetujui atasan</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nomor Agenda Surat Keluar (Otomatis & Terkunci) */}
               <div className="space-y-1 md:col-span-2">
                 <label className="font-bold text-on-surface-variant flex items-center justify-between">
-                  <span>Nomor Agenda Surat Keluar (Otomatis & Terkunci)</span>
-                  <span className="text-[11px] font-normal text-primary">0001/SK/XI/2026</span>
+                  <span>Nomor Agenda Surat Keluar (Buku Register Harian)</span>
+                  <span className="text-[11px] font-normal text-primary">Contoh: 0001/SK/XI/2026</span>
                 </label>
                 <div className="relative">
                   <input
@@ -393,7 +546,7 @@ export default function SuratKeluar() {
                     lock
                   </span>
                 </div>
-                <p className="text-[11px] text-outline">Rumus: Nomor Urut / Surat Keluar / Bulan / Tahun</p>
+                <p className="text-[11px] text-outline">Rumus Agenda: {`{Nomor Urut 4 Digit}/SK/{Bulan Romawi}/{Tahun}`}</p>
               </div>
             </div>
 
@@ -422,7 +575,9 @@ export default function SuratKeluar() {
         <div className="p-5 border-b border-outline-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 className="text-base font-bold text-on-surface">Buku Register Surat Keluar Resmi</h3>
-            <p className="text-xs text-outline">Daftar penomoran surat keluar dan status persetujuan pejabat pengesah</p>
+            <p className="text-xs text-outline">
+              Daftar naskah dinas keluar dengan penomoran resmi rumus (No. Urut / Kode TTD / Kode Klasifikasi / Bulan / Tahun).
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
@@ -448,7 +603,7 @@ export default function SuratKeluar() {
                 type="text"
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
-                placeholder="Cari nomor, perihal, tujuan..."
+                placeholder="Cari nomor, TTD, perihal, tujuan..."
                 className="w-full h-9 pl-9 pr-3 rounded-md bg-surface border border-outline-subtle text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
@@ -459,51 +614,98 @@ export default function SuratKeluar() {
           <table className="w-full text-left border-collapse text-xs md:text-sm">
             <thead>
               <tr className="bg-surface border-b border-outline-subtle text-on-surface-variant text-xs uppercase tracking-wider font-semibold">
-                <th className="py-3 px-4">Nomor & Agenda Resmi</th>
-                <th className="py-3 px-4">Tujuan Surat</th>
-                <th className="py-3 px-4">Perihal</th>
-                <th className="py-3 px-4">Pembuat & Unit</th>
-                <th className="py-3 px-4">Tanggal</th>
-                <th className="py-3 px-4">Status & Pengesahan</th>
-                <th className="py-3 px-4 text-right">Aksi</th>
+                <th className="py-3 px-4 min-w-[200px]">
+                  <div>Nomor Surat Keluar</div>
+                  <div className="text-[10px] text-outline font-normal font-sans normal-case tracking-normal">
+                    (No. Urut / TTD / Klasifikasi / Bulan / Tahun)
+                  </div>
+                </th>
+                <th className="py-3 px-4 w-32">Penandatangan</th>
+                <th className="py-3 px-4 min-w-[170px]">Tujuan Surat</th>
+                <th className="py-3 px-4 min-w-[240px]">Perihal & Lampiran</th>
+                <th className="py-3 px-4 min-w-[170px]">Pengusul & Pembuat</th>
+                <th className="py-3 px-4 whitespace-nowrap">Tanggal</th>
+                <th className="py-3 px-4 min-w-[150px]">Status</th>
+                <th className="py-3 px-4 text-right whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-subtle text-on-surface">
               {filteredSurat.map((item, idx) => {
                 const isApproved = item.status === 'Disetujui & Diterbitkan Nomor';
+                const ttdKode = item.kodePenandatangan || (item.nomorSurat && item.nomorSurat.includes('/') ? item.nomorSurat.split('/')[1] : 'KPA');
+                const ttdInfo = getPenandatanganByKode(ttdKode);
+
                 return (
                   <tr key={item.id} className="hover:bg-surface/50 transition-colors">
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    {/* Kolom Nomor Surat Keluar (Rumus: No. Urut/TTD/Klasifikasi/Bulan/Tahun) */}
+                    <td className="py-3.5 px-4 whitespace-nowrap align-top">
                       {isApproved ? (
-                        <div className="font-bold text-primary font-code text-xs">
-                          {item.nomorSurat}
+                        <div>
+                          <div className="font-bold text-primary font-code text-xs tracking-wide">
+                            {item.nomorSurat}
+                          </div>
+                          <div className="text-[11px] text-outline font-code mt-0.5">
+                            Agenda: {item.agenda || formatAgendaSuratKeluar(idx + 1, item.tanggalSurat)}
+                          </div>
                         </div>
                       ) : (
-                        <div className="inline-flex items-center gap-1 text-xs font-semibold text-amber-900 bg-warning-light px-2 py-0.5 rounded border border-warning/40">
-                          <span className="material-symbols-outlined text-[14px]">pending</span>
-                          <span>{item.nomorSurat}</span>
+                        <div>
+                          <div className="inline-flex items-center gap-1 text-xs font-semibold text-amber-900 bg-warning-light px-2 py-0.5 rounded border border-warning/40">
+                            <span className="material-symbols-outlined text-[13px]">pending</span>
+                            <span className="font-code font-bold">
+                              {formatNomorSuratKeluar(item.nomorUrut || '...', ttdKode, item.kodeKlasifikasi, item.tanggalSurat)}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-outline font-code mt-0.5">
+                            Agenda: {item.agenda || formatAgendaSuratKeluar(idx + 1, item.tanggalSurat)}
+                          </div>
                         </div>
                       )}
-                      <div className="text-[11px] text-outline font-code">
-                        {item.agenda || formatAgendaSuratKeluar(idx + 1, item.tanggalSurat)}
+                      <div className="text-[10px] text-outline mt-0.5 font-medium">
+                        Klasifikasi: <span className="font-mono font-bold text-on-surface">{item.kodeKlasifikasi}</span>
                       </div>
-                      <div className="text-[10px] text-outline mt-0.5">Klasifikasi: {item.kodeKlasifikasi}</div>
                     </td>
-                    <td className="py-3.5 px-4 font-semibold whitespace-nowrap">{item.tujuanSurat}</td>
-                    <td className="py-3.5 px-4 max-w-xs">
+
+                    {/* Kolom Kode & Pejabat Penandatangan */}
+                    <td className="py-3.5 px-4 whitespace-nowrap align-top">
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-bold font-mono border ${
+                        ttdKode === 'KPA'
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : ttdKode === 'WKPA'
+                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                          : ttdKode === 'PAN.PA'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-300'
+                      }`}>
+                        <span className="material-symbols-outlined text-[13px]">draw</span>
+                        <span>{ttdKode}</span>
+                      </span>
+                      <div className="text-[11px] text-outline mt-0.5 font-medium">
+                        {ttdInfo.nama}
+                      </div>
+                    </td>
+
+                    <td className="py-3.5 px-4 font-semibold whitespace-nowrap align-top">
+                      {item.tujuanSurat}
+                    </td>
+
+                    <td className="py-3.5 px-4 max-w-xs align-top">
                       <div className="font-medium text-on-surface truncate" title={item.perihal}>
                         {item.perihal}
                       </div>
                       <span className="text-[11px] text-outline">{item.lampiran}</span>
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap text-xs">
+
+                    <td className="py-3.5 px-4 whitespace-nowrap text-xs align-top">
                       <div className="font-semibold text-on-surface">{item.pembuat}</div>
                       <div className="text-[11px] text-outline">{item.unitPengusul}</div>
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-medium">
+
+                    <td className="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-medium align-top">
                       {item.tanggalSurat}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+
+                    <td className="py-3.5 px-4 whitespace-nowrap align-top">
                       {isApproved ? (
                         <div>
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-success-light text-success border border-success/30">
@@ -519,12 +721,13 @@ export default function SuratKeluar() {
                         </span>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap text-right">
+
+                    <td className="py-3.5 px-4 whitespace-nowrap text-right align-top">
                       {!isApproved ? (
                         <button
                           onClick={() => approveAndNumberSuratKeluar(item.id)}
                           className="h-8 px-3 rounded-btn bg-success hover:bg-success-dark text-white text-xs font-bold inline-flex items-center gap-1 shadow-2xs transition-colors"
-                          title="Setujui dan beri nomor otomatis"
+                          title="Setujui dan beri nomor resmi sesuai rumus"
                         >
                           <span className="material-symbols-outlined text-[16px]">verified</span>
                           <span>Setujui & Beri Nomor</span>

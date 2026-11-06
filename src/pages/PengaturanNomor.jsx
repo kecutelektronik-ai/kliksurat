@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSurat } from '../context/SuratContext';
+import { PENANDATANGAN_OPTIONS } from '../constants/suratOptions';
 
 export default function PengaturanNomor() {
   const {
@@ -36,6 +37,7 @@ export default function PengaturanNomor() {
   // Simulator State
   const klasifikasiList = nomorConfig.klasifikasi || [];
   const [simKode, setSimKode] = useState(klasifikasiList[0]?.kode || 'HK.01');
+  const [simPenandatangan, setSimPenandatangan] = useState('KPA');
   const [simBulan, setSimBulan] = useState('X');
 
   const handleSaveConfig = (e) => {
@@ -124,7 +126,8 @@ export default function PengaturanNomor() {
   };
 
   const simTarget = klasifikasiList.find((k) => k.kode === simKode) || klasifikasiList[0];
-  const simGeneratedNumber = `${prefix}/${(simTarget?.counter || 0) + 1}/${simKode}/${simBulan}/${tahun}`;
+  // Rumus: (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
+  const simGeneratedNumber = `${(simTarget?.counter || 0) + 1}/${simPenandatangan}/${simKode}/${simBulan}/${tahun}`;
 
   return (
     <div className="space-y-6">
@@ -210,11 +213,26 @@ export default function PengaturanNomor() {
             </span>
           </div>
           <p className="text-xs text-outline">
-            Hasil di atas adalah pratinjau nomor resmi berikutnya yang akan digenerate saat atasan menyetujui surat keluar.
+            <strong>Rumus:</strong> (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div>
+            <label className="text-[11px] font-bold text-outline block mb-1">Penandatangan (TTD):</label>
+            <select
+              value={simPenandatangan}
+              onChange={(e) => setSimPenandatangan(e.target.value)}
+              className="h-10 px-3 rounded-btn border border-outline-subtle bg-white text-xs font-bold text-on-surface focus:ring-2 focus:ring-primary/20 outline-none"
+            >
+              {PENANDATANGAN_OPTIONS.map((p) => (
+                <option key={p.kode} value={p.kode}>
+                  {p.nama} ({p.kode})
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="text-[11px] font-bold text-outline block mb-1">Pilih Klasifikasi:</label>
             <select
@@ -250,10 +268,15 @@ export default function PengaturanNomor() {
       {/* Main Settings Form Card */}
       <div className="bg-white rounded-card border border-outline-subtle p-6 shadow-2xs space-y-6">
         <div className="flex items-center justify-between pb-3 border-b border-outline-subtle">
-          <h3 className="text-base font-bold text-on-surface flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
-            Parameter Format Baku Penomoran Mahkamah Agung
-          </h3>
+          <div>
+            <h3 className="text-base font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
+              Parameter Format Baku Penomoran Mahkamah Agung
+            </h3>
+            <p className="text-xs text-outline mt-0.5">
+              Rumus: <code className="font-mono text-primary font-bold">(Nomor Urut / Kode Penandatangan / Kode Klasifikasi / Bulan Romawi / Tahun)</code>
+            </p>
+          </div>
           <span className="text-xs text-outline font-code">SOP MARI-2026</span>
         </div>
 

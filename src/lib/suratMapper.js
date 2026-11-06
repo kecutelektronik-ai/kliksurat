@@ -45,6 +45,14 @@ export function mapRowToSuratMasuk(row) {
 }
 
 export function mapRowToSuratKeluar(row) {
+  let extractedKodeTtd = 'KPA';
+  if (row.nomor_surat && row.nomor_surat.includes('/')) {
+    const parts = row.nomor_surat.split('/');
+    if (parts.length >= 5) {
+      extractedKodeTtd = parts[1];
+    }
+  }
+
   return {
     id: row.id,
     nomorSurat: row.nomor_surat || '',
@@ -59,6 +67,7 @@ export function mapRowToSuratKeluar(row) {
     disetujuiOleh: row.disetujui_oleh || null,
     waktuPersetujuan: row.waktu_persetujuan ? String(row.waktu_persetujuan).slice(0, 16) : null,
     nomorUrut: row.nomor_urut ?? null,
+    kodePenandatangan: row.kode_penandatangan || extractedKodeTtd,
     kodeKlasifikasi: row.kode_klasifikasi || 'HK.01',
     lampiran: row.lampiran || '',
   };

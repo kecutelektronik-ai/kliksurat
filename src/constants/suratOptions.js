@@ -280,5 +280,39 @@ export const UNIT_PENGUSUL_OPTIONS = [
   'Kesekretariatan',
 ];
 
+/**
+ * Pilihan Kode Penandatangan Surat Keluar Resmi:
+ * Sesuai Aturan Penomoran Surat:
+ * ketua : KPA
+ * wakil ketua : WKPA
+ * panitera : PAN.PA
+ * sekretaris : SEK.PA
+ */
+export const PENANDATANGAN_OPTIONS = [
+  { role: 'ketua', nama: 'Ketua', kode: 'KPA', label: 'Ketua (KPA)', deskripsi: 'Ketua Pengadilan Agama' },
+  { role: 'wakil_ketua', nama: 'Wakil Ketua', kode: 'WKPA', label: 'Wakil Ketua (WKPA)', deskripsi: 'Wakil Ketua Pengadilan Agama' },
+  { role: 'panitera', nama: 'Panitera', kode: 'PAN.PA', label: 'Panitera (PAN.PA)', deskripsi: 'Panitera Pengadilan Agama' },
+  { role: 'sekretaris', nama: 'Sekretaris', kode: 'SEK.PA', label: 'Sekretaris (SEK.PA)', deskripsi: 'Sekretaris Pengadilan Agama' },
+];
+
+export function getPenandatanganByKode(kode) {
+  return PENANDATANGAN_OPTIONS.find((p) => p.kode === kode) || PENANDATANGAN_OPTIONS[0];
+}
+
+/**
+ * Rumus Nomor Surat Keluar:
+ * (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
+ * Contoh: 1044/KPA/HK.01/XI/2026
+ */
+export function formatNomorSuratKeluar(nomorUrut, kodePenandatangan = 'KPA', kodeKlasifikasi = 'HK.01', dateInput = new Date(), customTahun = null) {
+  const roman = getRomanMonth(dateInput);
+  const year = customTahun || getYearFromDate(dateInput);
+  const no = nomorUrut !== null && nomorUrut !== undefined ? nomorUrut : '...';
+  const ttd = kodePenandatangan || 'KPA';
+  const klas = kodeKlasifikasi || 'HK.01';
+  return `${no}/${ttd}/${klas}/${roman}/${year}`;
+}
+
+
 
 
