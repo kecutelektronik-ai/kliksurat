@@ -98,6 +98,7 @@ const INITIAL_SURAT_MASUK = [
     jenisSurat: 'Surat Undangan',
     prioritas: 'Segera',
     sifatSurat: 'Biasa',
+    pejabatPenerima: 'Ketua Pengadilan',
     tanggalSurat: '2026-10-18',
     tanggalTerima: '2026-10-19T08:30',
     sifat: 'segera',
@@ -105,7 +106,7 @@ const INITIAL_SURAT_MASUK = [
     lampiran: '1 Berkas (18 Lembar PDF)',
     fileScan: 'Undangan_Rakor_PTA_Surabaya_2026.pdf',
     fileSize: '2.4 MB',
-    tujuanAwal: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
+    tujuanAwal: 'Ketua Pengadilan',
     prioritasTinggi: true,
   },
   {
@@ -117,6 +118,7 @@ const INITIAL_SURAT_MASUK = [
     jenisSurat: 'Surat Dinas',
     prioritas: 'Sangat Segera',
     sifatSurat: 'Terbatas',
+    pejabatPenerima: 'Ketua Pengadilan',
     tanggalSurat: '2026-10-19',
     tanggalTerima: '2026-10-20T09:15',
     sifat: 'sangat_segera',
@@ -124,7 +126,7 @@ const INITIAL_SURAT_MASUK = [
     lampiran: '1 Berkas (4 Dokumen Juknis)',
     fileScan: 'Sosialisasi_PTSP_Ramah_Disabilitas.pdf',
     fileSize: '3.1 MB',
-    tujuanAwal: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
+    tujuanAwal: 'Ketua Pengadilan',
     prioritasTinggi: true,
   },
   {
@@ -136,6 +138,7 @@ const INITIAL_SURAT_MASUK = [
     jenisSurat: 'Surat Dinas',
     prioritas: 'Segera',
     sifatSurat: 'Rahasia',
+    pejabatPenerima: 'Sekretaris',
     tanggalSurat: '2026-10-16',
     tanggalTerima: '2026-10-18T11:00',
     sifat: 'segera',
@@ -143,7 +146,7 @@ const INITIAL_SURAT_MASUK = [
     lampiran: '2 Berkas Excel & SK Formasi',
     fileScan: 'Verifikasi_Kenaikan_Pangkat_April2027.pdf',
     fileSize: '4.8 MB',
-    tujuanAwal: 'Sekretaris / Kasubbag Kepegawaian',
+    tujuanAwal: 'Sekretaris',
     prioritasTinggi: true,
   },
   {
@@ -155,6 +158,7 @@ const INITIAL_SURAT_MASUK = [
     jenisSurat: 'Surat Edaran',
     prioritas: 'Segera',
     sifatSurat: 'Biasa',
+    pejabatPenerima: 'Panitera',
     tanggalSurat: '2026-10-14',
     tanggalTerima: '2026-10-16T10:00',
     sifat: 'segera',
@@ -162,7 +166,7 @@ const INITIAL_SURAT_MASUK = [
     lampiran: '1 Berkas PDF (Pedoman Mutu)',
     fileScan: 'Juknis_Audit_Aksesibilitas_MARI.pdf',
     fileSize: '1.9 MB',
-    tujuanAwal: 'Ketua / Panitera',
+    tujuanAwal: 'Panitera',
     prioritasTinggi: false,
   },
   {
@@ -174,6 +178,7 @@ const INITIAL_SURAT_MASUK = [
     jenisSurat: 'Surat Dinas',
     prioritas: 'Segera',
     sifatSurat: 'Biasa',
+    pejabatPenerima: 'Panitera Muda Gugatan',
     tanggalSurat: '2026-10-17',
     tanggalTerima: '2026-10-18T13:45',
     sifat: 'segera',
@@ -713,6 +718,7 @@ export function SuratProvider({ children }) {
     const prioritasNorm = formData.prioritas || (formData.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
     const sifatSuratNorm = formData.sifatSurat || 'Biasa';
     const sifatNorm = formData.sifat || sifatSuratNorm.toLowerCase().replace(/ /g, '_');
+    const targetPejabat = formData.pejabatPenerima || 'Ketua Pengadilan';
 
     const newLetter = {
       id: newId,
@@ -720,6 +726,7 @@ export function SuratProvider({ children }) {
       jenisSurat: formData.jenisSurat || 'Surat Dinas',
       prioritas: prioritasNorm,
       sifatSurat: sifatSuratNorm,
+      pejabatPenerima: targetPejabat,
       agenda: agendaNo,
       asalSurat: formData.asalSurat,
       perihal: formData.perihal,
@@ -730,7 +737,7 @@ export function SuratProvider({ children }) {
       lampiran: formData.lampiran || '1 Berkas PDF',
       fileScan: formData.fileScan || 'Naskah_Surat_Masuk.pdf',
       fileSize: '2.1 MB',
-      tujuanAwal: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
+      tujuanAwal: targetPejabat,
       prioritasTinggi: true,
     };
 

@@ -8,6 +8,7 @@ export function mapRowToSuratMasuk(row) {
   const jenisSuratFromTrack = firstTrack?.metadata?.jenisSurat;
   const prioritasFromTrack = firstTrack?.metadata?.prioritas;
   const sifatSuratFromTrack = firstTrack?.metadata?.sifatSurat;
+  const pejabatFromTrack = firstTrack?.metadata?.pejabatPenerima;
 
   const rawSifat = row.sifat_surat || sifatSuratFromTrack || row.sifat;
   let sifatSuratNorm = 'Biasa';
@@ -19,6 +20,8 @@ export function mapRowToSuratMasuk(row) {
     else sifatSuratNorm = 'Biasa';
   }
 
+  const pejabatNorm = row.pejabat_penerima || pejabatFromTrack || row.tujuan_surat || 'Ketua Pengadilan';
+
   return {
     id: row.id,
     nomorSurat: row.nomor_surat || '',
@@ -28,6 +31,7 @@ export function mapRowToSuratMasuk(row) {
     jenisSurat: row.jenis_naskah || jenisSuratFromTrack || 'Surat Dinas',
     prioritas: row.prioritas || prioritasFromTrack || (row.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera'),
     sifatSurat: sifatSuratNorm,
+    pejabatPenerima: pejabatNorm,
     tanggalSurat: row.tanggal_surat ? String(row.tanggal_surat).slice(0, 10) : '',
     tanggalTerima: row.tanggal_terima ? String(row.tanggal_terima).slice(0, 16) : '',
     sifat: row.sifat || 'biasa',
@@ -35,7 +39,7 @@ export function mapRowToSuratMasuk(row) {
     lampiran: row.lampiran || '',
     fileScan: row.file_scan || '',
     fileSize: row.file_size || '',
-    tujuanAwal: row.tujuan_surat || 'Ketua Pengadilan Agama Lumajang Kelas I-A',
+    tujuanAwal: pejabatNorm,
     prioritasTinggi: Boolean(row.prioritas_tinggi),
   };
 }
@@ -70,6 +74,7 @@ export function mapSuratMasukToRow(item, initialTracking = []) {
           jenisSurat: item.jenisSurat || 'Surat Dinas',
           prioritas: item.prioritas || (item.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera'),
           sifatSurat: item.sifatSurat || 'Biasa',
+          pejabatPenerima: item.pejabatPenerima || 'Ketua Pengadilan',
         }
       };
     }
@@ -80,13 +85,15 @@ export function mapSuratMasukToRow(item, initialTracking = []) {
     ? item.sifatSurat.toLowerCase().replace(/ /g, '_')
     : (item.sifat || 'biasa');
 
+  const targetPejabat = item.pejabatPenerima || item.tujuanAwal || 'Ketua Pengadilan';
+
   return {
     id: item.id,
     jenis_surat: 'masuk',
     nomor_surat: item.nomorSurat,
     agenda: item.agenda,
     asal_surat: item.asalSurat,
-    tujuan_surat: item.tujuanAwal || 'Ketua Pengadilan Agama Lumajang Kelas I-A',
+    tujuan_surat: targetPejabat,
     perihal: item.perihal,
     tanggal_surat: item.tanggalSurat,
     tanggal_terima: item.tanggalTerima ? new Date(item.tanggalTerima).toISOString() : new Date().toISOString(),

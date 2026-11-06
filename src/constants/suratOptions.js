@@ -243,4 +243,31 @@ export function formatAgendaSuratKeluar(counter, dateInput = new Date()) {
   return `${numStr}/SK/${roman}/${year}`;
 }
 
+/**
+ * 10 Pejabat Penerima Disposisi Surat:
+ * Sesuai Standar Struktur Organisasi & Alur Disposisi Pengadilan
+ * 1. Ketua Pengadilan
+ * 2. Wakil Ketua Pengadilan
+ * 3. Panitera
+ * 4. Sekretaris
+ * 5. Panitera Muda Permohonan
+ * 6. Panitera Muda Gugatan
+ * 7. Panitera Muda Hukum
+ * 8. Kepala Subbagian Perencanaan, Teknologi Informasi, dan Pelaporan
+ * 9. Kepala Subbagian Kepegawaian, Organisasi, dan Tata Laksana
+ * 10. Kepala Subbagian Umum dan Keuangan
+ */
+export const PEJABAT_PENERIMA_DISPOSISI_OPTIONS = [
+  'Ketua Pengadilan',
+  'Wakil Ketua Pengadilan',
+  'Panitera',
+  'Sekretaris',
+  'Panitera Muda Permohonan',
+  'Panitera Muda Gugatan',
+  'Panitera Muda Hukum',
+  'Kepala Subbagian Perencanaan, Teknologi Informasi, dan Pelaporan',
+  'Kepala Subbagian Kepegawaian, Organisasi, dan Tata Laksana',
+  'Kepala Subbagian Umum dan Keuangan',
+];
+
 

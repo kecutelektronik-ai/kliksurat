@@ -5,6 +5,7 @@ import {
   STATUS_SURAT_MASUK_OPTIONS,
   PRIORITAS_SURAT_OPTIONS,
   SIFAT_SURAT_OPTIONS,
+  PEJABAT_PENERIMA_DISPOSISI_OPTIONS,
   getStatusBadge,
   getPrioritasBadge,
   getSifatBadge,
@@ -20,6 +21,7 @@ export default function SuratMasuk() {
     status: 'Diregistrasi',
     prioritas: 'Segera',
     sifatSurat: 'Biasa',
+    pejabatPenerima: 'Ketua Pengadilan',
     nomorSurat: '',
     asalSurat: '',
     perihal: '',
@@ -35,6 +37,7 @@ export default function SuratMasuk() {
   const [filterStatus, setFilterStatus] = useState('semua');
   const [filterPrioritas, setFilterPrioritas] = useState('semua');
   const [filterSifatSurat, setFilterSifatSurat] = useState('semua');
+  const [filterPejabatPenerima, setFilterPejabatPenerima] = useState('semua');
   const [editingStatusId, setEditingStatusId] = useState(null);
   const [showForm, setShowForm] = useState(true);
 
@@ -57,12 +60,14 @@ export default function SuratMasuk() {
     const prioritasFinal = form.prioritas || 'Segera';
     const sifatSuratFinal = form.sifatSurat || 'Biasa';
     const sifatFinal = sifatSuratFinal.toLowerCase().replace(/ /g, '_');
+    const pejabatFinal = form.pejabatPenerima || 'Ketua Pengadilan';
 
     addSuratMasuk({
       ...form,
       prioritas: prioritasFinal,
       sifatSurat: sifatSuratFinal,
       sifat: sifatFinal,
+      pejabatPenerima: pejabatFinal,
       jenisSurat: finalJenisSurat,
       status: form.status || 'Diregistrasi'
     });
@@ -73,6 +78,7 @@ export default function SuratMasuk() {
       status: 'Diregistrasi',
       prioritas: 'Segera',
       sifatSurat: 'Biasa',
+      pejabatPenerima: 'Ketua Pengadilan',
       nomorSurat: '',
       asalSurat: '',
       perihal: '',
@@ -88,6 +94,7 @@ export default function SuratMasuk() {
     const q = searchFilter.toLowerCase();
     const itemPrioritas = s.prioritas || (s.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
     const itemSifat = s.sifatSurat || 'Biasa';
+    const itemPejabat = s.pejabatPenerima || s.tujuanAwal || 'Ketua Pengadilan';
     const matchSearch =
       s.nomorSurat.toLowerCase().includes(q) ||
       s.asalSurat.toLowerCase().includes(q) ||
@@ -95,14 +102,16 @@ export default function SuratMasuk() {
       (s.jenisSurat && s.jenisSurat.toLowerCase().includes(q)) ||
       (s.status && s.status.toLowerCase().includes(q)) ||
       itemPrioritas.toLowerCase().includes(q) ||
-      itemSifat.toLowerCase().includes(q);
+      itemSifat.toLowerCase().includes(q) ||
+      itemPejabat.toLowerCase().includes(q);
 
     const matchJenis = filterJenis === 'semua' || (s.jenisSurat || 'Surat Dinas') === filterJenis;
     const matchStatus = filterStatus === 'semua' || s.status === filterStatus;
     const matchPrioritas = filterPrioritas === 'semua' || itemPrioritas === filterPrioritas;
     const matchSifat = filterSifatSurat === 'semua' || itemSifat === filterSifatSurat;
+    const matchPejabat = filterPejabatPenerima === 'semua' || itemPejabat === filterPejabatPenerima;
 
-    return matchSearch && matchJenis && matchStatus && matchPrioritas && matchSifat;
+    return matchSearch && matchJenis && matchStatus && matchPrioritas && matchSifat && matchPejabat;
   });
 
   return (
@@ -364,6 +373,55 @@ export default function SuratMasuk() {
                   </span>
                 </div>
                 <p className="text-[11px] text-outline">Pilih tahapan status awal surat masuk saat registrasi warkat.</p>
+              </div>
+
+              {/* Pejabat Penerima Disposisi Surat (Sesuai Referensi Pengguna) */}
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="block text-xs font-bold text-on-surface-variant flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[16px] text-primary">account_circle</span>
+                    <span>Pejabat Penerima Disposisi Surat <span className="text-danger">*</span></span>
+                  </span>
+                  <span className="text-[11px] font-normal text-outline">Pilih pejabat pengadilan penerima disposisi naskah</span>
+                </label>
+                <div className="relative">
+                  <select
+                    required
+                    value={form.pejabatPenerima}
+                    onChange={(e) => setForm({ ...form, pejabatPenerima: e.target.value })}
+                    className="w-full h-10 pl-9 pr-8 rounded-btn bg-white border border-outline-subtle text-sm text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none cursor-pointer"
+                  >
+                    {PEJABAT_PENERIMA_DISPOSISI_OPTIONS.map((pj, idx) => (
+                      <option key={pj} value={pj}>
+                        {idx + 1}. {pj}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-primary pointer-events-none">
+                    assignment_ind
+                  </span>
+                  <span className="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-outline pointer-events-none">
+                    expand_more
+                  </span>
+                </div>
+                {/* Shortcut tombol cepat untuk pejabat utama */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="text-[10px] text-outline font-medium mr-1">Pilihan Cepat:</span>
+                  {['Ketua Pengadilan', 'Wakil Ketua Pengadilan', 'Panitera', 'Sekretaris'].map((rec) => (
+                    <button
+                      key={rec}
+                      type="button"
+                      onClick={() => setForm({ ...form, pejabatPenerima: rec })}
+                      className={`px-2.5 py-0.5 rounded text-[11px] font-semibold transition-all ${
+                        form.pejabatPenerima === rec
+                          ? 'bg-primary text-white shadow-2xs'
+                          : 'bg-surface text-on-surface-variant hover:bg-primary-light hover:text-primary border border-outline-subtle'
+                      }`}
+                    >
+                      {rec}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -652,6 +710,25 @@ export default function SuratMasuk() {
                 expand_more
               </span>
             </div>
+
+            {/* Filter Dropdown Pejabat Penerima Disposisi (10 Pejabat Resmi) */}
+            <div className="relative">
+              <select
+                value={filterPejabatPenerima}
+                onChange={(e) => setFilterPejabatPenerima(e.target.value)}
+                className="h-9 pl-3 pr-8 rounded-md bg-surface border border-outline-subtle text-xs font-semibold text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none max-w-[210px] truncate"
+              >
+                <option value="semua">Semua Penerima Disposisi</option>
+                {PEJABAT_PENERIMA_DISPOSISI_OPTIONS.map((pj) => (
+                  <option key={pj} value={pj}>
+                    {pj}
+                  </option>
+                ))}
+              </select>
+              <span className="material-symbols-outlined absolute right-2 top-2.5 text-[16px] text-outline pointer-events-none">
+                expand_more
+              </span>
+            </div>
             <button
               onClick={() => showToast('Filter tanggal aktif.', 'info')}
               className="h-9 px-3 rounded-md border border-outline-subtle text-on-surface-variant text-xs font-semibold flex items-center gap-1.5 hover:bg-surface transition-colors"
@@ -675,13 +752,14 @@ export default function SuratMasuk() {
             <thead>
               <tr className="bg-surface border-b border-outline-subtle text-on-surface-variant text-xs uppercase tracking-wider font-semibold">
                 <th className="py-3 px-4">Nomor & Agenda</th>
-                <th className="py-3 px-4">Jenis Surat</th>
-                <th className="py-3 px-4">Asal Surat</th>
+                <th className="py-3 px-3">Jenis Surat</th>
+                <th className="py-3 px-3">Asal Surat</th>
+                <th className="py-3 px-3">Penerima Disposisi</th>
                 <th className="py-3 px-4">Perihal</th>
                 <th className="py-3 px-4">Tanggal Diterima</th>
                 <th className="py-3 px-3">Prioritas</th>
                 <th className="py-3 px-3">Sifat</th>
-                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-3">Status</th>
                 <th className="py-3 px-4 text-right">Aksi</th>
               </tr>
             </thead>
@@ -694,14 +772,20 @@ export default function SuratMasuk() {
                       <div className="font-bold text-on-surface font-code text-xs">{item.nomorSurat}</div>
                       <div className="text-[11px] text-outline font-code">{item.agenda}</div>
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-3 whitespace-nowrap">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-primary-light text-primary border border-primary/20">
                         <span className="material-symbols-outlined text-[15px]">article</span>
                         <span>{item.jenisSurat || 'Surat Dinas'}</span>
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-3 whitespace-nowrap">
                       <div className="font-semibold text-on-surface">{item.asalSurat}</div>
+                    </td>
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-900 border border-indigo-200">
+                        <span className="material-symbols-outlined text-[15px] text-indigo-700">account_circle</span>
+                        <span>{item.pejabatPenerima || item.tujuanAwal || 'Ketua Pengadilan'}</span>
+                      </span>
                     </td>
                     <td className="py-3.5 px-4 max-w-xs">
                       <p className="truncate font-medium text-on-surface" title={item.perihal}>
@@ -741,7 +825,7 @@ export default function SuratMasuk() {
                         );
                       })()}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-3 whitespace-nowrap">
                       {(() => {
                         const badge = getStatusBadge(item.status);
                         const isEditing = editingStatusId === item.id;

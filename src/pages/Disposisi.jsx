@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
+import { PEJABAT_PENERIMA_DISPOSISI_OPTIONS } from '../constants/suratOptions';
 import logoInstansi from '../assets/logo-instansi.png';
 
 export default function Disposisi() {
@@ -42,18 +43,8 @@ export default function Disposisi() {
     'Asli kepada',
   ];
 
-  // 9 Jabatan Penerima Disposisi Pengadilan Agama Lumajang
-  const OFFICIAL_RECIPIENTS = [
-    'Wakil Ketua',
-    'Panitera',
-    'Sekretaris',
-    'Panitera Muda Permohonan',
-    'Panitera Muda Gugatan',
-    'Panitera Muda Hukum',
-    'Kasubbag Kepegawaian & Ortala',
-    'Kasubbag Perencanaan, TI & Pelaporan',
-    'Kasubbag Umum & Keuangan',
-  ];
+  // 10 Jabatan Penerima Disposisi Resmi Pengadilan Agama
+  const OFFICIAL_RECIPIENTS = PEJABAT_PENERIMA_DISPOSISI_OPTIONS;
 
   // State Formulir Disposisi
   const [form, setForm] = useState({
