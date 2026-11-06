@@ -64,10 +64,14 @@ export default function Disposisi() {
   });
 
   useEffect(() => {
+    const prioritasIsSangatSegera = currentSurat?.prioritas === 'Sangat Segera' || currentSurat?.sifat === 'sangat_segera';
+    const defaultSifatDisposisi = prioritasIsSangatSegera ? 'sangat_segera' : 'segera';
+    const defaultRecipient = currentSurat?.pejabatPenerima ? [currentSurat.pejabatPenerima] : ['Sekretaris'];
+
     if (existingDisposisi) {
       setForm({
-        sifatDisposisi: existingDisposisi.sifatDisposisi || currentSurat?.sifat || 'segera',
-        diteruskanKepada: existingDisposisi.diteruskanKepada || ['Sekretaris'],
+        sifatDisposisi: existingDisposisi.sifatDisposisi || defaultSifatDisposisi,
+        diteruskanKepada: existingDisposisi.diteruskanKepada || defaultRecipient,
         petunjukPilihan: existingDisposisi.instruksiPilihan || existingDisposisi.petunjukPilihan || [
           'Selesaikan sesuai ketentuan yang berlaku',
         ],
@@ -85,8 +89,8 @@ export default function Disposisi() {
       });
     } else {
       setForm({
-        sifatDisposisi: currentSurat?.sifat === 'sangat_segera' ? 'sangat_segera' : 'segera',
-        diteruskanKepada: ['Sekretaris'],
+        sifatDisposisi: defaultSifatDisposisi,
+        diteruskanKepada: defaultRecipient,
         petunjukPilihan: ['Selesaikan sesuai ketentuan yang berlaku'],
         isiArahan: `Mohon diteliti dan diselesaikan sesuai ketentuan naskah dinas resmi terkait ${currentSurat?.perihal || ''}.`,
         catatanKhusus: '',
@@ -200,8 +204,11 @@ export default function Disposisi() {
               <span className="font-code text-xs font-bold text-on-surface">
                 No. Surat: {currentSurat?.nomorSurat}
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full font-bold uppercase bg-warning-light text-amber-900 border border-warning/40">
-                Sifat: {currentSurat?.sifat}
+              <span className="text-xs px-2.5 py-0.5 rounded-full font-bold uppercase bg-surface text-on-surface border border-outline-subtle">
+                Sifat: {currentSurat?.sifatSurat || (currentSurat?.sifat && !currentSurat.sifat.includes('segera') ? currentSurat.sifat.replace(/_/g, ' ') : 'Biasa')}
+              </span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full font-bold uppercase bg-warning-light text-amber-900 border border-warning/40">
+                Prioritas: {currentSurat?.prioritas || (currentSurat?.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera')}
               </span>
             </div>
             <h3 className="text-sm md:text-base font-bold text-on-surface">
@@ -507,7 +514,9 @@ export default function Disposisi() {
                 <div className="flex">
                   <span className="w-14 font-semibold shrink-0">Sifat</span>
                   <span className="mr-1">:</span>
-                  <span className="uppercase font-semibold">{form.sifatDisposisi.replace('_', ' ')}</span>
+                  <span className="uppercase font-semibold">
+                    {currentSurat?.sifatSurat || (currentSurat?.sifat && !currentSurat.sifat.includes('segera') ? currentSurat.sifat.replace(/_/g, ' ') : 'BIASA')}
+                  </span>
                 </div>
                 <div className="flex">
                   <span className="w-14 font-semibold shrink-0">Jenis</span>

@@ -684,7 +684,7 @@ export function generateWarkatHtml(surat) {
           <tr>
             <td>Sifat</td>
             <td>:</td>
-            <td><span class="badge-sifat">${(surat.sifat || 'biasa').replace('_', ' ')}</span></td>
+            <td><span class="badge-sifat">${(surat.sifatSurat || surat.sifat || 'biasa').replace('_', ' ')}</span></td>
           </tr>
           <tr>
             <td>Lampiran</td>
