@@ -331,7 +331,7 @@ export default function Akun() {
               <tr className="bg-[#0B3B24] text-white text-[11px] font-bold tracking-wider uppercase">
                 <th className="py-3 px-4 w-36">JABATAN</th>
                 <th className="py-3 px-4">NAMA PENGURUS</th>
-                <th className="py-3 px-4">USERNAME / EMAIL LOGIN</th>
+                <th className="py-3 px-4">USERNAME LOGIN</th>
                 <th className="py-3 px-4 w-36">KATA SANDI</th>
                 <th className="py-3 px-4 text-center w-24">STATUS</th>
                 <th className="py-3 px-4 text-right w-44">AKSI (CRUD)</th>
@@ -401,16 +401,13 @@ export default function Akun() {
                         </div>
                       </td>
 
-                      {/* Kolom USERNAME / EMAIL LOGIN */}
+                      {/* Kolom USERNAME LOGIN */}
                       <td className="py-3.5 px-4 align-middle whitespace-nowrap">
                         <div className="flex items-center gap-1.5 font-mono text-emerald-800 font-semibold text-xs">
                           <span className="material-symbols-outlined text-[16px] text-emerald-600">
                             mail
                           </span>
-                          <span>{user.username || user.email?.split('@')[0]}</span>
-                        </div>
-                        <div className="text-[11px] text-outline font-sans truncate max-w-[200px]">
-                          {user.email || `${user.username}@peradilan.go.id`}
+                          <span>{user.username || user.roleKey}</span>
                         </div>
                       </td>
 
@@ -585,17 +582,6 @@ export default function Akun() {
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-on-surface">Email Dinas Kedinasan</label>
-                <input
-                  type="email"
-                  value={addForm.email}
-                  onChange={(e) => setAddForm({ ...addForm, email: e.target.value })}
-                  placeholder="nama@peradilan.go.id"
-                  className="w-full h-10 px-3 rounded-btn border border-outline-subtle bg-white text-on-surface outline-none focus:border-emerald-700"
-                />
-              </div>
-
               {/* Preview Hak Akses Berdasarkan Jabatan */}
               <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs space-y-1">
                 <div className="font-bold text-emerald-900 flex items-center gap-1">
@@ -723,16 +709,6 @@ export default function Akun() {
                     className="w-full h-10 px-3 rounded-btn border border-outline-subtle bg-white font-mono text-on-surface outline-none focus:border-emerald-700"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-bold text-on-surface">Email Dinas Kedinasan</label>
-                <input
-                  type="email"
-                  value={editForm.email}
-                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full h-10 px-3 rounded-btn border border-outline-subtle bg-white text-on-surface outline-none focus:border-emerald-700"
-                />
               </div>
 
               {/* Preview Hak Akses Berdasarkan Jabatan */}
