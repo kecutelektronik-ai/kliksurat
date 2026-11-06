@@ -60,7 +60,7 @@ export default function SuratKeluar() {
   ) || nomorConfig.klasifikasi?.[0];
 
   const selectedPenandatangan = getPenandatanganByKode(form.kodePenandatangan);
-  const kodePa = nomorConfig.kodePa || nomorConfig.kodePrefix || 'A13-W8';
+  const kodePa = nomorConfig.kodePa || nomorConfig.kodePrefix || 'W13-A8';
 
   // Perhitungan Pratinjau Nomor Surat Keluar Berdasarkan Rumus:
   // [Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]
@@ -649,7 +649,7 @@ export default function SuratKeluar() {
 
                 return (
                   <tr key={item.id} className="hover:bg-surface/50 transition-colors">
-                    {/* Kolom Nomor Surat Keluar (Rumus: No. Urut/TTD.A13-W8/Klasifikasi/Bulan/Tahun) */}
+                    {/* Kolom Nomor Surat Keluar (Rumus: No. Urut/TTD.W13-A8/Klasifikasi/Bulan/Tahun) */}
                     <td className="py-3.5 px-4 whitespace-nowrap align-top">
                       {isApproved ? (
                         <div>

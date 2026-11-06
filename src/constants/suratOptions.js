@@ -299,13 +299,13 @@ export function getPenandatanganByKode(kode) {
   return PENANDATANGAN_OPTIONS.find((p) => p.kode === kode) || PENANDATANGAN_OPTIONS[0];
 }
 
-export const KODE_PA_LUMAJANG = 'A13-W8';
+export const KODE_PA_LUMAJANG = 'W13-A8';
 
 /**
  * Rumus Nomor Surat Keluar Resmi:
  * [Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]
- * Kode PA Lumajang : A13-W8
- * Contoh: 1044/KPA.A13-W8/HK.01/XI/2026
+ * Kode PA Lumajang : W13-A8
+ * Contoh: 1044/KPA.W13-A8/HK.01/XI/2026
  */
 export function formatNomorSuratKeluar(
   nomorUrut,

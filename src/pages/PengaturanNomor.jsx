@@ -14,7 +14,7 @@ export default function PengaturanNomor() {
     showToast,
   } = useSurat();
 
-  const [prefix, setPrefix] = useState(nomorConfig.kodePa || nomorConfig.kodePrefix || 'A13-W8');
+  const [prefix, setPrefix] = useState(nomorConfig.kodePa || nomorConfig.kodePrefix || 'W13-A8');
   const [tahun, setTahun] = useState(nomorConfig.tahun || 2026);
 
   // New Classification State
@@ -293,12 +293,12 @@ export default function PengaturanNomor() {
                 disabled={!isAdmin}
                 value={prefix}
                 onChange={(e) => setPrefix(e.target.value.toUpperCase())}
-                placeholder="Contoh: A13-W8"
+                placeholder="Contoh: W13-A8"
                 className={`w-full h-10 px-3 rounded-btn border border-outline-subtle font-code font-bold text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none ${
                   isAdmin ? 'bg-surface' : 'bg-gray-100 cursor-not-allowed'
                 }`}
               />
-              <p className="text-[11px] text-outline">Kode unik satker PA Lumajang (A13-W8)</p>
+              <p className="text-[11px] text-outline">Kode unik satker PA Lumajang (W13-A8)</p>
             </div>
 
             <div className="space-y-1">
