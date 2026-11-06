@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSurat } from '../context/SuratContext';
 import {
   JENIS_SURAT_OPTIONS,
@@ -12,25 +12,29 @@ import {
   formatAgendaSuratMasuk,
 } from '../constants/suratOptions';
 
+// Helper blangko kosong registrasi surat masuk
+const getBlankForm = () => ({
+  jenisSurat: 'Surat Dinas',
+  jenisSuratLainnya: '',
+  status: 'Diregistrasi',
+  prioritas: 'Segera',
+  sifatSurat: 'Biasa',
+  pejabatPenerima: 'Ketua Pengadilan',
+  nomorSurat: '',
+  asalSurat: '',
+  perihal: '',
+  tanggalSurat: new Date().toISOString().slice(0, 10),
+  tanggalTerima: new Date().toISOString().slice(0, 16),
+  lampiran: '',
+  sifat: 'biasa',
+  fileScan: ''
+});
+
 export default function SuratMasuk() {
   const { suratMasuk, addSuratMasuk, updateSuratMasukStatus, navigateTo, showToast } = useSurat();
 
-  const [form, setForm] = useState({
-    jenisSurat: 'Surat Dinas',
-    jenisSuratLainnya: '',
-    status: 'Diregistrasi',
-    prioritas: 'Segera',
-    sifatSurat: 'Biasa',
-    pejabatPenerima: 'Ketua Pengadilan',
-    nomorSurat: '',
-    asalSurat: '',
-    perihal: '',
-    tanggalSurat: new Date().toISOString().slice(0, 10),
-    tanggalTerima: new Date().toISOString().slice(0, 16),
-    lampiran: '1 Berkas (12 Lembar PDF)',
-    sifat: 'biasa',
-    fileScan: 'Scan_Dokumen_Resmi.pdf'
-  });
+  const [form, setForm] = useState(getBlankForm);
+  const [successNotice, setSuccessNotice] = useState(null);
 
   const [searchFilter, setSearchFilter] = useState('');
   const [filterJenis, setFilterJenis] = useState('semua');
@@ -41,9 +45,19 @@ export default function SuratMasuk() {
   const [editingStatusId, setEditingStatusId] = useState(null);
   const [showForm, setShowForm] = useState(true);
 
+  // Auto-dismiss notifikasi sukses setelah 10 detik
+  useEffect(() => {
+    if (successNotice) {
+      const timer = setTimeout(() => {
+        setSuccessNotice(null);
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [successNotice]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.nomorSurat || !form.asalSurat || !form.perihal) {
+    if (!form.nomorSurat.trim() || !form.asalSurat.trim() || !form.perihal.trim()) {
       showToast('Harap lengkapi semua kolom bertanda bintang (*)', 'warning');
       return;
     }
@@ -62,8 +76,16 @@ export default function SuratMasuk() {
     const sifatFinal = sifatSuratFinal.toLowerCase().replace(/ /g, '_');
     const pejabatFinal = form.pejabatPenerima || 'Ketua Pengadilan';
 
+    const savedNomor = form.nomorSurat;
+    const savedAgenda = formatAgendaSuratMasuk(
+      suratMasuk.length + 1,
+      form.tanggalSurat || form.tanggalTerima || new Date()
+    );
+
     addSuratMasuk({
       ...form,
+      lampiran: form.lampiran.trim() || '1 Berkas',
+      fileScan: form.fileScan || 'Scan_Warkat_Resmi.pdf',
       prioritas: prioritasFinal,
       sifatSurat: sifatSuratFinal,
       sifat: sifatFinal,
@@ -72,22 +94,20 @@ export default function SuratMasuk() {
       status: form.status || 'Diregistrasi'
     });
 
-    setForm({
-      jenisSurat: 'Surat Dinas',
-      jenisSuratLainnya: '',
-      status: 'Diregistrasi',
-      prioritas: 'Segera',
-      sifatSurat: 'Biasa',
-      pejabatPenerima: 'Ketua Pengadilan',
-      nomorSurat: '',
-      asalSurat: '',
-      perihal: '',
-      tanggalSurat: new Date().toISOString().slice(0, 10),
-      tanggalTerima: new Date().toISOString().slice(0, 16),
-      lampiran: '1 Berkas PDF',
-      sifat: 'biasa',
-      fileScan: 'Scan_Dokumen_Resmi.pdf'
+    // 1. Notifikasi di layar bahwa surat masuk berhasil disimpan
+    setSuccessNotice({
+      nomorSurat: savedNomor,
+      agenda: savedAgenda,
+      waktu: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'
     });
+    showToast('Surat masuk berhasil disimpan! Menampilkan blangko registrasi baru.', 'success');
+
+    // 2. Layar menampilkan blangko kosong registrasi surat masuk
+    setForm(getBlankForm());
+    setShowForm(true);
+
+    // 3. Gulir layar ke atas menuju blangko kosong
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const filteredSurat = suratMasuk.filter(s => {
@@ -153,6 +173,41 @@ export default function SuratMasuk() {
         </div>
       </div>
 
+      {/* Notifikasi Sukses Simpan Surat Masuk */}
+      {successNotice && (
+        <div className="p-4 md:p-5 rounded-card bg-emerald-50 border-2 border-emerald-500 text-emerald-950 shadow-sm flex items-start justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <span className="material-symbols-outlined text-[24px]">task_alt</span>
+            </div>
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h4 className="text-sm md:text-base font-bold text-emerald-950">
+                  Surat Masuk Berhasil Disimpan!
+                </h4>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900 font-code font-bold">
+                  Agenda: {successNotice.agenda}
+                </span>
+                <span className="text-[11px] text-emerald-700">
+                  {successNotice.waktu}
+                </span>
+              </div>
+              <p className="text-xs text-emerald-800 leading-relaxed">
+                Naskah dinas nomor <strong>{successNotice.nomorSurat}</strong> telah sukses diregistrasi ke dalam sistem. Di bawah ini ditampilkan <strong>blangko kosong registrasi</strong> yang siap untuk pencatatan surat masuk berikutnya.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSuccessNotice(null)}
+            className="p-1 rounded-md text-emerald-700 hover:text-emerald-950 hover:bg-emerald-100 transition-colors shrink-0 cursor-pointer"
+            title="Tutup notifikasi"
+          >
+            <span className="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+      )}
+
       {/* Formulir Registrasi Surat Masuk */}
       {showForm && (
         <div className="bg-white rounded-card border border-outline-subtle shadow-sm overflow-hidden animate-in fade-in duration-200">
@@ -163,17 +218,31 @@ export default function SuratMasuk() {
               </div>
               <div>
                 <h3 className="text-sm md:text-base font-bold text-on-surface">
-                  Formulir Pencatatan Surat Masuk Baru
+                  Blangko Formulir Registrasi Surat Masuk
                 </h3>
                 <p className="text-xs text-outline">
-                  Isi kelengkapan metadata warkat fisik atau naskah dinas elektronik resmi
+                  Formulir pendaftaran naskah dinas resmi siap diisi
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary-light text-primary border border-primary/20">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-              Mode Registrasi Aktif
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setForm(getBlankForm());
+                  showToast('Blangko formulir telah dikosongkan.', 'info');
+                }}
+                className="text-xs font-semibold text-outline hover:text-danger flex items-center gap-1 px-2.5 py-1 rounded hover:bg-surface border border-outline-subtle transition-colors cursor-pointer"
+                title="Kosongkan seluruh isian formulir"
+              >
+                <span className="material-symbols-outlined text-[15px]">restart_alt</span>
+                <span>Kosongkan Blangko</span>
+              </button>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                Blangko Siap Diisi
+              </span>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -550,46 +619,86 @@ export default function SuratMasuk() {
 
             {/* Unggah Dokumen Scan PDF */}
             <div className="space-y-2 pt-2 border-t border-outline-subtle">
-              <label className="block text-xs font-bold text-on-surface-variant">
-                Warkat Digital / Berkas Pindaian (Scan Dokumen PDF) <span className="text-danger">*</span>
+              <label className="block text-xs font-bold text-on-surface-variant flex items-center justify-between">
+                <span>Warkat Digital / Berkas Pindaian (Scan Dokumen PDF) <span className="text-danger">*</span></span>
+                <span className="text-[11px] font-normal text-outline">Format PDF Resmi</span>
               </label>
-              <div className="border-2 border-dashed border-primary/40 rounded-card p-6 text-center bg-surface hover:bg-primary-light/20 transition-colors cursor-pointer group">
+              <div
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = '.pdf';
+                  input.onchange = (e) => {
+                    const f = e.target.files?.[0];
+                    if (f) {
+                      setForm(prev => ({ ...prev, fileScan: f.name }));
+                      showToast(`Berkas warkat '${f.name}' siap dilampirkan.`, 'info');
+                    }
+                  };
+                  input.click();
+                }}
+                className="border-2 border-dashed border-primary/40 rounded-card p-5 text-center bg-surface hover:bg-primary-light/20 transition-colors cursor-pointer group"
+              >
                 <div className="max-w-md mx-auto flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-primary-light text-primary flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                    <span className="material-symbols-outlined text-[28px]">cloud_upload</span>
+                  <div className="w-11 h-11 rounded-full bg-primary-light text-primary flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-[26px]">cloud_upload</span>
                   </div>
-                  <p className="text-sm font-bold text-on-surface">Tarik berkas PDF atau klik untuk unggah</p>
+                  <p className="text-sm font-bold text-on-surface">Klik untuk pilih berkas PDF atau tarik berkas ke sini</p>
                   <p className="text-xs text-outline mt-0.5">Format dokumen PDF standar ISO/PDF-A (Maksimal ukuran file 15 MB)</p>
                 </div>
               </div>
 
               {/* Preview File Chip */}
-              <div className="p-3 bg-white border border-outline-subtle rounded-btn flex items-center justify-between shadow-2xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-danger-light text-danger flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[20px]">picture_as_pdf</span>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-on-surface">{form.fileScan}</span>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-primary-light text-primary">
-                        Terenkripsi SHA-256
-                      </span>
+              {form.fileScan ? (
+                <div className="p-3 bg-white border border-outline-subtle rounded-btn flex items-center justify-between shadow-2xs animate-in fade-in">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-danger-light text-danger flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[20px]">picture_as_pdf</span>
                     </div>
-                    <span className="text-[11px] text-outline">2.4 MB • Diperiksa Bebas Virus</span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-on-surface">{form.fileScan}</span>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-primary-light text-primary">
+                          Terenkripsi SHA-256
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-outline">Berkas terunggah • Siap disimpan</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => showToast('Pratinjau dokumen PDF terbuka.', 'info')}
+                      className="w-8 h-8 rounded-lg text-outline hover:text-primary hover:bg-surface flex items-center justify-center transition-colors"
+                      title="Pratinjau PDF"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">visibility</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setForm(prev => ({ ...prev, fileScan: '' }))}
+                      className="w-8 h-8 rounded-lg text-outline hover:text-danger hover:bg-danger-light flex items-center justify-center transition-colors"
+                      title="Lepas Berkas"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">close</span>
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
+              ) : (
+                <div className="p-3 bg-surface/50 border border-dashed border-outline-subtle rounded-btn flex flex-wrap items-center justify-between gap-2 text-xs text-outline">
+                  <span className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[18px]">info</span>
+                    <span>Blangko belum memuat berkas pindaian (klik kotak di atas untuk memilih file PDF).</span>
+                  </span>
                   <button
                     type="button"
-                    onClick={() => showToast('Pratinjau dokumen PDF terbuka.', 'info')}
-                    className="w-8 h-8 rounded-lg text-outline hover:text-primary hover:bg-surface flex items-center justify-center transition-colors"
-                    title="Pratinjau PDF"
+                    onClick={() => setForm(prev => ({ ...prev, fileScan: 'Scan_Dokumen_Resmi.pdf' }))}
+                    className="text-xs text-primary font-semibold hover:underline cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[18px]">visibility</span>
+                    Lampirkan Berkas Standar
                   </button>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Action Buttons */}
