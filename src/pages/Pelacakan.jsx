@@ -3,40 +3,44 @@ import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
 
 export default function Pelacakan() {
-  const { suratMasuk, trackingList, activeLetterId, setActiveLetterId, showToast } = useSurat();
+  const { suratMasuk, trackingList, activeLetterId, setActiveLetterId, navigateTo, showToast } = useSurat();
 
-  const [searchLetter, setSearchLetter] = useState(activeLetterId || 'SM-001');
+  const [searchLetter, setSearchLetter] = useState(activeLetterId || suratMasuk[0]?.id || '');
+
+  if (suratMasuk.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-outline-subtle">
+          <div>
+            <h2 className="text-2xl font-bold text-on-surface tracking-tight">Pelacakan Alur Surat</h2>
+            <p className="text-xs md:text-sm text-outline mt-0.5">
+              Jejak Audit Real-time Perjalanan Berkas Naskah Dinas
+            </p>
+          </div>
+        </div>
+        <div className="p-12 text-center bg-white rounded-xl border border-outline-subtle shadow-xs">
+          <span className="material-symbols-outlined text-[48px] text-outline mb-2 block">
+            timeline
+          </span>
+          <h3 className="text-base font-bold text-on-surface">Belum Ada Surat Masuk untuk Dilacak</h3>
+          <p className="text-xs text-outline mt-1 mb-5">
+            Database persuratan saat ini kosong. Alur pelacakan otomatis aktif saat ada surat masuk tercatat.
+          </p>
+          <button
+            onClick={() => navigateTo('surat-masuk')}
+            className="px-4 py-2 text-white rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-xs"
+            style={{ backgroundColor: '#0B3B24' }}
+          >
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            <span>+ Catat Surat Masuk</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const currentSurat = suratMasuk.find((s) => s.id === searchLetter) || suratMasuk[0];
-  const history = trackingList[currentSurat?.id] || [
-    {
-      waktu: '19 Okt 2026, 08:30 WIB',
-      petugas: 'Ahmad Fauzi, S.H. (Petugas Persuratan)',
-      tahap: 'Penerimaan & Registrasi Agenda',
-      status: `Warkat fisik & scan PDF tercatat di buku register dengan agenda ${currentSurat?.agenda}`,
-      icon: 'inbox',
-      badge: 'Registrasi Selesai',
-      badgeColor: 'bg-primary-light text-primary',
-    },
-    {
-      waktu: '19 Okt 2026, 09:15 WIB',
-      petugas: 'Sistem Integrasi Fonnte',
-      tahap: 'Pemberitahuan WhatsApp',
-      status: 'Notifikasi otomatis terkirim ke WhatsApp Ketua Pengadilan Agama',
-      icon: 'chat',
-      badge: 'Notifikasi Terkirim',
-      badgeColor: 'bg-success-light text-success border border-success/30',
-    },
-    {
-      waktu: '20 Okt 2026, 10:15 WIB',
-      petugas: 'Dr. H. Ahmad Zainuddin, S.H., M.H. (Ketua)',
-      tahap: 'Pengesahan Disposisi',
-      status: 'Disposisi disahkan: Hadiri & Tindaklanjuti, diteruskan ke Sekretaris & Panitera',
-      icon: 'assignment_turned_in',
-      badge: 'Didisposisi',
-      badgeColor: 'bg-success-light text-success border border-success/30',
-    },
-  ];
+  const history = currentSurat?.id ? (trackingList[currentSurat.id] || []) : [];
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

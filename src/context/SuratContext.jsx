@@ -218,267 +218,10 @@ export const USERS = INITIAL_USERS_LIST.reduce((acc, u) => {
   return acc;
 }, {});
 
-const INITIAL_SURAT_MASUK = [
-  {
-    id: 'SM-001',
-    nomorSurat: '012/PA.Lmg/X/2026',
-    agenda: '0001/SM/X/2026',
-    asalSurat: 'PTA Surabaya (Pengadilan Tinggi Agama)',
-    perihal: 'Undangan Rapat Koordinasi Pembinaan Wilayah Hukum Pengadilan Tinggi Agama Surabaya Semester II',
-    jenisSurat: 'Surat Undangan',
-    prioritas: 'Segera',
-    sifatSurat: 'Biasa',
-    pejabatPenerima: 'Sekretaris',
-    tanggalSurat: '2026-10-18',
-    tanggalTerima: '2026-10-19T08:30',
-    sifat: 'segera',
-    status: 'Dalam Tindak Lanjut',
-    lampiran: '1 Berkas (18 Lembar PDF)',
-    fileScan: 'Undangan_Rakor_PTA_Surabaya_2026.pdf',
-    fileSize: '2.4 MB',
-    tujuanAwal: 'Sekretaris',
-    prioritasTinggi: true,
-  },
-  {
-    id: 'SM-002',
-    nomorSurat: '047/UM.01/X/2026',
-    agenda: '0002/SM/X/2026',
-    asalSurat: 'Pengadilan Tinggi Jawa Timur',
-    perihal: 'Pemberitahuan Kegiatan Sosialisasi Standar Pelayanan Terpadu Satu Pintu (PTSP) Ramah Disabilitas',
-    jenisSurat: 'Surat Dinas',
-    prioritas: 'Sangat Segera',
-    sifatSurat: 'Terbatas',
-    pejabatPenerima: 'Sekretaris',
-    tanggalSurat: '2026-10-19',
-    tanggalTerima: '2026-10-20T09:15',
-    sifat: 'sangat_segera',
-    status: 'Menunggu Disposisi',
-    lampiran: '1 Berkas (4 Dokumen Juknis)',
-    fileScan: 'Sosialisasi_PTSP_Ramah_Disabilitas.pdf',
-    fileSize: '3.1 MB',
-    tujuanAwal: 'Sekretaris',
-    prioritasTinggi: true,
-  },
-  {
-    id: 'SM-003',
-    nomorSurat: '042/KP.02/X/2026',
-    agenda: '0003/SM/X/2026',
-    asalSurat: 'Biro Kepegawaian & Ortala Mahkamah Agung RI',
-    perihal: 'Verifikasi Berkas Usulan Kenaikan Pangkat Hakim & Aparatur Pegawai Negeri Sipil Periode April 2027',
-    jenisSurat: 'Surat Dinas',
-    prioritas: 'Segera',
-    sifatSurat: 'Rahasia',
-    pejabatPenerima: 'Sekretaris',
-    tanggalSurat: '2026-10-16',
-    tanggalTerima: '2026-10-18T11:00',
-    sifat: 'segera',
-    status: 'Dalam Tindak Lanjut',
-    lampiran: '2 Berkas Excel & SK Formasi',
-    fileScan: 'Verifikasi_Kenaikan_Pangkat_April2027.pdf',
-    fileSize: '4.8 MB',
-    tujuanAwal: 'Sekretaris',
-    prioritasTinggi: true,
-  },
-  {
-    id: 'SM-004',
-    nomorSurat: '013/MA/HK.01/X/2026',
-    agenda: '0004/SM/X/2026',
-    asalSurat: 'Kepaniteraan Mahkamah Agung RI',
-    perihal: 'Petunjuk Teknis Audit Kepatuhan Aksesibilitas Layanan Peradilan Elektronik Tahun Anggaran 2026',
-    jenisSurat: 'Surat Edaran',
-    prioritas: 'Segera',
-    sifatSurat: 'Biasa',
-    pejabatPenerima: 'Panitera',
-    tanggalSurat: '2026-10-14',
-    tanggalTerima: '2026-10-16T10:00',
-    sifat: 'segera',
-    status: 'Telah Didisposisi',
-    lampiran: '1 Berkas PDF (Pedoman Mutu)',
-    fileScan: 'Juknis_Audit_Aksesibilitas_MARI.pdf',
-    fileSize: '1.9 MB',
-    tujuanAwal: 'Panitera',
-    prioritasTinggi: false,
-  },
-  {
-    id: 'SM-005',
-    nomorSurat: '014/PA.Jbr/X/2026',
-    agenda: '0005/SM/X/2026',
-    asalSurat: 'Pengadilan Agama Jember Kelas I-A',
-    perihal: 'Permohonan Bantuan Delegasi Panggilan Sidang Perkara Nomor 1245/Pdt.G/2026/PA.Jbr',
-    jenisSurat: 'Surat Dinas',
-    prioritas: 'Segera',
-    sifatSurat: 'Biasa',
-    pejabatPenerima: 'Panitera Muda Gugatan',
-    tanggalSurat: '2026-10-17',
-    tanggalTerima: '2026-10-18T13:45',
-    sifat: 'segera',
-    status: 'Selesai Ditindaklanjuti',
-    lampiran: '1 Lembar Relaas Panggilan',
-    fileScan: 'Delegasi_Panggilan_PA_Jember.pdf',
-    fileSize: '820 KB',
-    tujuanAwal: 'Panitera Muda Gugatan',
-    prioritasTinggi: false,
-  }
-];
-
-const INITIAL_SURAT_KELUAR = [
-  {
-    id: 'SK-001',
-    nomorSurat: '1042/PAN.PA.W13-A8/HK.01/X/2026',
-    agenda: '0001/SK/X/2026',
-    unitPengusul: 'Kepaniteraan Perkara',
-    kodePenandatangan: 'PAN.PA',
-    pembuat: 'Ibu Dra. Hj. Nurjanah, M.H. (Panitera)',
-    tujuanSurat: 'Mahkamah Agung Republik Indonesia',
-    perihal: 'Penyampaian Laporan Triwulan III Kinerja Perkara Elektronik (e-Court) & Mediasi Yudisial',
-    tanggalSurat: '2026-10-19',
-    sifat: 'biasa',
-    status: 'Disetujui & Diterbitkan Nomor',
-    disetujuiOleh: 'Dr. H. Ahmad Zainuddin, S.H., M.H.',
-    waktuPersetujuan: '2026-10-19T14:20',
-    nomorUrut: 1042,
-    kodeKlasifikasi: 'HK.01',
-    lampiran: '1 Berkas Laporan',
-  },
-  {
-    id: 'SK-002',
-    nomorSurat: '1043/SEK.PA.W13-A8/PL.01/X/2026',
-    agenda: '0002/SK/X/2026',
-    unitPengusul: 'Kesekretariatan (Subbag Perencanaan)',
-    kodePenandatangan: 'SEK.PA',
-    pembuat: 'Bpk. H. M. Ridwan, S.H. (Sekretaris)',
-    tujuanSurat: 'Badan Urusan Administrasi Mahkamah Agung RI',
-    perihal: 'Usulan Alokasi Anggaran Tambahan Pemeliharaan Gedung & Pengadaan Ruang Server TA 2027',
-    tanggalSurat: '2026-10-19',
-    sifat: 'segera',
-    status: 'Disetujui & Diterbitkan Nomor',
-    disetujuiOleh: 'Dr. H. Ahmad Zainuddin, S.H., M.H.',
-    waktuPersetujuan: '2026-10-19T15:45',
-    nomorUrut: 1043,
-    kodeKlasifikasi: 'PL.01',
-    lampiran: 'RAB & Proposal Teknis',
-  },
-  {
-    id: 'SK-003',
-    nomorSurat: 'Draft (Menunggu Nomor)',
-    agenda: '0003/SK/X/2026',
-    unitPengusul: 'Kepaniteraan (Panmud Hukum)',
-    kodePenandatangan: 'KPA',
-    pembuat: 'Ahmad Fauzi, S.H. (Panmud Hukum)',
-    tujuanSurat: 'Pengadilan Tinggi Agama Surabaya',
-    perihal: 'Surat Tugas Delegasi Pendampingan Rapat Koordinasi Pembinaan Wilayah Semester II',
-    tanggalSurat: '2026-10-21',
-    sifat: 'segera',
-    status: 'Menunggu Persetujuan Atasan',
-    disetujuiOleh: null,
-    waktuPersetujuan: null,
-    nomorUrut: null,
-    kodeKlasifikasi: 'UM.01',
-    lampiran: 'Daftar Pejabat Ditugaskan',
-  },
-  {
-    id: 'SK-004',
-    nomorSurat: 'Draft (Menunggu Paraf)',
-    agenda: '0004/SK/X/2026',
-    unitPengusul: 'Kesekretariatan (Subbag TI & Pelaporan)',
-    kodePenandatangan: 'SEK.PA',
-    pembuat: 'Staf Subbag TI',
-    tujuanSurat: 'Penyedia Layanan Jaringan Internet Telkom',
-    perihal: 'Permohonan Peningkatan Bandwidth VPN Peradilan Terintegrasi Mahkamah Agung',
-    tanggalSurat: '2026-10-18',
-    sifat: 'biasa',
-    status: 'Menunggu Paraf Sekretaris',
-    disetujuiOleh: null,
-    waktuPersetujuan: null,
-    nomorUrut: null,
-    kodeKlasifikasi: 'PL.01',
-    lampiran: 'Spesifikasi Teknis',
-  }
-];
-
-const INITIAL_DISPOSISI = {
-  'SM-001': {
-    id: 'DISP-001',
-    nomorLembar: 'LK-012',
-    suratId: 'SM-001',
-    alurTahap: 3,
-    
-    // Tahap 1: Registrasi Petugas
-    petugasRegistrasi: 'Ahmad Fauzi, S.H.',
-    disposisiAwalKe: 'Sekretaris',
-    tanggalRegistrasi: '2026-10-19',
-
-    // Tahap 2: Telaah & Catatan Sekretaris
-    catatanSekretaris: 'Telah diteliti kelengkapan naskah dinas sesuai tata persuratan. Diajukan kepada Yth. Ketua Pengadilan untuk arahan dan petunjuk tindak lanjut.',
-    penelaahSekretaris: 'Bpk. H. M. Ridwan, S.H. (Sekretaris)',
-    tanggalTelaahSekretaris: '19/10/2026',
-    tujuanPimpinan: 'Ketua Pengadilan',
-
-    // Tahap 3: Arahan Perintah Pimpinan (Ketua)
-    pemberiDisposisi: 'Dr. H. Ahmad Zainuddin, S.H., M.H. (Ketua Pengadilan Agama)',
-    tanggalDisposisi: '2026-10-20T10:15',
-    sifatDisposisi: 'segera',
-    diteruskanKepada: ['Sekretaris', 'Panitera'],
-    instruksiPilihan: ['Tanggapi & tindak lanjuti', 'Harap dihadiri/diwakili', 'Selesaikan sesuai ketentuan yang berlaku'],
-    isiArahan: '1. Hadiri dan wakili pimpinan dalam agenda Rapat Koordinasi Wilayah PTA Surabaya tanggal 24 Oktober 2026.\n2. Siapkan rekapitulasi data perkara e-Court dan serapan anggaran DIPA 01 & 04 untuk bahan pemaparan resmi.',
-    catatanKhusus: 'Laporkan hasil rakor segera setelah kegiatan selesai dan koordinasikan penerbitan Surat Tugas (ST).',
-
-    // Tahap 4: Disposisi Pengarsipan Sekretaris ke Kasubag Umum & Keuangan
-    disposisiKeArsip: 'Kepala Subbagian Umum dan Keuangan',
-    catatanPengarsipan: '',
-    tanggalArsip: '',
-    isArchived: false,
-
-    tandaTanganElektronik: {
-      status: 'TERVERIFIKASI',
-      penandatangan: 'Dr. H. Ahmad Zainuddin, S.H., M.H.',
-      jabatan: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
-      sha256: '9F8A...2026-MARI-ID',
-      waktuSertifikasi: '20 Okt 2026 10:15:32 WIB'
-    }
-  }
-};
-
-const INITIAL_TRACKING = {
-  'SM-001': [
-    {
-      waktu: '19 Okt 2026, 08:30 WIB',
-      petugas: 'Ahmad Fauzi, S.H. (Petugas Persuratan)',
-      tahap: 'Penerimaan & Registrasi Agenda',
-      status: 'Surat fisik & PDF diterima, dicatat ke buku agenda AGD-2026/X/SM-0012',
-      icon: 'inbox',
-      badge: 'Registrasi Selesai',
-      badgeColor: 'bg-primary-light text-primary'
-    },
-    {
-      waktu: '19 Okt 2026, 09:40 WIB',
-      petugas: 'Ahmad Fauzi, S.H.',
-      tahap: 'Penerusan ke Meja Pimpinan',
-      status: 'Berkas digital diteruskan ke sistem naskah dinas Ketua Pengadilan Agama',
-      icon: 'send',
-      badge: 'Diteruskan ke Ketua',
-      badgeColor: 'bg-secondary-light text-secondary-dark'
-    },
-    {
-      waktu: '20 Okt 2026, 10:15 WIB',
-      petugas: 'Dr. H. Ahmad Zainuddin, S.H., M.H. (Ketua)',
-      tahap: 'Pemberian Disposisi Pimpinan',
-      status: 'Lembar disposisi LK-012 disahkan secara digital. Instruksi: Hadiri & Tindak Lanjuti kepada Sekretaris & Panitera',
-      icon: 'assignment_turned_in',
-      badge: 'Disposisi Sah',
-      badgeColor: 'bg-success-light text-success'
-    },
-    {
-      waktu: '20 Okt 2026, 10:18 WIB',
-      petugas: 'Gateway WhatsApp Fonnte',
-      tahap: 'Notifikasi Otomatis WhatsApp',
-      status: 'Pesan notifikasi disposisi terkirim ke WhatsApp Sekretaris & Panitera (+62 812-XXXX-XXXX)',
-      icon: 'chat',
-      badge: 'WA Terkirim',
-      badgeColor: 'bg-success-light text-success border border-success/30'
-    }
-  ]
-};
+const INITIAL_SURAT_MASUK = [];
+const INITIAL_SURAT_KELUAR = [];
+const INITIAL_DISPOSISI = {};
+const INITIAL_TRACKING = {};
 
 const INITIAL_NOMOR_CONFIG = {
   kodePrefix: 'W13-A8',
@@ -491,31 +234,31 @@ const INITIAL_NOMOR_CONFIG = {
       kode: 'HK.01',
       nama: 'Kepaniteraan Perkara / Administrasi Hukum',
       penjelasan: 'Naskah dinas terkait administrasi perkara peradilan, pemanggilan para pihak, pemberitahuan putusan, delegasi sidang, permohonan kasasi/PK, dan laporan perkara.',
-      counter: 1043
+      counter: 0
     },
     {
       kode: 'PL.01',
       nama: 'Perencanaan, TI & Pelaporan',
       penjelasan: 'Naskah dinas terkait usulan rencana kerja operasional, anggaran DIPA, implementasi teknologi informasi, laporan kinerja instansi (LKjIP), SAKIP, dan evaluasi berkala.',
-      counter: 215
+      counter: 0
     },
     {
       kode: 'UM.01',
       nama: 'Umum & Tata Persuratan Kedinasan',
       penjelasan: 'Naskah dinas urusan dinas umum, koordinasi lintas satker, permohonan fasilitas sarpras, pengadaan barang dan jasa, rumah tangga, serta tata persuratan dinas.',
-      counter: 531
+      counter: 0
     },
     {
       kode: 'KP.02',
       nama: 'Kepegawaian, Organisasi & Tata Laksana',
       penjelasan: 'Naskah dinas usulan kenaikan pangkat/golongan, mutasi dan promosi jabatan, permohonan cuti dinas, disiplin pegawai/aparatur, dan pembaruan struktur organisasi.',
-      counter: 189
+      counter: 0
     },
     {
       kode: 'KU.01',
       nama: 'Keuangan & Pengelolaan DIPA',
       penjelasan: 'Naskah dinas pertanggungjawaban realisasi anggaran, pengajuan SPM/SP2D ke KPPN, laporan bulanan bendahara, rekonsiliasi keuangan DIPA 01 & 04, dan urusan pajak.',
-      counter: 304
+      counter: 0
     },
   ]
 };
@@ -599,7 +342,7 @@ export function SuratProvider({ children }) {
 
   // Active navigation view
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [activeLetterId, setActiveLetterId] = useState('SM-001');
+  const [activeLetterId, setActiveLetterId] = useState(null);
 
   // Supabase Loading & Error States
   const [isLoading, setIsLoading] = useState(true);
@@ -608,22 +351,70 @@ export function SuratProvider({ children }) {
   // Main collections (initialized with local cache or fallback)
   const [suratMasuk, setSuratMasuk] = useState(() => {
     const saved = localStorage.getItem('surat_masuk_data');
-    return saved ? JSON.parse(saved) : INITIAL_SURAT_MASUK;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.some((s) => s.id === 'SM-001' || s.id === 'SM-002')) {
+          localStorage.removeItem('surat_masuk_data');
+          return [];
+        }
+        return parsed;
+      } catch {
+        return [];
+      }
+    }
+    return INITIAL_SURAT_MASUK;
   });
 
   const [suratKeluar, setSuratKeluar] = useState(() => {
     const saved = localStorage.getItem('surat_keluar_data');
-    return saved ? JSON.parse(saved) : INITIAL_SURAT_KELUAR;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.some((s) => s.id === 'SK-001' || s.id === 'SK-002')) {
+          localStorage.removeItem('surat_keluar_data');
+          return [];
+        }
+        return parsed;
+      } catch {
+        return [];
+      }
+    }
+    return INITIAL_SURAT_KELUAR;
   });
 
   const [disposisiList, setDisposisiList] = useState(() => {
     const saved = localStorage.getItem('surat_disposisi_data');
-    return saved ? JSON.parse(saved) : INITIAL_DISPOSISI;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed['SM-001'] || parsed['SM-002']) {
+          localStorage.removeItem('surat_disposisi_data');
+          return {};
+        }
+        return parsed;
+      } catch {
+        return {};
+      }
+    }
+    return INITIAL_DISPOSISI;
   });
 
   const [trackingList, setTrackingList] = useState(() => {
     const saved = localStorage.getItem('surat_tracking_data');
-    return saved ? JSON.parse(saved) : INITIAL_TRACKING;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed['SM-001'] || parsed['SM-002']) {
+          localStorage.removeItem('surat_tracking_data');
+          return {};
+        }
+        return parsed;
+      } catch {
+        return {};
+      }
+    }
+    return INITIAL_TRACKING;
   });
 
   const [nomorConfig, setNomorConfig] = useState(() => {
@@ -659,42 +450,14 @@ export function SuratProvider({ children }) {
       senderPhone: '+62 812-3456-7890',
       status: 'Terhubung & Aktif',
       serverStatus: 'Online',
-      dailyQuota: { used: 180, total: 5000 },
+      dailyQuota: { used: 0, total: 5000 },
       triggers: {
         suratMasuk: true,
         distribusi: true,
         disposisi: true,
         tindakLanjut: true,
       },
-      messageLogs: [
-        {
-          id: 'log-1',
-          time: '20 Okt 2026, 10:18 WIB',
-          recipient: 'Bpk. H. M. Ridwan, S.H. (Sekretaris)',
-          type: 'Disposisi Surat',
-          nomorSurat: '012/PA.Lmg/X/2026',
-          text: 'Yth. Bpk. H. M. Ridwan, S.H., terdapat Disposisi Baru dari Ketua PA Lumajang untuk surat No. 012/PA.Lmg/X/2026. Arahan: Hadiri dan wakili pimpinan dalam Rakor PTA Surabaya.',
-          status: 'Terkirim (Centang Dua)'
-        },
-        {
-          id: 'log-2',
-          time: '20 Okt 2026, 10:18 WIB',
-          recipient: 'Ibu Dra. Hj. Nurjanah, M.H. (Panitera)',
-          type: 'Disposisi Surat',
-          nomorSurat: '012/PA.Lmg/X/2026',
-          text: 'Yth. Ibu Dra. Hj. Nurjanah, M.H., terdapat Disposisi Baru dari Ketua PA Lumajang untuk surat No. 012/PA.Lmg/X/2026. Arahan: Siapkan bahan pemaparan e-Court.',
-          status: 'Terkirim (Centang Dua)'
-        },
-        {
-          id: 'log-3',
-          time: '20 Okt 2026, 09:15 WIB',
-          recipient: 'Dr. H. Ahmad Zainuddin, S.H., M.H. (Ketua)',
-          type: 'Surat Masuk Baru',
-          nomorSurat: '047/UM.01/X/2026',
-          text: 'Pemberitahuan Surat Masuk Baru: No. 047/UM.01/X/2026 dari Pengadilan Tinggi perihal Sosialisasi PTSP Disabilitas. Sifat: Sangat Segera.',
-          status: 'Terkirim (Centang Dua)'
-        }
-      ]
+      messageLogs: []
     };
   });
 
@@ -753,6 +516,16 @@ export function SuratProvider({ children }) {
         localStorage.setItem('surat_keluar_data', JSON.stringify(keluar));
         localStorage.setItem('surat_disposisi_data', JSON.stringify(disposisiMap));
         localStorage.setItem('surat_tracking_data', JSON.stringify(trackingMap));
+      } else {
+        // Data di Supabase kosong (0 baris)
+        setSuratMasuk([]);
+        setSuratKeluar([]);
+        setDisposisiList({});
+        setTrackingList({});
+        localStorage.setItem('surat_masuk_data', JSON.stringify([]));
+        localStorage.setItem('surat_keluar_data', JSON.stringify([]));
+        localStorage.setItem('surat_disposisi_data', JSON.stringify({}));
+        localStorage.setItem('surat_tracking_data', JSON.stringify({}));
       }
     } catch (err) {
       console.error('Koneksi Supabase gagal:', err);

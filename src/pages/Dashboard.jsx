@@ -5,6 +5,22 @@ export default function Dashboard() {
   const { suratMasuk, suratKeluar, currentUser, navigateTo, showToast } = useSurat();
   const [filterPeriod, setFilterPeriod] = useState('minggu');
 
+  const dalamProsesCount =
+    suratMasuk.filter((s) => s.status !== 'Selesai' && s.status !== 'Diarsipkan').length +
+    suratKeluar.filter((s) => s.status !== 'Disetujui & Diterbitkan Nomor').length;
+
+  const selesaiCount =
+    suratMasuk.filter((s) => s.status === 'Selesai' || s.status === 'Diarsipkan').length +
+    suratKeluar.filter((s) => s.status === 'Disetujui & Diterbitkan Nomor').length;
+
+  const priorityLetters = suratMasuk.filter(
+    (s) =>
+      s.status === 'Menunggu Disposisi' ||
+      s.prioritasTinggi ||
+      s.prioritas === 'Sangat Segera' ||
+      s.sifat === 'sangat_segera'
+  );
+
   const handlePrintAgenda = () => {
     window.print();
   };
@@ -90,11 +106,11 @@ export default function Dashboard() {
           </div>
           <div>
             <div className="text-3xl font-extrabold text-on-surface leading-none mb-2">
-              {suratMasuk.length + 120}
+              {suratMasuk.length}
             </div>
             <div className="flex items-center gap-1 text-xs text-primary font-medium">
-              <span className="material-symbols-outlined text-[16px]">trending_up</span>
-              <span>+12% dari bulan lalu</span>
+              <span className="material-symbols-outlined text-[16px]">folder</span>
+              <span>Surat masuk tercatat</span>
             </div>
           </div>
         </div>
@@ -112,11 +128,11 @@ export default function Dashboard() {
           </div>
           <div>
             <div className="text-3xl font-extrabold text-on-surface leading-none mb-2">
-              {suratKeluar.length + 82}
+              {suratKeluar.length}
             </div>
             <div className="flex items-center gap-1 text-xs text-outline font-medium">
-              <span className="material-symbols-outlined text-[16px]">update</span>
-              <span>+5 surat hari ini</span>
+              <span className="material-symbols-outlined text-[16px]">folder</span>
+              <span>Surat keluar tercatat</span>
             </div>
           </div>
         </div>
@@ -133,10 +149,12 @@ export default function Dashboard() {
             </div>
           </div>
           <div>
-            <div className="text-3xl font-extrabold text-on-surface leading-none mb-2">18</div>
+            <div className="text-3xl font-extrabold text-on-surface leading-none mb-2">
+              {dalamProsesCount}
+            </div>
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-warning-light text-amber-900 border border-warning/30 text-[11px] font-semibold">
               <span className="material-symbols-outlined text-[13px]">pending</span>
-              <span>Perlu verifikasi alur</span>
+              <span>Perlu verifikasi / tindak lanjut</span>
             </div>
           </div>
         </div>
@@ -153,10 +171,12 @@ export default function Dashboard() {
             </div>
           </div>
           <div>
-            <div className="text-3xl font-extrabold text-on-surface leading-none mb-2">193</div>
+            <div className="text-3xl font-extrabold text-on-surface leading-none mb-2">
+              {selesaiCount}
+            </div>
             <div className="flex items-center gap-1 text-xs text-success font-semibold">
               <span className="material-symbols-outlined text-[16px]">verified</span>
-              <span>Telah terarsip & terdistribusi</span>
+              <span>Telah terarsip & tuntas</span>
             </div>
           </div>
         </div>
@@ -169,113 +189,63 @@ export default function Dashboard() {
             <span className="material-symbols-outlined text-danger text-[22px]">warning</span>
             <h3 className="text-lg font-bold text-on-surface">Surat Perlu Ditindaklanjuti</h3>
             <span className="px-2 py-0.5 rounded-full bg-danger-light text-danger text-xs font-bold">
-              3 Perlu Perhatian
+              {priorityLetters.length} Perlu Perhatian
             </span>
           </div>
           <span className="text-xs text-outline font-medium hidden sm:inline">Pembaruan otomatis berkala</span>
         </div>
 
-        {/* 3 Priority Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Priority Card 1: 047/UM.01/X/2026 */}
-          <div className="p-5 rounded-card bg-white border-l-4 border-l-danger border-y border-r border-outline-subtle shadow-2xs flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-code text-xs text-outline font-semibold">047/UM.01/X/2026</span>
-                <span className="px-2 py-0.5 rounded text-[11px] bg-danger-light text-danger font-bold">
-                  Butuh Disposisi Segera
-                </span>
-              </div>
-              <h4 className="text-sm font-bold text-on-surface leading-snug">
-                Pemberitahuan Kegiatan Sosialisasi PTSP Ramah Disabilitas
-              </h4>
-              <div className="text-xs text-outline space-y-1 pt-1">
-                <p>
-                  <span className="font-semibold text-on-surface">Pengirim:</span> Pengadilan Tinggi Jawa Timur
-                </p>
-                <p className="text-danger font-medium flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">assignment_late</span>
-                  <span>Butuh paraf Panitera & instruksi Ketua</span>
-                </p>
-              </div>
-            </div>
-            <div className="pt-4 mt-3 border-t border-surface">
-              <button
-                onClick={() => navigateTo('disposisi', 'SM-002')}
-                className="w-full h-9 px-3 rounded-btn bg-primary text-white text-xs font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-all shadow-xs"
-              >
-                <span className="material-symbols-outlined text-[16px]">forward_to_inbox</span>
-                <span>Buka Lembar Disposisi</span>
-              </button>
-            </div>
+        {/* Priority Cards */}
+        {priorityLetters.length === 0 ? (
+          <div className="p-8 text-center bg-white rounded-card border border-outline-subtle text-outline text-xs">
+            <span className="material-symbols-outlined text-[36px] text-emerald-600 block mb-1">
+              task_alt
+            </span>
+            <p className="font-semibold text-on-surface text-sm">Semua Tugas Berjalan Lancar</p>
+            <p className="text-outline mt-0.5">Tidak ada surat mendesak yang menunggu tindak lanjut saat ini.</p>
           </div>
-
-          {/* Priority Card 2: 042/KP.02/X/2026 */}
-          <div className="p-5 rounded-card bg-white border-l-4 border-l-warning border-y border-r border-outline-subtle shadow-2xs flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-code text-xs text-outline font-semibold">042/KP.02/X/2026</span>
-                <span className="px-2 py-0.5 rounded text-[11px] bg-warning-light text-amber-900 border border-warning/40 font-bold">
-                  Verifikasi Lampiran
-                </span>
-              </div>
-              <h4 className="text-sm font-bold text-on-surface leading-snug">
-                Usulan Kenaikan Pangkat Hakim & Pegawai Periode April 2027
-              </h4>
-              <div className="text-xs text-outline space-y-1 pt-1">
-                <p>
-                  <span className="font-semibold text-on-surface">Biro:</span> Kepegawaian & Ortala MARI
-                </p>
-                <p className="text-amber-800 font-medium flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">timer</span>
-                  <span>Batas Waktu: 24 Jam lagi</span>
-                </p>
-              </div>
-            </div>
-            <div className="pt-4 mt-3 border-t border-surface">
-              <button
-                onClick={() => navigateTo('pelacakan', 'SM-003')}
-                className="w-full h-9 px-3 rounded-btn bg-warning hover:bg-warning-dark text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.99]"
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {priorityLetters.slice(0, 3).map((item) => (
+              <div
+                key={item.id}
+                className="p-5 rounded-card bg-white border-l-4 border-l-danger border-y border-r border-outline-subtle shadow-2xs flex flex-col justify-between"
               >
-                <span className="material-symbols-outlined text-[16px] font-bold">fact_check</span>
-                <span>Verifikasi Sekarang</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Priority Card 3: 039/PL.01/X/2026 */}
-          <div className="p-5 rounded-card bg-white border-l-4 border-l-tertiary border-y border-r border-outline-subtle shadow-2xs flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-code text-xs text-outline font-semibold">039/PL.01/X/2026</span>
-                <span className="px-2 py-0.5 rounded text-[11px] bg-tertiary-light text-tertiary font-bold">
-                  Paraf Sekretaris Tertunda
-                </span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-code text-xs text-outline font-semibold">
+                      {item.nomorSurat}
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[11px] bg-danger-light text-danger font-bold">
+                      {item.prioritas || 'Perlu Disposisi'}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-bold text-on-surface leading-snug line-clamp-2">
+                    {item.perihal}
+                  </h4>
+                  <div className="text-xs text-outline space-y-1 pt-1">
+                    <p>
+                      <span className="font-semibold text-on-surface">Pengirim:</span> {item.asalSurat}
+                    </p>
+                    <p className="text-danger font-medium flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">assignment_late</span>
+                      <span>Status: {item.status}</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-4 mt-3 border-t border-surface">
+                  <button
+                    onClick={() => navigateTo('disposisi', item.id)}
+                    className="w-full h-9 px-3 rounded-btn bg-primary text-white text-xs font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-all shadow-xs"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">forward_to_inbox</span>
+                    <span>Buka Lembar Disposisi</span>
+                  </button>
+                </div>
               </div>
-              <h4 className="text-sm font-bold text-on-surface leading-snug">
-                Pengadaan Perangkat Sidang Elektronik Ruang Sidang Utama
-              </h4>
-              <div className="text-xs text-outline space-y-1 pt-1">
-                <p>
-                  <span className="font-semibold text-on-surface">Subbagian:</span> Perencanaan, TI & Pelaporan
-                </p>
-                <p className="text-tertiary font-medium flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">schedule</span>
-                  <span>Tertahan 2 hari di meja Sekretaris</span>
-                </p>
-              </div>
-            </div>
-            <div className="pt-4 mt-3 border-t border-surface">
-              <button
-                onClick={() => handleSendReminderWA('039/PL.01/X/2026')}
-                className="w-full h-9 px-3 rounded-btn bg-success hover:bg-success-dark text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-xs"
-              >
-                <span className="material-symbols-outlined text-[16px]">chat</span>
-                <span>Kirim Pengingat WhatsApp</span>
-              </button>
-            </div>
+            ))}
           </div>
-        </div>
+        )}
       </section>
 
       {/* Table Section: Aktivitas Surat Terbaru */}
@@ -307,72 +277,79 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-subtle text-on-surface">
-                {suratMasuk.slice(0, 4).map((item) => {
-                  const isMenunggu = item.status === 'Menunggu Disposisi';
-                  return (
-                    <tr
-                      key={item.id}
-                      className={`hover:bg-surface/50 transition-colors ${
-                        isMenunggu ? 'bg-danger-light/10' : ''
-                      }`}
-                    >
-                      <td className="py-3 px-4 md:px-6 font-code font-bold text-primary whitespace-nowrap">
-                        <div>{item.nomorSurat}</div>
-                        <div className="text-[10px] text-outline font-normal">{item.agenda}</div>
-                      </td>
-                      <td className="py-3 px-4 md:px-6 max-w-sm">
-                        <div className="font-semibold text-on-surface truncate">{item.perihal}</div>
-                        <div className="text-xs text-outline truncate">Pengirim: {item.asalSurat}</div>
-                      </td>
-                      <td className="py-3 px-4 md:px-6 text-on-surface-variant whitespace-nowrap">
-                        {item.tanggalSurat}
-                      </td>
-                      <td className="py-3 px-4 md:px-6 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold text-xs ${
-                            item.status === 'Selesai'
-                              ? 'bg-success-light text-success border border-success/30'
-                              : isMenunggu
-                              ? 'bg-danger-light text-danger'
-                              : 'bg-warning-light text-amber-900 border border-warning/40'
-                          }`}
-                        >
+                {suratMasuk.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="py-10 text-center text-outline text-xs">
+                      <span className="material-symbols-outlined text-[36px] block mb-1 text-outline">
+                        inbox
+                      </span>
+                      Belum ada aktivitas persuratan yang tercatat.
+                    </td>
+                  </tr>
+                ) : (
+                  suratMasuk.slice(0, 4).map((item) => {
+                    const isMenunggu = item.status === 'Menunggu Disposisi';
+                    return (
+                      <tr
+                        key={item.id}
+                        className={`hover:bg-surface/50 transition-colors ${
+                          isMenunggu ? 'bg-danger-light/10' : ''
+                        }`}
+                      >
+                        <td className="py-3 px-4 md:px-6 font-code font-bold text-primary whitespace-nowrap">
+                          <div>{item.nomorSurat}</div>
+                          <div className="text-[10px] text-outline font-normal">{item.agenda}</div>
+                        </td>
+                        <td className="py-3 px-4 md:px-6 max-w-sm">
+                          <div className="font-semibold text-on-surface truncate">{item.perihal}</div>
+                          <div className="text-xs text-outline truncate">Pengirim: {item.asalSurat}</div>
+                        </td>
+                        <td className="py-3 px-4 md:px-6 text-on-surface-variant whitespace-nowrap">
+                          {item.tanggalSurat}
+                        </td>
+                        <td className="py-3 px-4 md:px-6 whitespace-nowrap">
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold text-xs ${
                               item.status === 'Selesai'
-                                ? 'bg-success'
+                                ? 'bg-success-light text-success border border-success/30'
                                 : isMenunggu
-                                ? 'bg-danger'
-                                : 'bg-warning-dark'
+                                ? 'bg-danger-light text-danger'
+                                : 'bg-warning-light text-amber-900 border border-warning/40'
                             }`}
-                          ></span>
-                          {item.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 md:px-6 text-right whitespace-nowrap">
-                        <button
-                          onClick={() => {
-                            if (isMenunggu) {
-                              navigateTo('disposisi', item.id);
-                            } else {
-                              navigateTo('pelacakan', item.id);
-                            }
-                          }}
-                          className={`h-8 px-3 rounded-btn text-xs font-semibold inline-flex items-center gap-1 transition-all ${
-                            isMenunggu
-                              ? 'bg-primary text-white hover:bg-primary-dark shadow-2xs'
-                              : 'bg-white border border-outline-subtle text-primary hover:bg-primary-light'
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[16px]">
-                            {isMenunggu ? 'edit_document' : 'visibility'}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                item.status === 'Selesai'
+                                  ? 'bg-success'
+                                  : isMenunggu
+                                  ? 'bg-danger'
+                                  : 'bg-warning-dark'
+                              }`}
+                            ></span>
+                            {item.status}
                           </span>
-                          <span>{isMenunggu ? 'Disposisi' : 'Detail'}</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                        <td className="py-3 px-4 md:px-6 text-right whitespace-nowrap">
+                          <button
+                            onClick={() => {
+                              if (isMenunggu) {
+                                navigateTo('disposisi', item.id);
+                              } else {
+                                navigateTo('pelacakan', item.id);
+                              }
+                            }}
+                            className="p-1.5 rounded-md hover:bg-surface text-outline hover:text-primary transition-colors"
+                            title="Detail"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">
+                              arrow_forward
+                            </span>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

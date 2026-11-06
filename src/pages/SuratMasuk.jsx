@@ -876,7 +876,17 @@ export default function SuratMasuk() {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-subtle text-on-surface">
-              {filteredSurat.map((item) => {
+              {filteredSurat.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="py-12 text-center text-outline">
+                    <span className="material-symbols-outlined text-[36px] text-outline mb-1 block">
+                      inbox
+                    </span>
+                    Belum ada data surat masuk. Klik tombol "+ Catat Surat Masuk" untuk menambahkan surat baru.
+                  </td>
+                </tr>
+              ) : (
+                filteredSurat.map((item) => {
                 const isMenunggu = item.status === 'Menunggu Disposisi';
                 return (
                   <tr key={item.id} className="hover:bg-surface/60 transition-colors">
@@ -1049,8 +1059,9 @@ export default function SuratMasuk() {
                     </td>
                   </tr>
                 );
-              })}
-            </tbody>
+              })
+            )}
+          </tbody>
           </table>
         </div>
 

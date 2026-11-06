@@ -14,12 +14,13 @@ export default function Disposisi() {
     currentUser,
     plhConfig,
     showToast,
+    navigateTo,
   } = useSurat();
 
-  const [selectedLetterId, setSelectedLetterId] = useState(activeLetterId || 'SM-001');
+  const [selectedLetterId, setSelectedLetterId] = useState(activeLetterId || suratMasuk[0]?.id || '');
 
   const currentSurat = suratMasuk.find((s) => s.id === selectedLetterId) || suratMasuk[0];
-  const existingDisposisi = disposisiList[selectedLetterId];
+  const existingDisposisi = selectedLetterId ? disposisiList[selectedLetterId] : null;
 
   // 18 Petunjuk Resmi Mahkamah Agung (Gambar 26 Pedoman Tata Naskah Dinas MARI)
   const OFFICIAL_PETUNJUK = [
@@ -324,6 +325,38 @@ export default function Disposisi() {
   const pimpinanName = plhConfig?.isActive
     ? `${plhConfig.pejabatPlh.name} (${plhConfig.tipePelimpahan === 'hakim_ditunjuk' ? 'Hakim yang Ditunjuk' : 'Wakil Ketua'})`
     : 'Dr. H. Ahmad Zainuddin, S.H., M.H. (Ketua)';
+
+  if (suratMasuk.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-outline-subtle no-print">
+          <div>
+            <h2 className="text-2xl font-bold text-on-surface tracking-tight">Disposisi Surat</h2>
+            <p className="text-xs md:text-sm text-outline mt-0.5">
+              Lembar Disposisi Elektronik Resmi Mahkamah Agung RI
+            </p>
+          </div>
+        </div>
+        <div className="p-12 text-center bg-white rounded-xl border border-outline-subtle shadow-xs">
+          <span className="material-symbols-outlined text-[48px] text-outline mb-2 block">
+            mark_email_unread
+          </span>
+          <h3 className="text-base font-bold text-on-surface">Belum Ada Surat Masuk untuk Didisposisi</h3>
+          <p className="text-xs text-outline mt-1 mb-5">
+            Database surat saat ini kosong. Catat surat masuk baru terlebih dahulu untuk membuat lembar disposisi.
+          </p>
+          <button
+            onClick={() => navigateTo('surat-masuk')}
+            className="px-4 py-2 text-white rounded-lg text-xs font-bold transition-all inline-flex items-center gap-1.5 shadow-xs"
+            style={{ backgroundColor: '#0B3B24' }}
+          >
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            <span>+ Catat Surat Masuk</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

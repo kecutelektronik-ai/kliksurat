@@ -143,11 +143,15 @@ export default function Distribusi() {
                 onChange={(e) => setSelectedSurat(e.target.value)}
                 className="w-full h-10 px-3 rounded-btn border border-outline-subtle bg-white text-on-surface font-medium focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-xs"
               >
-                {suratMasuk.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.nomorSurat} - {s.asalSurat}
-                  </option>
-                ))}
+                {suratMasuk.length === 0 ? (
+                  <option value="">(Belum ada surat masuk tersedia)</option>
+                ) : (
+                  suratMasuk.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.nomorSurat} - {s.asalSurat}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 

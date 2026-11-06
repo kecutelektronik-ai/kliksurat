@@ -798,7 +798,17 @@ export default function SuratKeluar() {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-subtle text-on-surface">
-              {filteredSurat.map((item, idx) => {
+              {filteredSurat.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="py-12 text-center text-outline">
+                    <span className="material-symbols-outlined text-[36px] text-outline mb-1 block">
+                      outbox
+                    </span>
+                    Belum ada data surat keluar. Klik tombol "+ Buat Usulan Surat Keluar" untuk membuat baru.
+                  </td>
+                </tr>
+              ) : (
+                filteredSurat.map((item, idx) => {
                 const isApproved = item.status === 'Disetujui & Diterbitkan Nomor';
                 const rawTtd = item.kodePenandatangan || (item.nomorSurat && item.nomorSurat.includes('/') ? item.nomorSurat.split('/')[1] : 'KPA');
                 let ttdKode = 'KPA';
@@ -919,8 +929,9 @@ export default function SuratKeluar() {
                     </td>
                   </tr>
                 );
-              })}
-            </tbody>
+              })
+            )}
+          </tbody>
           </table>
         </div>
       </div>

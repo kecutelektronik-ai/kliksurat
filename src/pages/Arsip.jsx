@@ -141,8 +141,19 @@ export default function Arsip() {
       </div>
 
       {/* Grid Arsip Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {filteredArchives.map((item) => (
+      {filteredArchives.length === 0 ? (
+        <div className="p-12 text-center bg-white rounded-xl border border-outline-subtle text-outline">
+          <span className="material-symbols-outlined text-[42px] block mb-2 text-outline">
+            folder_off
+          </span>
+          <p className="font-semibold text-on-surface text-sm">Belum Ada Arsip Persuratan</p>
+          <p className="text-xs text-outline mt-0.5">
+            Surat masuk dan surat keluar yang telah selesai diproses akan diarsipkan secara otomatis di sini.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredArchives.map((item) => (
           <div
             key={item.id}
             className="p-5 rounded-card bg-white border border-outline-subtle hover:border-primary/40 shadow-2xs transition-all flex flex-col justify-between space-y-4"
@@ -220,7 +231,8 @@ export default function Arsip() {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
