@@ -151,16 +151,8 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
               </button>
             )}
 
-            <div className="px-3 py-2 bg-black/20 border border-white/10 rounded-lg flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-accent animate-pulse ring-2 ring-white/50"></span>
-                <span className="text-stone-200 font-medium">Server PTIP Aktif</span>
-              </div>
-              <span className="text-stone-300 font-semibold font-code">v2.4-ID</span>
-            </div>
-
             {/* Copyright */}
-            <div className="text-center pt-1 text-[11px] leading-tight">
+            <div className="text-center pt-2 text-[11px] leading-tight">
               <p className="font-semibold text-white/90">
                 <span className="text-warning font-bold">KlikDispos</span> &copy; MASKOD-2026. Hak Cipta
               </p>
