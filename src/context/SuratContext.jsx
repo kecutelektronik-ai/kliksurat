@@ -206,7 +206,7 @@ const INITIAL_SURAT_MASUK = [
 const INITIAL_SURAT_KELUAR = [
   {
     id: 'SK-001',
-    nomorSurat: '1042/PAN.PA/HK.01/X/2026',
+    nomorSurat: '1042/PAN.PA.A13-W8/HK.01/X/2026',
     agenda: '0001/SK/X/2026',
     unitPengusul: 'Kepaniteraan Perkara',
     kodePenandatangan: 'PAN.PA',
@@ -224,7 +224,7 @@ const INITIAL_SURAT_KELUAR = [
   },
   {
     id: 'SK-002',
-    nomorSurat: '1043/SEK.PA/PL.01/X/2026',
+    nomorSurat: '1043/SEK.PA.A13-W8/PL.01/X/2026',
     agenda: '0002/SK/X/2026',
     unitPengusul: 'Kesekretariatan (Subbag Perencanaan)',
     kodePenandatangan: 'SEK.PA',
@@ -363,10 +363,11 @@ const INITIAL_TRACKING = {
 };
 
 const INITIAL_NOMOR_CONFIG = {
-  kodePrefix: 'W13-A12',
+  kodePrefix: 'A13-W8',
+  kodePa: 'A13-W8',
   tahun: 2026,
-  format: '[NO]/[KODE_PENANDATANGAN]/[KODE_KLASIFIKASI]/[BULAN]/[TAHUN]',
-  rumus: '(nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)',
+  format: '[NO]/[KODE_PENANDATANGAN].[KODE_PA]/[KODE_KLASIFIKASI]/[BULAN]/[TAHUN]',
+  rumus: '[Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]',
   klasifikasi: [
     {
       kode: 'HK.01',
@@ -931,9 +932,10 @@ export function SuratProvider({ children }) {
     const monthIdx = isNaN(dateObj.getTime()) ? new Date().getMonth() : dateObj.getMonth();
     const romanMonth = getRomanMonth(monthIdx);
     const tahunSurat = isNaN(dateObj.getTime()) ? (nomorConfig.tahun || 2026) : dateObj.getFullYear();
+    const kodePa = nomorConfig.kodePa || nomorConfig.kodePrefix || 'A13-W8';
     
-    // Rumus: (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
-    const generatedNo = `${nextNum}/${kodePenandatangan}/${targetKlasifikasi}/${romanMonth}/${tahunSurat}`;
+    // Rumus: [Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]
+    const generatedNo = `${nextNum}/${kodePenandatangan}.${kodePa}/${targetKlasifikasi}/${romanMonth}/${tahunSurat}`;
     
     // Penentuan nama pejabat yang menyetujui (Ketua / Plh Wakil Ketua / Plh Hakim Ditunjuk)
     let approvedByName = currentUser.name;

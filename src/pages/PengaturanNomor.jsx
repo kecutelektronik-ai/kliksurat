@@ -14,7 +14,7 @@ export default function PengaturanNomor() {
     showToast,
   } = useSurat();
 
-  const [prefix, setPrefix] = useState(nomorConfig.kodePrefix || 'W13-A12');
+  const [prefix, setPrefix] = useState(nomorConfig.kodePa || nomorConfig.kodePrefix || 'A13-W8');
   const [tahun, setTahun] = useState(nomorConfig.tahun || 2026);
 
   // New Classification State
@@ -45,6 +45,7 @@ export default function PengaturanNomor() {
     setNomorConfig({
       ...nomorConfig,
       kodePrefix: prefix,
+      kodePa: prefix,
       tahun: Number(tahun),
     });
     showToast('Konfigurasi tata penomoran surat berhasil disimpan.', 'success');
@@ -126,8 +127,8 @@ export default function PengaturanNomor() {
   };
 
   const simTarget = klasifikasiList.find((k) => k.kode === simKode) || klasifikasiList[0];
-  // Rumus: (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
-  const simGeneratedNumber = `${(simTarget?.counter || 0) + 1}/${simPenandatangan}/${simKode}/${simBulan}/${tahun}`;
+  // Rumus: [Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]
+  const simGeneratedNumber = `${(simTarget?.counter || 0) + 1}/${simPenandatangan}.${prefix}/${simKode}/${simBulan}/${tahun}`;
 
   return (
     <div className="space-y-6">
@@ -213,7 +214,7 @@ export default function PengaturanNomor() {
             </span>
           </div>
           <p className="text-xs text-outline">
-            <strong>Rumus:</strong> (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
+            <strong>Rumus Baku:</strong> <code>[Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]</code> (Kode PA: <strong>{prefix}</strong>)
           </p>
         </div>
 
@@ -274,7 +275,7 @@ export default function PengaturanNomor() {
               Parameter Format Baku Penomoran Mahkamah Agung
             </h3>
             <p className="text-xs text-outline mt-0.5">
-              Rumus: <code className="font-mono text-primary font-bold">(Nomor Urut / Kode Penandatangan / Kode Klasifikasi / Bulan Romawi / Tahun)</code>
+              Rumus Baku: <code className="font-mono text-primary font-bold">[Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]</code>
             </p>
           </div>
           <span className="text-xs text-outline font-code">SOP MARI-2026</span>
@@ -284,20 +285,20 @@ export default function PengaturanNomor() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs md:text-sm">
             <div className="space-y-1">
               <label className="font-bold text-on-surface-variant">
-                Kode Prefix Satuan Kerja <span className="text-danger">*</span>
+                Kode PA Lumajang (Satuan Kerja) <span className="text-danger">*</span>
               </label>
               <input
                 type="text"
                 required
                 disabled={!isAdmin}
                 value={prefix}
-                onChange={(e) => setPrefix(e.target.value)}
-                placeholder="Contoh: W13-A12"
+                onChange={(e) => setPrefix(e.target.value.toUpperCase())}
+                placeholder="Contoh: A13-W8"
                 className={`w-full h-10 px-3 rounded-btn border border-outline-subtle font-code font-bold text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none ${
                   isAdmin ? 'bg-surface' : 'bg-gray-100 cursor-not-allowed'
                 }`}
               />
-              <p className="text-[11px] text-outline">Kode unik pengadilan dari Mahkamah Agung RI</p>
+              <p className="text-[11px] text-outline">Kode unik satker PA Lumajang (A13-W8)</p>
             </div>
 
             <div className="space-y-1">

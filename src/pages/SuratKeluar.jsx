@@ -60,15 +60,18 @@ export default function SuratKeluar() {
   ) || nomorConfig.klasifikasi?.[0];
 
   const selectedPenandatangan = getPenandatanganByKode(form.kodePenandatangan);
+  const kodePa = nomorConfig.kodePa || nomorConfig.kodePrefix || 'A13-W8';
 
-  // Perhitungan Pratinjau Nomor Surat Keluar Berdasarkan Rumus
-  // (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
+  // Perhitungan Pratinjau Nomor Surat Keluar Berdasarkan Rumus:
+  // [Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]
   const nextEstimatedNum = (selectedKlasifikasi?.counter || 0) + 1;
   const previewNomorSuratKeluar = formatNomorSuratKeluar(
     nextEstimatedNum,
     form.kodePenandatangan,
     form.kodeKlasifikasi,
-    form.tanggalSurat
+    form.tanggalSurat,
+    null,
+    kodePa
   );
 
   const handleOpenAddKlasifikasi = () => {
@@ -217,21 +220,23 @@ export default function SuratKeluar() {
             <span className="material-symbols-outlined text-[22px]">format_list_numbered</span>
           </div>
           <div>
-            <div className="font-bold text-on-surface text-sm flex items-center gap-2">
+            <div className="font-bold text-on-surface text-sm flex flex-wrap items-center gap-2">
               <span>SOP Rumus Penomoran Surat Keluar Resmi</span>
-              <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-primary text-white font-bold">
-                (No. Urut / TTD / Klasifikasi / Bulan / Tahun)
+              <span className="font-mono text-[11px] px-2.5 py-0.5 rounded bg-primary text-white font-bold">
+                (No. Urut / TTD.{kodePa} / Klasifikasi / Bulan / Tahun)
               </span>
             </div>
             <p className="text-on-surface-variant text-xs mt-0.5">
-              Rumus Baku: <code>[Nomor Urut]/[Kode Penandatangan]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]</code>
+              Rumus Baku: <code>[Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]</code>
             </p>
           </div>
         </div>
 
-        {/* Pilihan Kode Penandatangan Resmi */}
+        {/* Pilihan Kode Penandatangan Resmi & Kode PA */}
         <div className="flex flex-wrap items-center gap-1.5 self-stretch lg:self-auto">
-          <span className="text-[11px] font-bold text-outline mr-1">Kode TTD:</span>
+          <span className="px-2 py-1 rounded bg-white text-primary border border-primary/30 font-mono font-bold text-[11px]" title="Kode Satuan Kerja Pengadilan Agama Lumajang">
+            Kode PA: <strong>{kodePa}</strong>
+          </span>
           <span className="px-2 py-1 rounded bg-blue-50 text-blue-800 border border-blue-200 font-mono font-bold text-[11px]" title="Ketua Pengadilan Agama">
             Ketua: <strong>KPA</strong>
           </span>
@@ -471,7 +476,7 @@ export default function SuratKeluar() {
               </div>
 
               {/* KOLOM NOMOR SURAT KELUAR DENGAN RUMUS:
-                  (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun) */}
+                  [Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun] */}
               <div className="space-y-1 md:col-span-2">
                 <div className="p-4 rounded-card bg-primary-light/50 border border-primary/30 space-y-2.5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
@@ -492,14 +497,14 @@ export default function SuratKeluar() {
                       </div>
                     </div>
 
-                    {/* Breakdown 5 Parameter Rumus */}
+                    {/* Breakdown Parameter Rumus: No Urut / TTD.Kode PA / Klas / Bulan / Tahun */}
                     <div className="flex flex-wrap items-center justify-center gap-1 text-[11px]">
                       <span className="px-2 py-0.5 rounded bg-surface border border-outline-subtle font-mono text-on-surface" title="Nomor Urut Surat Keluar">
                         No: <strong>{nextEstimatedNum}</strong>
                       </span>
                       <span className="text-outline font-bold">/</span>
-                      <span className="px-2 py-0.5 rounded bg-primary-light text-primary border border-primary/30 font-mono font-bold" title={`Kode Penandatangan: ${selectedPenandatangan.nama}`}>
-                        TTD: <strong>{form.kodePenandatangan}</strong>
+                      <span className="px-2 py-0.5 rounded bg-primary-light text-primary border border-primary/30 font-mono font-bold" title={`Kode Penandatangan & Kode PA Lumajang: ${selectedPenandatangan.nama}`}>
+                        TTD: <strong>{form.kodePenandatangan}.{kodePa}</strong>
                       </span>
                       <span className="text-outline font-bold">/</span>
                       <span className="px-2 py-0.5 rounded bg-surface border border-outline-subtle font-mono text-on-surface" title="Kode Klasifikasi Surat">
@@ -519,7 +524,7 @@ export default function SuratKeluar() {
                   <div className="text-[11px] text-on-surface-variant flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-0.5">
                     <div className="flex items-center gap-1">
                       <span className="material-symbols-outlined text-[15px] text-primary">info</span>
-                      <span><strong>Rumus:</strong> (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)</span>
+                      <span><strong>Rumus:</strong> [Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun] (Kode PA: {kodePa})</span>
                     </div>
                     <span className="text-[10px] text-outline italic">Diterbitkan otomatis saat naskah disetujui atasan</span>
                   </div>
@@ -614,13 +619,13 @@ export default function SuratKeluar() {
           <table className="w-full text-left border-collapse text-xs md:text-sm">
             <thead>
               <tr className="bg-surface border-b border-outline-subtle text-on-surface-variant text-xs uppercase tracking-wider font-semibold">
-                <th className="py-3 px-4 min-w-[200px]">
+                <th className="py-3 px-4 min-w-[220px]">
                   <div>Nomor Surat Keluar</div>
                   <div className="text-[10px] text-outline font-normal font-sans normal-case tracking-normal">
-                    (No. Urut / TTD / Klasifikasi / Bulan / Tahun)
+                    (No. Urut / TTD.{kodePa} / Klasifikasi / Bulan / Tahun)
                   </div>
                 </th>
-                <th className="py-3 px-4 w-32">Penandatangan</th>
+                <th className="py-3 px-4 w-36">Penandatangan</th>
                 <th className="py-3 px-4 min-w-[170px]">Tujuan Surat</th>
                 <th className="py-3 px-4 min-w-[240px]">Perihal & Lampiran</th>
                 <th className="py-3 px-4 min-w-[170px]">Pengusul & Pembuat</th>
@@ -632,12 +637,19 @@ export default function SuratKeluar() {
             <tbody className="divide-y divide-outline-subtle text-on-surface">
               {filteredSurat.map((item, idx) => {
                 const isApproved = item.status === 'Disetujui & Diterbitkan Nomor';
-                const ttdKode = item.kodePenandatangan || (item.nomorSurat && item.nomorSurat.includes('/') ? item.nomorSurat.split('/')[1] : 'KPA');
+                const rawTtd = item.kodePenandatangan || (item.nomorSurat && item.nomorSurat.includes('/') ? item.nomorSurat.split('/')[1] : 'KPA');
+                let ttdKode = 'KPA';
+                if (rawTtd.includes('PAN.PA')) ttdKode = 'PAN.PA';
+                else if (rawTtd.includes('SEK.PA')) ttdKode = 'SEK.PA';
+                else if (rawTtd.includes('WKPA')) ttdKode = 'WKPA';
+                else if (rawTtd.includes('KPA')) ttdKode = 'KPA';
+                else ttdKode = rawTtd.split('.')[0] || 'KPA';
+
                 const ttdInfo = getPenandatanganByKode(ttdKode);
 
                 return (
                   <tr key={item.id} className="hover:bg-surface/50 transition-colors">
-                    {/* Kolom Nomor Surat Keluar (Rumus: No. Urut/TTD/Klasifikasi/Bulan/Tahun) */}
+                    {/* Kolom Nomor Surat Keluar (Rumus: No. Urut/TTD.A13-W8/Klasifikasi/Bulan/Tahun) */}
                     <td className="py-3.5 px-4 whitespace-nowrap align-top">
                       {isApproved ? (
                         <div>
@@ -653,7 +665,7 @@ export default function SuratKeluar() {
                           <div className="inline-flex items-center gap-1 text-xs font-semibold text-amber-900 bg-warning-light px-2 py-0.5 rounded border border-warning/40">
                             <span className="material-symbols-outlined text-[13px]">pending</span>
                             <span className="font-code font-bold">
-                              {formatNomorSuratKeluar(item.nomorUrut || '...', ttdKode, item.kodeKlasifikasi, item.tanggalSurat)}
+                              {formatNomorSuratKeluar(item.nomorUrut || '...', ttdKode, item.kodeKlasifikasi, item.tanggalSurat, null, kodePa)}
                             </span>
                           </div>
                           <div className="text-[11px] text-outline font-code mt-0.5">
@@ -678,7 +690,7 @@ export default function SuratKeluar() {
                           : 'bg-amber-50 text-amber-800 border-amber-300'
                       }`}>
                         <span className="material-symbols-outlined text-[13px]">draw</span>
-                        <span>{ttdKode}</span>
+                        <span>{ttdKode}.{kodePa}</span>
                       </span>
                       <div className="text-[11px] text-outline mt-0.5 font-medium">
                         {ttdInfo.nama}

@@ -49,7 +49,12 @@ export function mapRowToSuratKeluar(row) {
   if (row.nomor_surat && row.nomor_surat.includes('/')) {
     const parts = row.nomor_surat.split('/');
     if (parts.length >= 5) {
-      extractedKodeTtd = parts[1];
+      const ttdSegment = parts[1];
+      if (ttdSegment.includes('PAN.PA')) extractedKodeTtd = 'PAN.PA';
+      else if (ttdSegment.includes('SEK.PA')) extractedKodeTtd = 'SEK.PA';
+      else if (ttdSegment.includes('WKPA')) extractedKodeTtd = 'WKPA';
+      else if (ttdSegment.includes('KPA')) extractedKodeTtd = 'KPA';
+      else extractedKodeTtd = ttdSegment.split('.')[0] || 'KPA';
     }
   }
 

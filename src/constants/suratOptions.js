@@ -299,18 +299,29 @@ export function getPenandatanganByKode(kode) {
   return PENANDATANGAN_OPTIONS.find((p) => p.kode === kode) || PENANDATANGAN_OPTIONS[0];
 }
 
+export const KODE_PA_LUMAJANG = 'A13-W8';
+
 /**
- * Rumus Nomor Surat Keluar:
- * (nomor urut surat keluar/kode penandatangan surat/kode klasifikasi surat/bulan (angka romawi)/tahun)
- * Contoh: 1044/KPA/HK.01/XI/2026
+ * Rumus Nomor Surat Keluar Resmi:
+ * [Nomor Urut]/[Kode Penandatangan].[Kode PA Lumajang]/[Kode Klasifikasi]/[Bulan Romawi]/[Tahun]
+ * Kode PA Lumajang : A13-W8
+ * Contoh: 1044/KPA.A13-W8/HK.01/XI/2026
  */
-export function formatNomorSuratKeluar(nomorUrut, kodePenandatangan = 'KPA', kodeKlasifikasi = 'HK.01', dateInput = new Date(), customTahun = null) {
+export function formatNomorSuratKeluar(
+  nomorUrut,
+  kodePenandatangan = 'KPA',
+  kodeKlasifikasi = 'HK.01',
+  dateInput = new Date(),
+  customTahun = null,
+  kodePa = KODE_PA_LUMAJANG
+) {
   const roman = getRomanMonth(dateInput);
   const year = customTahun || getYearFromDate(dateInput);
   const no = nomorUrut !== null && nomorUrut !== undefined ? nomorUrut : '...';
   const ttd = kodePenandatangan || 'KPA';
+  const pa = kodePa || KODE_PA_LUMAJANG;
   const klas = kodeKlasifikasi || 'HK.01';
-  return `${no}/${ttd}/${klas}/${roman}/${year}`;
+  return `${no}/${ttd}.${pa}/${klas}/${roman}/${year}`;
 }
 
 
