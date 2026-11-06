@@ -20,7 +20,7 @@ export function mapRowToSuratMasuk(row) {
     else sifatSuratNorm = 'Biasa';
   }
 
-  const pejabatNorm = row.pejabat_penerima || pejabatFromTrack || row.tujuan_surat || 'Ketua Pengadilan';
+  const pejabatNorm = row.pejabat_penerima || pejabatFromTrack || row.tujuan_surat || 'Sekretaris';
 
   return {
     id: row.id,

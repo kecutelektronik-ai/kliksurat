@@ -85,6 +85,18 @@ export const USERS = {
     avatarColor: 'bg-indigo-700 text-white',
     badge: 'Hakim yang Ditunjuk',
     permissions: ['view_all', 'disposisi', 'receive_disposisi', 'final_approval', 'pimpinan_dashboard', 'reports']
+  },
+  kasubag_umum: {
+    id: 'usr-7',
+    name: 'Budi Santoso, S.Kom.',
+    role: 'Kepala Subbagian Umum dan Keuangan',
+    roleKey: 'kasubag_umum',
+    nip: '19820719 200801 1 005',
+    department: 'Subbag Umum & Keuangan (Tata Usaha & Kearsipan)',
+    initials: 'BS',
+    avatarColor: 'bg-teal-700 text-white',
+    badge: 'Kasubag Umum & Keuangan',
+    permissions: ['view_all', 'receive_disposisi', 'archive', 'reports']
   }
 };
 
@@ -98,15 +110,15 @@ const INITIAL_SURAT_MASUK = [
     jenisSurat: 'Surat Undangan',
     prioritas: 'Segera',
     sifatSurat: 'Biasa',
-    pejabatPenerima: 'Ketua Pengadilan',
+    pejabatPenerima: 'Sekretaris',
     tanggalSurat: '2026-10-18',
     tanggalTerima: '2026-10-19T08:30',
     sifat: 'segera',
-    status: 'Menunggu Disposisi',
+    status: 'Dalam Tindak Lanjut',
     lampiran: '1 Berkas (18 Lembar PDF)',
     fileScan: 'Undangan_Rakor_PTA_Surabaya_2026.pdf',
     fileSize: '2.4 MB',
-    tujuanAwal: 'Ketua Pengadilan',
+    tujuanAwal: 'Sekretaris',
     prioritasTinggi: true,
   },
   {
@@ -118,7 +130,7 @@ const INITIAL_SURAT_MASUK = [
     jenisSurat: 'Surat Dinas',
     prioritas: 'Sangat Segera',
     sifatSurat: 'Terbatas',
-    pejabatPenerima: 'Ketua Pengadilan',
+    pejabatPenerima: 'Sekretaris',
     tanggalSurat: '2026-10-19',
     tanggalTerima: '2026-10-20T09:15',
     sifat: 'sangat_segera',
@@ -126,7 +138,7 @@ const INITIAL_SURAT_MASUK = [
     lampiran: '1 Berkas (4 Dokumen Juknis)',
     fileScan: 'Sosialisasi_PTSP_Ramah_Disabilitas.pdf',
     fileSize: '3.1 MB',
-    tujuanAwal: 'Ketua Pengadilan',
+    tujuanAwal: 'Sekretaris',
     prioritasTinggi: true,
   },
   {
@@ -267,13 +279,34 @@ const INITIAL_DISPOSISI = {
     id: 'DISP-001',
     nomorLembar: 'LK-012',
     suratId: 'SM-001',
+    alurTahap: 3,
+    
+    // Tahap 1: Registrasi Petugas
+    petugasRegistrasi: 'Ahmad Fauzi, S.H.',
+    disposisiAwalKe: 'Sekretaris',
+    tanggalRegistrasi: '2026-10-19',
+
+    // Tahap 2: Telaah & Catatan Sekretaris
+    catatanSekretaris: 'Telah diteliti kelengkapan naskah dinas sesuai tata persuratan. Diajukan kepada Yth. Ketua Pengadilan untuk arahan dan petunjuk tindak lanjut.',
+    penelaahSekretaris: 'Bpk. H. M. Ridwan, S.H. (Sekretaris)',
+    tanggalTelaahSekretaris: '19/10/2026',
+    tujuanPimpinan: 'Ketua Pengadilan',
+
+    // Tahap 3: Arahan Perintah Pimpinan (Ketua)
     pemberiDisposisi: 'Dr. H. Ahmad Zainuddin, S.H., M.H. (Ketua Pengadilan Agama)',
     tanggalDisposisi: '2026-10-20T10:15',
     sifatDisposisi: 'segera',
     diteruskanKepada: ['Sekretaris', 'Panitera'],
-    instruksiPilihan: ['Tanggapi & tindak lanjuti', 'Hadiri / Wakili'],
+    instruksiPilihan: ['Tanggapi & tindak lanjuti', 'Harap dihadiri/diwakili', 'Selesaikan sesuai ketentuan yang berlaku'],
     isiArahan: '1. Hadiri dan wakili pimpinan dalam agenda Rapat Koordinasi Wilayah PTA Surabaya tanggal 24 Oktober 2026.\n2. Siapkan rekapitulasi data perkara e-Court dan serapan anggaran DIPA 01 & 04 untuk bahan pemaparan resmi.',
     catatanKhusus: 'Laporkan hasil rakor segera setelah kegiatan selesai dan koordinasikan penerbitan Surat Tugas (ST).',
+
+    // Tahap 4: Disposisi Pengarsipan Sekretaris ke Kasubag Umum & Keuangan
+    disposisiKeArsip: 'Kepala Subbagian Umum dan Keuangan',
+    catatanPengarsipan: '',
+    tanggalArsip: '',
+    isArchived: false,
+
     tandaTanganElektronik: {
       status: 'TERVERIFIKASI',
       penandatangan: 'Dr. H. Ahmad Zainuddin, S.H., M.H.',
@@ -908,7 +941,7 @@ export function SuratProvider({ children }) {
     }
   };
 
-  // Save Disposisi -> Update Supabase
+  // Save Disposisi -> Update Supabase & Multi-step Workflow
   const saveDisposisi = async (suratId, formDisposisi) => {
     const existing = disposisiList[suratId];
     const nomorLembar = existing?.nomorLembar || `LK-${suratId.replace('SM-', '')}`;
@@ -937,18 +970,68 @@ export function SuratProvider({ children }) {
       }
     }
 
+    const tahapSaatIni = formDisposisi.alurTahap || (formDisposisi.tahapAksi ? formDisposisi.tahapAksi : 3);
+    
+    let targetStatus = 'Telah Didisposisi';
+    let tahapTrackLabel = 'Pengesahan Disposisi';
+    let trackStatusMsg = '';
+    let trackIcon = 'assignment_turned_in';
+
+    if (tahapSaatIni === 2) {
+      // Tahap 2: Sekretaris/Plh memberi catatan & meneruskan ke Ketua/Wakil Ketua/Plh
+      targetStatus = 'Telah Didisposisi';
+      tahapTrackLabel = 'Telaah & Catatan Pengelolaan Surat';
+      const tujuan = formDisposisi.tujuanPimpinan || 'Ketua Pengadilan';
+      trackStatusMsg = `Sekretaris menelaah dan meneruskan lembar disposisi ke ${tujuan}. Catatan: "${(formDisposisi.catatanSekretaris || '').slice(0, 100)}"`;
+      trackIcon = 'rate_review';
+    } else if (tahapSaatIni === 3) {
+      // Tahap 3: Ketua/Wakil/Plh memberi perintah tindak lanjut ke Sekretaris/Panitera/Keduanya
+      targetStatus = 'Dalam Tindak Lanjut';
+      tahapTrackLabel = 'Perintah Tindak Lanjut Pimpinan';
+      const recipients = formDisposisi.diteruskanKepada || ['Sekretaris', 'Panitera'];
+      trackStatusMsg = `Pimpinan menerbitkan arahan tindak lanjut kepada: ${recipients.join(' & ')}. Perintah: "${(formDisposisi.isiArahan || '').slice(0, 100)}"`;
+      trackIcon = 'assignment_turned_in';
+    } else if (tahapSaatIni === 4) {
+      // Tahap 4: Sekretaris mendisposisi ke Kasubag Umum & Keuangan untuk arsip
+      targetStatus = 'Diarsipkan';
+      tahapTrackLabel = 'Disposisi Pengarsipan Surat';
+      trackStatusMsg = `Sekretaris mendisposisikan surat kepada Kasubag Umum & Keuangan untuk pengarsipan warkat dinas. Status: Diarsipkan.`;
+      trackIcon = 'inventory_2';
+    }
+
+    if (formDisposisi.statusSurat) {
+      targetStatus = formDisposisi.statusSurat;
+    }
+
     const newDisposisi = {
       id: existing?.id || `DISP-${Date.now()}`,
       nomorLembar,
       suratId,
-      pemberiDisposisi: `${pemberiName} (${pemberiRole})`,
-      tanggalDisposisi: new Date().toISOString(),
-      sifatDisposisi: formDisposisi.sifatDisposisi || 'segera',
-      diteruskanKepada: formDisposisi.diteruskanKepada || ['Sekretaris'],
-      instruksiPilihan: formDisposisi.instruksiPilihan || ['Tanggapi & tindak lanjuti'],
-      isiArahan: formDisposisi.isiArahan || '',
-      catatanKhusus: formDisposisi.catatanKhusus || '',
-      tandaTanganElektronik: {
+      ...existing,
+      ...formDisposisi,
+      alurTahap: Math.max(tahapSaatIni, existing?.alurTahap || 1),
+      pemberiDisposisi: formDisposisi.pemberiDisposisi || existing?.pemberiDisposisi || `${pemberiName} (${pemberiRole})`,
+      tanggalDisposisi: formDisposisi.tanggalDisposisi || existing?.tanggalDisposisi || new Date().toISOString(),
+      sifatDisposisi: formDisposisi.sifatDisposisi || existing?.sifatDisposisi || 'segera',
+      diteruskanKepada: formDisposisi.diteruskanKepada || existing?.diteruskanKepada || ['Sekretaris', 'Panitera'],
+      instruksiPilihan: formDisposisi.instruksiPilihan || existing?.instruksiPilihan || ['Selesaikan sesuai ketentuan yang berlaku'],
+      isiArahan: formDisposisi.isiArahan !== undefined ? formDisposisi.isiArahan : (existing?.isiArahan || ''),
+      catatanKhusus: formDisposisi.catatanKhusus !== undefined ? formDisposisi.catatanKhusus : (existing?.catatanKhusus || ''),
+      
+      // Catatan Sekretaris (Tahap 2)
+      catatanSekretaris: formDisposisi.catatanSekretaris !== undefined ? formDisposisi.catatanSekretaris : (existing?.catatanSekretaris || ''),
+      penelaahSekretaris: formDisposisi.penelaahSekretaris || existing?.penelaahSekretaris || 'Bpk. H. M. Ridwan, S.H. (Sekretaris)',
+      tanggalTelaahSekretaris: formDisposisi.tanggalTelaahSekretaris || existing?.tanggalTelaahSekretaris || new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      tujuanPimpinan: formDisposisi.tujuanPimpinan || existing?.tujuanPimpinan || 'Ketua Pengadilan',
+
+      // Pengarsipan ke Kasubag Umum & Keuangan (Tahap 4)
+      disposisiKeArsip: formDisposisi.disposisiKeArsip || existing?.disposisiKeArsip || 'Kepala Subbagian Umum dan Keuangan',
+      catatanPengarsipan: formDisposisi.catatanPengarsipan !== undefined ? formDisposisi.catatanPengarsipan : (existing?.catatanPengarsipan || ''),
+      tanggalArsip: formDisposisi.tanggalArsip || existing?.tanggalArsip || (tahapSaatIni === 4 ? new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''),
+      petugasArsip: formDisposisi.petugasArsip || existing?.petugasArsip || 'Kepala Subbagian Umum dan Keuangan',
+      isArchived: tahapSaatIni === 4 ? true : Boolean(existing?.isArchived),
+
+      tandaTanganElektronik: existing?.tandaTanganElektronik || {
         status: 'TERVERIFIKASI',
         penandatangan: penandatanganName,
         jabatan: jabatanTte,
@@ -960,11 +1043,11 @@ export function SuratProvider({ children }) {
     const newTrack = {
       waktu: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
       petugas: `${currentUser.name} (${currentUser.role})`,
-      tahap: 'Pengesahan Disposisi',
-      status: `Lembar Disposisi ${nomorLembar} diterbitkan ke: ${newDisposisi.diteruskanKepada.join(', ')}`,
-      icon: 'assignment_turned_in',
-      badge: 'Didisposisi',
-      badgeColor: 'bg-success-light text-success'
+      tahap: tahapTrackLabel,
+      status: trackStatusMsg || `Lembar Disposisi ${nomorLembar} diproses.`,
+      icon: trackIcon,
+      badge: targetStatus,
+      badgeColor: targetStatus === 'Diarsipkan' ? 'bg-zinc-100 text-zinc-800' : targetStatus === 'Dalam Tindak Lanjut' ? 'bg-orange-100 text-orange-900' : 'bg-success-light text-success'
     };
 
     const updatedTracking = [...(trackingList[suratId] || []), newTrack];
@@ -977,7 +1060,7 @@ export function SuratProvider({ children }) {
 
     setSuratMasuk(prev => prev.map(s => {
       if (s.id === suratId) {
-        return { ...s, status: 'Telah Didisposisi' };
+        return { ...s, status: targetStatus };
       }
       return s;
     }));
@@ -993,13 +1076,13 @@ export function SuratProvider({ children }) {
         .from('kliksurat')
         .update({
           disposisi: newDisposisi,
-          status: 'Telah Didisposisi',
+          status: targetStatus,
           tracking: updatedTracking,
         })
         .eq('id', suratId);
 
       if (error) throw error;
-      showToast(`Lembar Disposisi ${nomorLembar} berhasil disahkan dan tersimpan di database.`);
+      showToast(`Alur Disposisi ${nomorLembar} berhasil diperbarui (Status: ${targetStatus}).`);
     } catch (err) {
       console.error('Gagal simpan disposisi ke Supabase:', err);
       showToast(`Disposisi tersimpan lokal (Sinkronisasi database: ${err.message})`, 'warning');
@@ -1007,12 +1090,18 @@ export function SuratProvider({ children }) {
 
     // Trigger WhatsApp notification to recipients
     if (waSettings.triggers.disposisi) {
-      newDisposisi.diteruskanKepada.forEach(penerima => {
+      const targetPenerima = tahapSaatIni === 2
+        ? [newDisposisi.tujuanPimpinan]
+        : tahapSaatIni === 4
+        ? ['Kepala Subbagian Umum dan Keuangan']
+        : newDisposisi.diteruskanKepada;
+
+      targetPenerima.forEach(penerima => {
         triggerWhatsApp(
-          'Disposisi Baru',
+          'Alur Disposisi Surat',
           penerima,
           suratMasuk.find(s => s.id === suratId)?.nomorSurat || suratId,
-          `Yth. ${penerima}, terdapat Disposisi Baru dari ${currentUser.name} untuk surat ${suratMasuk.find(s => s.id === suratId)?.nomorSurat}. Arahan: "${newDisposisi.isiArahan.slice(0, 100)}..."`
+          `Yth. ${penerima}, pembaruan alur disposisi surat ${suratMasuk.find(s => s.id === suratId)?.nomorSurat} dari ${currentUser.name}. Status: ${targetStatus}.`
         );
       });
     }

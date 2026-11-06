@@ -19,7 +19,7 @@ const getBlankForm = () => ({
   status: 'Diregistrasi',
   prioritas: 'Segera',
   sifatSurat: 'Biasa',
-  pejabatPenerima: 'Ketua Pengadilan',
+  pejabatPenerima: 'Sekretaris',
   nomorSurat: '',
   asalSurat: '',
   perihal: '',
@@ -74,7 +74,7 @@ export default function SuratMasuk() {
     const prioritasFinal = form.prioritas || 'Segera';
     const sifatSuratFinal = form.sifatSurat || 'Biasa';
     const sifatFinal = sifatSuratFinal.toLowerCase().replace(/ /g, '_');
-    const pejabatFinal = form.pejabatPenerima || 'Ketua Pengadilan';
+    const pejabatFinal = form.pejabatPenerima || 'Sekretaris';
 
     const savedNomor = form.nomorSurat;
     const savedAgenda = formatAgendaSuratMasuk(
@@ -473,10 +473,10 @@ export default function SuratMasuk() {
                     expand_more
                   </span>
                 </div>
-                {/* Shortcut tombol cepat untuk pejabat utama */}
+                {/* Shortcut tombol cepat untuk pejabat utama sesuai alur persuratan */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
                   <span className="text-[10px] text-outline font-medium mr-1">Pilihan Cepat:</span>
-                  {['Ketua Pengadilan', 'Wakil Ketua Pengadilan', 'Panitera', 'Sekretaris'].map((rec) => (
+                  {['Sekretaris', 'Ketua Pengadilan', 'Wakil Ketua Pengadilan', 'Panitera'].map((rec) => (
                     <button
                       key={rec}
                       type="button"
@@ -487,7 +487,7 @@ export default function SuratMasuk() {
                           : 'bg-surface text-on-surface-variant hover:bg-primary-light hover:text-primary border border-outline-subtle'
                       }`}
                     >
-                      {rec}
+                      {rec === 'Sekretaris' ? 'Sekretaris (Penanggung Jawab Surat)' : rec}
                     </button>
                   ))}
                 </div>
