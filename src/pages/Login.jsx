@@ -86,11 +86,11 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
             <label className="block text-xs font-semibold text-on-surface-variant">
-              Email Kedinasan / NIP / Username
+              Username
             </label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">
-                mail
+                person
               </span>
               <input
                 type="text"
@@ -98,7 +98,7 @@ export default function Login() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full h-10 pl-9 pr-3 rounded-btn bg-surface border border-outline-subtle text-sm text-on-surface focus:border-[#334426] focus:ring-2 focus:ring-[#334426]/20 outline-none transition-all"
-                placeholder="Contoh: sekretaris@peradilan.go.id atau username"
+                placeholder="Masukkan username"
               />
             </div>
           </div>
