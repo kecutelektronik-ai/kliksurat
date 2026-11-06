@@ -4,8 +4,10 @@ import {
   JENIS_SURAT_OPTIONS,
   STATUS_SURAT_MASUK_OPTIONS,
   PRIORITAS_SURAT_OPTIONS,
+  SIFAT_SURAT_OPTIONS,
   getStatusBadge,
   getPrioritasBadge,
+  getSifatBadge,
   formatAgendaSuratMasuk,
 } from '../constants/suratOptions';
 
@@ -17,13 +19,14 @@ export default function SuratMasuk() {
     jenisSuratLainnya: '',
     status: 'Diregistrasi',
     prioritas: 'Segera',
+    sifatSurat: 'Biasa',
     nomorSurat: '',
     asalSurat: '',
     perihal: '',
     tanggalSurat: new Date().toISOString().slice(0, 10),
     tanggalTerima: new Date().toISOString().slice(0, 16),
     lampiran: '1 Berkas (12 Lembar PDF)',
-    sifat: 'segera',
+    sifat: 'biasa',
     fileScan: 'Scan_Dokumen_Resmi.pdf'
   });
 
@@ -31,6 +34,7 @@ export default function SuratMasuk() {
   const [filterJenis, setFilterJenis] = useState('semua');
   const [filterStatus, setFilterStatus] = useState('semua');
   const [filterPrioritas, setFilterPrioritas] = useState('semua');
+  const [filterSifatSurat, setFilterSifatSurat] = useState('semua');
   const [editingStatusId, setEditingStatusId] = useState(null);
   const [showForm, setShowForm] = useState(true);
 
@@ -51,11 +55,13 @@ export default function SuratMasuk() {
       : form.jenisSurat;
 
     const prioritasFinal = form.prioritas || 'Segera';
-    const sifatFinal = prioritasFinal === 'Sangat Segera' ? 'sangat_segera' : 'segera';
+    const sifatSuratFinal = form.sifatSurat || 'Biasa';
+    const sifatFinal = sifatSuratFinal.toLowerCase().replace(/ /g, '_');
 
     addSuratMasuk({
       ...form,
       prioritas: prioritasFinal,
+      sifatSurat: sifatSuratFinal,
       sifat: sifatFinal,
       jenisSurat: finalJenisSurat,
       status: form.status || 'Diregistrasi'
@@ -66,13 +72,14 @@ export default function SuratMasuk() {
       jenisSuratLainnya: '',
       status: 'Diregistrasi',
       prioritas: 'Segera',
+      sifatSurat: 'Biasa',
       nomorSurat: '',
       asalSurat: '',
       perihal: '',
       tanggalSurat: new Date().toISOString().slice(0, 10),
       tanggalTerima: new Date().toISOString().slice(0, 16),
       lampiran: '1 Berkas PDF',
-      sifat: 'segera',
+      sifat: 'biasa',
       fileScan: 'Scan_Dokumen_Resmi.pdf'
     });
   };
@@ -80,19 +87,22 @@ export default function SuratMasuk() {
   const filteredSurat = suratMasuk.filter(s => {
     const q = searchFilter.toLowerCase();
     const itemPrioritas = s.prioritas || (s.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
+    const itemSifat = s.sifatSurat || 'Biasa';
     const matchSearch =
       s.nomorSurat.toLowerCase().includes(q) ||
       s.asalSurat.toLowerCase().includes(q) ||
       s.perihal.toLowerCase().includes(q) ||
       (s.jenisSurat && s.jenisSurat.toLowerCase().includes(q)) ||
       (s.status && s.status.toLowerCase().includes(q)) ||
-      itemPrioritas.toLowerCase().includes(q);
+      itemPrioritas.toLowerCase().includes(q) ||
+      itemSifat.toLowerCase().includes(q);
 
     const matchJenis = filterJenis === 'semua' || (s.jenisSurat || 'Surat Dinas') === filterJenis;
     const matchStatus = filterStatus === 'semua' || s.status === filterStatus;
     const matchPrioritas = filterPrioritas === 'semua' || itemPrioritas === filterPrioritas;
+    const matchSifat = filterSifatSurat === 'semua' || itemSifat === filterSifatSurat;
 
-    return matchSearch && matchJenis && matchStatus && matchPrioritas;
+    return matchSearch && matchJenis && matchStatus && matchPrioritas && matchSifat;
   });
 
   return (
@@ -357,19 +367,22 @@ export default function SuratMasuk() {
               </div>
             </div>
 
-            {/* Prioritas Surat Masuk: Sangat Segera vs Segera */}
+            {/* A. Prioritas Surat Masuk: Sangat Segera vs Segera */}
             <div className="space-y-2 pt-2 border-t border-outline-subtle">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold text-on-surface-variant flex items-center gap-1">
-                  <span>Prioritas Surat</span>
-                  <span className="text-danger">*</span>
-                </label>
-                <span className="text-[11px] text-outline font-medium">Batas Waktu Disposisi & Tindak Lanjut</span>
+                <div>
+                  <h4 className="text-sm font-bold text-on-surface flex items-center gap-1.5">
+                    <span className="text-primary font-bold">A.</span> Prioritas Surat <span className="text-danger">*</span>
+                  </h4>
+                  <p className="text-xs text-outline mt-0.5">
+                    Menentukan tingkat urgensi dan batas waktu tindak lanjut naskah dinas.
+                  </p>
+                </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
                 {/* 1. Sangat Segera */}
                 <label
-                  onClick={() => setForm({ ...form, prioritas: 'Sangat Segera', sifat: 'sangat_segera' })}
+                  onClick={() => setForm({ ...form, prioritas: 'Sangat Segera' })}
                   className={`p-3.5 rounded-card border-2 cursor-pointer flex items-center justify-between transition-all ${
                     form.prioritas === 'Sangat Segera'
                       ? 'border-danger bg-danger-light/40 shadow-xs'
@@ -382,7 +395,7 @@ export default function SuratMasuk() {
                       name="prioritas"
                       value="Sangat Segera"
                       checked={form.prioritas === 'Sangat Segera'}
-                      onChange={() => setForm({ ...form, prioritas: 'Sangat Segera', sifat: 'sangat_segera' })}
+                      onChange={() => setForm({ ...form, prioritas: 'Sangat Segera' })}
                       className="text-danger focus:ring-danger w-4 h-4 cursor-pointer"
                     />
                     <div>
@@ -400,7 +413,7 @@ export default function SuratMasuk() {
 
                 {/* 2. Segera */}
                 <label
-                  onClick={() => setForm({ ...form, prioritas: 'Segera', sifat: 'segera' })}
+                  onClick={() => setForm({ ...form, prioritas: 'Segera' })}
                   className={`p-3.5 rounded-card border-2 cursor-pointer flex items-center justify-between transition-all ${
                     form.prioritas === 'Segera'
                       ? 'border-warning bg-warning-light/40 shadow-xs'
@@ -413,7 +426,7 @@ export default function SuratMasuk() {
                       name="prioritas"
                       value="Segera"
                       checked={form.prioritas === 'Segera'}
-                      onChange={() => setForm({ ...form, prioritas: 'Segera', sifat: 'segera' })}
+                      onChange={() => setForm({ ...form, prioritas: 'Segera' })}
                       className="text-warning-dark focus:ring-warning w-4 h-4 cursor-pointer"
                     />
                     <div>
@@ -428,6 +441,52 @@ export default function SuratMasuk() {
                     24 - 48 Jam
                   </span>
                 </label>
+              </div>
+            </div>
+
+            {/* B. Sifat Surat (Sesuai Referensi Gambar Pengguna) */}
+            <div className="space-y-2.5 pt-3 border-t border-outline-subtle">
+              <div>
+                <h4 className="text-sm font-bold text-on-surface flex items-center gap-1.5">
+                  <span className="text-primary font-bold">B.</span> Sifat Surat <span className="text-danger">*</span>
+                </h4>
+                <p className="text-xs text-outline mt-0.5">
+                  Menentukan tingkat kerahasiaan atau pembatasan akses.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs pt-1">
+                {SIFAT_SURAT_OPTIONS.map((opt) => {
+                  const isChecked = (form.sifatSurat || 'Biasa') === opt;
+                  return (
+                    <label
+                      key={opt}
+                      onClick={() => setForm({ ...form, sifatSurat: opt, sifat: opt.toLowerCase().replace(/ /g, '_') })}
+                      className={`p-3.5 rounded-card border-2 cursor-pointer flex items-center justify-between transition-all ${
+                        isChecked
+                          ? 'border-primary bg-primary-light/40 shadow-xs'
+                          : 'border-outline-subtle bg-white hover:bg-surface'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          type="radio"
+                          name="sifatSurat"
+                          value={opt}
+                          checked={isChecked}
+                          onChange={() => setForm({ ...form, sifatSurat: opt, sifat: opt.toLowerCase().replace(/ /g, '_') })}
+                          className="text-primary focus:ring-primary w-4 h-4 cursor-pointer"
+                        />
+                        <span className={`text-sm ${isChecked ? 'text-primary font-bold' : 'text-on-surface font-medium'}`}>
+                          {opt}
+                        </span>
+                      </div>
+                      <span className="material-symbols-outlined text-[18px] text-outline">
+                        {opt === 'Sangat Rahasia' ? 'lock' : opt === 'Rahasia' ? 'lock_clock' : opt === 'Terbatas' ? 'shield' : 'public'}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -574,6 +633,25 @@ export default function SuratMasuk() {
                 expand_more
               </span>
             </div>
+
+            {/* Filter Dropdown Sifat Surat (B. Sifat Surat: Biasa, Terbatas, Rahasia, Sangat Rahasia) */}
+            <div className="relative">
+              <select
+                value={filterSifatSurat}
+                onChange={(e) => setFilterSifatSurat(e.target.value)}
+                className="h-9 pl-3 pr-8 rounded-md bg-surface border border-outline-subtle text-xs font-semibold text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none"
+              >
+                <option value="semua">Semua Sifat Surat</option>
+                {SIFAT_SURAT_OPTIONS.map((sf) => (
+                  <option key={sf} value={sf}>
+                    {sf}
+                  </option>
+                ))}
+              </select>
+              <span className="material-symbols-outlined absolute right-2 top-2.5 text-[16px] text-outline pointer-events-none">
+                expand_more
+              </span>
+            </div>
             <button
               onClick={() => showToast('Filter tanggal aktif.', 'info')}
               className="h-9 px-3 rounded-md border border-outline-subtle text-on-surface-variant text-xs font-semibold flex items-center gap-1.5 hover:bg-surface transition-colors"
@@ -601,7 +679,8 @@ export default function SuratMasuk() {
                 <th className="py-3 px-4">Asal Surat</th>
                 <th className="py-3 px-4">Perihal</th>
                 <th className="py-3 px-4">Tanggal Diterima</th>
-                <th className="py-3 px-4">Prioritas</th>
+                <th className="py-3 px-3">Prioritas</th>
+                <th className="py-3 px-3">Sifat</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-right">Aksi</th>
               </tr>
@@ -633,7 +712,7 @@ export default function SuratMasuk() {
                     <td className="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-medium">
                       {item.tanggalTerima ? item.tanggalTerima.replace('T', ' ') : item.tanggalSurat}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-3 whitespace-nowrap">
                       {(() => {
                         const prio = item.prioritas || (item.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
                         const pBadge = getPrioritasBadge(prio);
@@ -644,6 +723,20 @@ export default function SuratMasuk() {
                           >
                             <span className="material-symbols-outlined text-[15px]">{pBadge.icon}</span>
                             <span>{pBadge.label}</span>
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      {(() => {
+                        const sBadge = getSifatBadge(item.sifatSurat || item.sifat);
+                        return (
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border ${sBadge.badgeClass}`}
+                            title={`Sifat: ${sBadge.label} (${sBadge.desc})`}
+                          >
+                            <span className="material-symbols-outlined text-[14px]">{sBadge.icon}</span>
+                            <span>{sBadge.label}</span>
                           </span>
                         );
                       })()}

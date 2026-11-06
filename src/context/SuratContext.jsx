@@ -97,6 +97,7 @@ const INITIAL_SURAT_MASUK = [
     perihal: 'Undangan Rapat Koordinasi Pembinaan Wilayah Hukum Pengadilan Tinggi Agama Surabaya Semester II',
     jenisSurat: 'Surat Undangan',
     prioritas: 'Segera',
+    sifatSurat: 'Biasa',
     tanggalSurat: '2026-10-18',
     tanggalTerima: '2026-10-19T08:30',
     sifat: 'segera',
@@ -115,6 +116,7 @@ const INITIAL_SURAT_MASUK = [
     perihal: 'Pemberitahuan Kegiatan Sosialisasi Standar Pelayanan Terpadu Satu Pintu (PTSP) Ramah Disabilitas',
     jenisSurat: 'Surat Dinas',
     prioritas: 'Sangat Segera',
+    sifatSurat: 'Terbatas',
     tanggalSurat: '2026-10-19',
     tanggalTerima: '2026-10-20T09:15',
     sifat: 'sangat_segera',
@@ -133,6 +135,7 @@ const INITIAL_SURAT_MASUK = [
     perihal: 'Verifikasi Berkas Usulan Kenaikan Pangkat Hakim & Aparatur Pegawai Negeri Sipil Periode April 2027',
     jenisSurat: 'Surat Dinas',
     prioritas: 'Segera',
+    sifatSurat: 'Rahasia',
     tanggalSurat: '2026-10-16',
     tanggalTerima: '2026-10-18T11:00',
     sifat: 'segera',
@@ -151,6 +154,7 @@ const INITIAL_SURAT_MASUK = [
     perihal: 'Petunjuk Teknis Audit Kepatuhan Aksesibilitas Layanan Peradilan Elektronik Tahun Anggaran 2026',
     jenisSurat: 'Surat Edaran',
     prioritas: 'Segera',
+    sifatSurat: 'Biasa',
     tanggalSurat: '2026-10-14',
     tanggalTerima: '2026-10-16T10:00',
     sifat: 'segera',
@@ -169,6 +173,7 @@ const INITIAL_SURAT_MASUK = [
     perihal: 'Permohonan Bantuan Delegasi Panggilan Sidang Perkara Nomor 1245/Pdt.G/2026/PA.Jbr',
     jenisSurat: 'Surat Dinas',
     prioritas: 'Segera',
+    sifatSurat: 'Biasa',
     tanggalSurat: '2026-10-17',
     tanggalTerima: '2026-10-18T13:45',
     sifat: 'segera',
@@ -706,13 +711,15 @@ export function SuratProvider({ children }) {
     const agendaNo = formatAgendaSuratMasuk(count, formData.tanggalSurat || formData.tanggalTerima || new Date());
     const currentStatus = formData.status || 'Diregistrasi';
     const prioritasNorm = formData.prioritas || (formData.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
-    const sifatNorm = prioritasNorm === 'Sangat Segera' ? 'sangat_segera' : (formData.sifat || 'segera');
+    const sifatSuratNorm = formData.sifatSurat || 'Biasa';
+    const sifatNorm = formData.sifat || sifatSuratNorm.toLowerCase().replace(/ /g, '_');
 
     const newLetter = {
       id: newId,
       nomorSurat: formData.nomorSurat,
       jenisSurat: formData.jenisSurat || 'Surat Dinas',
       prioritas: prioritasNorm,
+      sifatSurat: sifatSuratNorm,
       agenda: agendaNo,
       asalSurat: formData.asalSurat,
       perihal: formData.perihal,

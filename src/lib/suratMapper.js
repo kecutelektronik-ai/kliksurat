@@ -7,6 +7,17 @@ export function mapRowToSuratMasuk(row) {
   const firstTrack = Array.isArray(row.tracking) && row.tracking[0];
   const jenisSuratFromTrack = firstTrack?.metadata?.jenisSurat;
   const prioritasFromTrack = firstTrack?.metadata?.prioritas;
+  const sifatSuratFromTrack = firstTrack?.metadata?.sifatSurat;
+
+  const rawSifat = row.sifat_surat || sifatSuratFromTrack || row.sifat;
+  let sifatSuratNorm = 'Biasa';
+  if (rawSifat) {
+    const sLow = String(rawSifat).toLowerCase().replace(/_/g, ' ');
+    if (sLow.includes('sangat rahasia')) sifatSuratNorm = 'Sangat Rahasia';
+    else if (sLow.includes('rahasia')) sifatSuratNorm = 'Rahasia';
+    else if (sLow.includes('terbatas')) sifatSuratNorm = 'Terbatas';
+    else sifatSuratNorm = 'Biasa';
+  }
 
   return {
     id: row.id,
@@ -16,6 +27,7 @@ export function mapRowToSuratMasuk(row) {
     perihal: row.perihal || '',
     jenisSurat: row.jenis_naskah || jenisSuratFromTrack || 'Surat Dinas',
     prioritas: row.prioritas || prioritasFromTrack || (row.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera'),
+    sifatSurat: sifatSuratNorm,
     tanggalSurat: row.tanggal_surat ? String(row.tanggal_surat).slice(0, 10) : '',
     tanggalTerima: row.tanggal_terima ? String(row.tanggal_terima).slice(0, 16) : '',
     sifat: row.sifat || 'biasa',
@@ -57,11 +69,16 @@ export function mapSuratMasukToRow(item, initialTracking = []) {
           ...(t.metadata || {}),
           jenisSurat: item.jenisSurat || 'Surat Dinas',
           prioritas: item.prioritas || (item.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera'),
+          sifatSurat: item.sifatSurat || 'Biasa',
         }
       };
     }
     return t;
   });
+
+  const sifatNorm = item.sifatSurat
+    ? item.sifatSurat.toLowerCase().replace(/ /g, '_')
+    : (item.sifat || 'biasa');
 
   return {
     id: item.id,
@@ -73,7 +90,7 @@ export function mapSuratMasukToRow(item, initialTracking = []) {
     perihal: item.perihal,
     tanggal_surat: item.tanggalSurat,
     tanggal_terima: item.tanggalTerima ? new Date(item.tanggalTerima).toISOString() : new Date().toISOString(),
-    sifat: item.sifat || (item.prioritas === 'Sangat Segera' ? 'sangat_segera' : 'segera'),
+    sifat: sifatNorm,
     status: item.status || 'Menunggu Disposisi',
     lampiran: item.lampiran || '1 Berkas PDF',
     file_scan: item.fileScan || 'Naskah_Surat_Masuk.pdf',

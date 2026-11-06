@@ -61,6 +61,61 @@ export function getPrioritasBadge(prioritas) {
   };
 }
 
+/**
+ * Pilihan Sifat Surat Resmi (Tingkat Kerahasiaan / Pembatasan Akses):
+ * Sesuai Standar Tata Naskah Dinas:
+ * B. Sifat Surat
+ * Menentukan tingkat kerahasiaan atau pembatasan akses.
+ * 1. Biasa
+ * 2. Terbatas
+ * 3. Rahasia
+ * 4. Sangat Rahasia
+ */
+export const SIFAT_SURAT_OPTIONS = [
+  'Biasa',
+  'Terbatas',
+  'Rahasia',
+  'Sangat Rahasia',
+];
+
+export function getSifatBadge(sifat) {
+  const norm = String(sifat || '').toLowerCase().replace(/_/g, ' ');
+  if (norm === 'sangat rahasia') {
+    return {
+      bg: 'bg-red-50 text-red-700 border-red-300 font-bold',
+      badgeClass: 'bg-red-700 text-white font-bold',
+      icon: 'lock',
+      label: 'Sangat Rahasia',
+      desc: 'Tingkat kerahasiaan tertinggi, akses sangat terbatas'
+    };
+  }
+  if (norm === 'rahasia') {
+    return {
+      bg: 'bg-rose-50 text-rose-700 border-rose-300 font-semibold',
+      badgeClass: 'bg-rose-600 text-white font-semibold',
+      icon: 'lock_clock',
+      label: 'Rahasia',
+      desc: 'Hanya untuk pejabat berwenang'
+    };
+  }
+  if (norm === 'terbatas') {
+    return {
+      bg: 'bg-amber-50 text-amber-800 border-amber-300 font-semibold',
+      badgeClass: 'bg-amber-100 text-amber-900 border border-amber-400 font-semibold',
+      icon: 'shield',
+      label: 'Terbatas',
+      desc: 'Pembatasan akses pada unit atau pejabat tertentu'
+    };
+  }
+  return {
+    bg: 'bg-slate-100 text-slate-700 border-slate-300 font-medium',
+    badgeClass: 'bg-slate-100 text-slate-800 border border-slate-300 font-medium',
+    icon: 'public',
+    label: 'Biasa',
+    desc: 'Dapat diakses secara umum dalam kedinasan'
+  };
+}
+
 export function getStatusBadge(status) {
   switch (status) {
     case 'Diterima':
