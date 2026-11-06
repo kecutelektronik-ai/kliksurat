@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
 import {
@@ -30,7 +30,7 @@ export default function SuratKeluar() {
     ? 'Kepaniteraan'
     : 'Kesekretariatan';
 
-  const [form, setForm] = useState({
+  const getBlankForm = () => ({
     tujuanSurat: '',
     perihal: '',
     unitPengusul: defaultUnit,
@@ -40,6 +40,18 @@ export default function SuratKeluar() {
     sifat: 'biasa',
     lampiran: '1 Berkas Lampiran',
   });
+
+  const [form, setForm] = useState(getBlankForm());
+  const [successNotice, setSuccessNotice] = useState(null);
+
+  useEffect(() => {
+    if (successNotice) {
+      const timer = setTimeout(() => {
+        setSuccessNotice(null);
+      }, 12000);
+      return () => clearTimeout(timer);
+    }
+  }, [successNotice]);
 
   const [showForm, setShowForm] = useState(false);
   const [filterQuery, setFilterQuery] = useState('');
@@ -134,23 +146,41 @@ export default function SuratKeluar() {
 
   const handleCreateDraft = (e) => {
     e.preventDefault();
-    if (!form.tujuanSurat || !form.perihal) {
-      showToast('Harap lengkapi tujuan dan perihal surat keluar', 'warning');
+    if (!form.tujuanSurat?.trim() || !form.perihal?.trim()) {
+      showToast('Harap lengkapi tujuan dan perihal surat keluar (*)', 'warning');
       return;
     }
 
+    const savedTujuan = form.tujuanSurat.trim();
+    const savedPerihal = form.perihal.trim();
+    const savedAgenda = formatAgendaSuratKeluar(
+      suratKeluar.length + 1,
+      form.tanggalSurat || new Date()
+    );
+    const savedEstimasiNomor = previewNomorSuratKeluar;
+    const savedTtd = selectedPenandatangan.nama;
+    const savedKodeTtd = form.kodePenandatangan;
+
     addSuratKeluarDraft(form);
-    setForm({
-      tujuanSurat: '',
-      perihal: '',
-      unitPengusul: defaultUnit,
-      kodePenandatangan: 'KPA',
-      kodeKlasifikasi: 'HK.01',
-      tanggalSurat: new Date().toISOString().slice(0, 10),
-      sifat: 'biasa',
-      lampiran: '1 Berkas',
+
+    // 1. Notifikasi di layar: "Silakan draf diajukan ke atasan"
+    setSuccessNotice({
+      tujuan: savedTujuan,
+      perihal: savedPerihal,
+      agenda: savedAgenda,
+      estimasiNomor: savedEstimasiNomor,
+      penandatangan: savedTtd,
+      kodeTtd: savedKodeTtd,
+      waktu: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
     });
-    setShowForm(false);
+    showToast('Draf surat keluar berhasil disimpan! Silakan draf diajukan ke atasan.', 'success');
+
+    // 2. Munculkan blangko baru kosong untuk pengajuan naskah berikutnya
+    setForm(getBlankForm());
+    setShowForm(true);
+
+    // 3. Gulir ke atas dengan mulus menuju blangko baru
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const isLeader =
@@ -252,14 +282,61 @@ export default function SuratKeluar() {
         </div>
       </div>
 
+      {/* Notifikasi Sukses Simpan Draf & Instruksi Ajukan ke Atasan */}
+      {successNotice && (
+        <div className="p-4 md:p-5 rounded-card bg-emerald-50 border-2 border-emerald-500 text-emerald-950 shadow-md flex items-start justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <span className="material-symbols-outlined text-[24px]">send_and_archive</span>
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <h4 className="text-sm md:text-base font-bold text-emerald-950">
+                  Draf Berhasil Disimpan! Silakan Draf Diajukan ke Atasan
+                </h4>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900 font-code font-bold">
+                  Agenda: {successNotice.agenda}
+                </span>
+                <span className="text-[11px] text-emerald-700 font-medium">
+                  {successNotice.waktu}
+                </span>
+              </div>
+              <p className="text-xs text-emerald-800 leading-relaxed">
+                Draf naskah dinas untuk tujuan <strong>{successNotice.tujuan}</strong> perihal <em>"{successNotice.perihal}"</em> berhasil disimpan ke dalam sistem dengan estimasi nomor: <strong className="font-code text-emerald-950 bg-emerald-100 px-1.5 py-0.5 rounded">{successNotice.estimasiNomor}</strong>. <strong>Silakan draf diajukan ke atasan ({successNotice.penandatangan})</strong> untuk proses telaah, persetujuan, dan penomoran resmi.
+              </p>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white text-emerald-900 border border-emerald-300 text-xs font-semibold mt-1 shadow-2xs">
+                <span className="material-symbols-outlined text-[16px] text-emerald-600">note_add</span>
+                <span>Blangko baru kosong telah siap di bawah untuk pencatatan surat keluar berikutnya.</span>
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSuccessNotice(null)}
+            className="p-1 rounded-md text-emerald-700 hover:text-emerald-950 hover:bg-emerald-100 transition-colors shrink-0 cursor-pointer"
+            title="Tutup notifikasi"
+          >
+            <span className="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+      )}
+
       {/* Form Pengajuan Draf Surat Keluar */}
       {showForm && (
         <div className="bg-white rounded-card border border-outline-subtle shadow-sm p-6 space-y-5 animate-in fade-in duration-200">
           <div className="flex items-center justify-between border-b border-outline-subtle pb-3">
-            <h3 className="text-sm md:text-base font-bold text-on-surface flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="material-symbols-outlined text-primary text-[20px]">edit_note</span>
-              Formulir Konsep Draf Surat Keluar
-            </h3>
+              <h3 className="text-sm md:text-base font-bold text-on-surface">
+                Formulir Konsep Draf Surat Keluar
+              </h3>
+              {successNotice && (
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1 border border-emerald-300 animate-pulse">
+                  <span className="material-symbols-outlined text-[14px]">add_circle</span>
+                  Blangko Baru Siap Diisi
+                </span>
+              )}
+            </div>
             <span className="text-xs text-outline">Status Awal: Menunggu Persetujuan Atasan</span>
           </div>
 
