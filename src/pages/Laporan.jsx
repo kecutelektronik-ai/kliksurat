@@ -1,13 +1,28 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
 import KopSurat from '../components/KopSurat';
 
 export default function Laporan() {
-  const { suratMasuk, suratKeluar, disposisiList, nomorConfig, plhConfig, showToast } = useSurat();
+  const {
+    suratMasuk,
+    suratKeluar,
+    disposisiList,
+    nomorConfig,
+    plhConfig,
+    laporanTab,
+    setLaporanTab,
+    showToast,
+  } = useSurat();
 
   // Active Tab: 'masuk' | 'keluar' | 'kode_matriks' | 'gabungan'
-  const [activeTab, setActiveTab] = useState('masuk');
+  const [activeTab, setActiveTab] = useState(laporanTab || 'masuk');
+
+  useEffect(() => {
+    if (laporanTab) {
+      setActiveTab(laporanTab);
+    }
+  }, [laporanTab]);
 
   // Filter Utama: Pilihan Bulan, Tahun, dan Kode Surat
   const [selectedMonth, setSelectedMonth] = useState('10'); // '01' - '12' or 'all'

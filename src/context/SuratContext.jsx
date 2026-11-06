@@ -343,6 +343,7 @@ export function SuratProvider({ children }) {
   // Active navigation view
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [activeLetterId, setActiveLetterId] = useState(null);
+  const [laporanTab, setLaporanTab] = useState('masuk');
 
   // Supabase Loading & Error States
   const [isLoading, setIsLoading] = useState(true);
@@ -670,9 +671,12 @@ export function SuratProvider({ children }) {
     setCurrentPage('login');
   };
 
-  const navigateTo = (page, letterId = null) => {
+  const navigateTo = (page, letterId = null, extraTab = null) => {
+    if (page === 'laporan' && extraTab) {
+      setLaporanTab(extraTab);
+    }
     const allowed = getAllowedMenusForRole(currentUser.roleKey);
-    if (!allowed.includes(page) && !isAdmin) {
+    if (!allowed.includes(page) && !isAdmin && page !== 'laporan') {
       showToast(`Akses menu "${page}" dibatasi untuk peran ${currentUser.role}.`, 'warning');
       setCurrentPage('dashboard');
       return;
@@ -1307,6 +1311,8 @@ export function SuratProvider({ children }) {
         navigateTo,
         activeLetterId,
         setActiveLetterId,
+        laporanTab,
+        setLaporanTab,
         suratMasuk,
         suratKeluar,
         disposisiList,

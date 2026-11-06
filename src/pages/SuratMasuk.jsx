@@ -154,7 +154,7 @@ export default function SuratMasuk() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => navigateTo('laporan')}
+            onClick={() => navigateTo('laporan', null, 'masuk')}
             className="h-10 px-3.5 rounded-btn bg-white border border-outline-subtle text-primary hover:bg-surface text-xs md:text-sm font-semibold flex items-center gap-1.5 shadow-2xs transition-all"
             title="Buka buku agenda rekapitulasi surat masuk per bulan dan per kode surat"
           >
