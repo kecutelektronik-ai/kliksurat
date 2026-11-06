@@ -1,33 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useSurat, USERS, getAllowedMenusForRole } from '../context/SuratContext';
+import { useSurat, getAllowedMenusForRole } from '../context/SuratContext';
 
 export default function Header({ onOpenMobileMenu }) {
   const {
     currentUser,
-    switchUser,
     logout,
     navigateTo,
     waSettings,
     suratMasuk,
     plhConfig,
-    usersList,
-    isAdmin,
   } = useSurat();
-  const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const allowedMenus = getAllowedMenusForRole(currentUser?.roleKey);
 
-  const roleMenuRef = useRef(null);
   const notifMenuRef = useRef(null);
 
-  // Close dropdowns on outside click
+  // Close notifications on outside click
   useEffect(() => {
     function handleClickOutside(event) {
-      if (roleMenuRef.current && !roleMenuRef.current.contains(event.target)) {
-        setShowRoleMenu(false);
-      }
       if (notifMenuRef.current && !notifMenuRef.current.contains(event.target)) {
         setShowNotifMenu(false);
       }
@@ -178,113 +170,36 @@ export default function Header({ onOpenMobileMenu }) {
 
         <div className="h-6 w-px bg-white/20"></div>
 
-        {/* User Profile & Demo Role Switcher */}
-        <div className="relative" ref={roleMenuRef}>
-          <button
-            onClick={() => setShowRoleMenu(!showRoleMenu)}
-            className="flex items-center gap-2.5 p-1 rounded-lg hover:bg-white/10 transition-all text-left"
-            title="Klik untuk Ganti Peran Demo atau Keluar"
-          >
-            <div className={`w-9 h-9 rounded-full ${currentUser.avatarColor} border border-white/20 flex items-center justify-center font-bold text-xs shadow-2xs`}>
-              {currentUser.initials}
+        {/* User Identity Display */}
+        <div className="flex items-center gap-2.5 p-1 text-left select-none">
+          <div className={`w-9 h-9 rounded-full ${currentUser.avatarColor || 'bg-emerald-700 text-white'} border border-white/20 flex items-center justify-center font-bold text-xs shadow-2xs`}>
+            {currentUser.initials}
+          </div>
+          <div className="hidden md:block">
+            <div className="text-xs font-bold text-white leading-tight">
+              {currentUser.name}
             </div>
-            <div className="hidden md:block">
-              <div className="text-xs font-bold text-white leading-tight">
-                {currentUser.name}
-              </div>
-              <div className="text-[11px] text-white/80 font-medium leading-tight">
-                {currentUser.role}
-              </div>
+            <div className="text-[11px] text-white/80 font-medium leading-tight flex items-center gap-1.5">
+              <span>{currentUser.role}</span>
+              {currentUser.isAdmin && (
+                <span className="text-[9px] px-1 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 font-bold">
+                  Admin
+                </span>
+              )}
             </div>
-            <span className="material-symbols-outlined text-[18px] text-white/80">
-              expand_more
-            </span>
-          </button>
-
-          {/* Role Switcher Dropdown */}
-          {showRoleMenu && (
-            <div className="absolute right-0 mt-2 w-72 bg-white rounded-card shadow-xl border border-outline-subtle p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="pb-2 border-b border-outline-subtle mb-2">
-                <div className="text-xs font-bold text-on-surface">Masuk Sebagai:</div>
-                <div className="text-xs text-outline">{currentUser.department}</div>
-                <div className="text-[10px] text-outline font-code mt-0.5">NIP: {currentUser.nip}</div>
-              </div>
-
-              <div className="py-1 max-h-64 overflow-y-auto">
-                <div className="text-[11px] font-bold text-outline uppercase tracking-wider px-2 py-1 flex items-center justify-between">
-                  <span>Ganti Peran Pejabat:</span>
-                  <span className="text-[10px] text-primary lowercase">{usersList?.length || 7} akun</span>
-                </div>
-                {(usersList || Object.values(USERS)).map((user) => {
-                  const isSelected = currentUser.id === user.id || currentUser.roleKey === user.roleKey;
-                  return (
-                    <button
-                      key={user.id || user.roleKey}
-                      onClick={() => {
-                        switchUser(user.id || user.roleKey);
-                        setShowRoleMenu(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs text-left transition-colors ${
-                        isSelected
-                          ? 'bg-primary-light text-primary font-bold'
-                          : 'text-on-surface hover:bg-surface'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className={`w-6 h-6 rounded-full ${user.avatarColor || 'bg-primary text-white'} text-[10px] flex items-center justify-center font-bold shrink-0`}>
-                          {user.initials || 'U'}
-                        </span>
-                        <div className="truncate">
-                          <div className="truncate font-semibold">{user.name}</div>
-                          <div className="text-[10px] text-outline flex items-center gap-1">
-                            <span>{user.role || user.jabatan}</span>
-                            {user.isAdmin && (
-                              <span className="text-[9px] px-1 rounded bg-emerald-100 text-emerald-800 font-bold">Admin</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {isSelected && (
-                        <span className="material-symbols-outlined text-primary text-[16px] shrink-0">
-                          check
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="pt-2 border-t border-outline-subtle mt-2 flex items-center justify-between">
-                {isAdmin ? (
-                  <button
-                    onClick={() => {
-                      navigateTo('akun');
-                      setShowRoleMenu(false);
-                    }}
-                    className="text-xs text-primary font-bold hover:underline flex items-center gap-1"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">manage_accounts</span>
-                    Kelola Akun (Admin)
-                  </button>
-                ) : (
-                  <span className="text-[11px] text-outline font-medium italic">
-                    Izin: {currentUser.role}
-                  </span>
-                )}
-                <button
-                  onClick={() => {
-                    logout();
-                    setShowRoleMenu(false);
-                  }}
-                  className="text-xs text-danger font-semibold hover:underline flex items-center gap-1"
-                >
-                  <span className="material-symbols-outlined text-[14px]">logout</span>
-                  Keluar
-                </button>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
+
+        {/* Tombol Keluar Langsung */}
+        <button
+          onClick={logout}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-btn bg-white/10 hover:bg-rose-600 hover:text-white text-white/90 text-xs font-semibold border border-white/20 transition-all active:scale-[0.98] shadow-2xs"
+          title="Keluar dari Aplikasi KlikDispos"
+        >
+          <span className="material-symbols-outlined text-[16px]">logout</span>
+          <span className="hidden sm:inline">Keluar</span>
+        </button>
+
       </div>
     </header>
   );
