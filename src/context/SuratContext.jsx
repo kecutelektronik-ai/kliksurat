@@ -13,92 +13,210 @@ import {
 
 const SuratContext = createContext();
 
-export const USERS = {
-  petugas: {
-    id: 'usr-1',
-    name: 'Ahmad Fauzi, S.H.',
-    role: 'Petugas Persuratan',
-    roleKey: 'petugas',
-    nip: '19880412 201101 1 003',
-    department: 'Subbag Umum & Keuangan (Tata Usaha)',
-    initials: 'AF',
-    avatarColor: 'bg-primary text-white',
-    badge: 'Petugas Persuratan',
-    permissions: ['all_letters', 'register_in', 'number_out', 'distribute', 'archive', 'settings']
-  },
-  sekretaris: {
-    id: 'usr-2',
-    name: 'Bpk. H. M. Ridwan, S.H.',
-    role: 'Sekretaris',
+/**
+ * Standar Matriks Hak Akses Aplikasi KlikDispos:
+ * 1. Kasubag Umum & Sekretaris: Admin (melihat seluruh menu aplikasi, menambah, edit, hapus data)
+ * 2. Petugas Surat: hanya melihat dashboard, surat masuk, surat keluar, distribusi surat, pelacakan surat, arsip surat
+ * 3. Ketua, Wakil, Plh Ketua: hanya melihat dashboard, surat masuk, halaman pimpinan, arsip surat
+ * 4. Panitera: hanya melihat dashboard, surat masuk, disposisi surat
+ */
+export function getAllowedMenusForRole(roleKey) {
+  switch (roleKey) {
+    case 'kasubag_umum':
+    case 'sekretaris':
+    case 'admin':
+      return [
+        'dashboard',
+        'surat-masuk',
+        'surat-keluar',
+        'distribusi',
+        'disposisi',
+        'pelacakan',
+        'arsip',
+        'pengaturan-nomor',
+        'laporan',
+        'pimpinan',
+        'kewenangan-plh',
+        'whatsapp',
+        'akun',
+      ];
+    case 'petugas':
+      return [
+        'dashboard',
+        'surat-masuk',
+        'surat-keluar',
+        'distribusi',
+        'pelacakan',
+        'arsip',
+      ];
+    case 'ketua':
+    case 'wakil_ketua':
+    case 'hakim_senior':
+    case 'plh_ketua':
+      return [
+        'dashboard',
+        'surat-masuk',
+        'pimpinan',
+        'arsip',
+      ];
+    case 'panitera':
+      return [
+        'dashboard',
+        'surat-masuk',
+        'disposisi',
+      ];
+    default:
+      return ['dashboard', 'surat-masuk'];
+  }
+}
+
+export const INITIAL_USERS_LIST = [
+  {
+    id: 'usr-sekretaris',
+    key: 'sekretaris',
     roleKey: 'sekretaris',
+    jabatan: 'Sekretaris',
+    role: 'Sekretaris (Admin)',
+    name: 'Dr. Rozy Alifian Mukhtar, S.H., M.Kn.',
+    username: 'sekretaris',
+    email: 'sekretaris@peradilan.go.id',
+    password: 'password123',
     nip: '19750824 200212 1 001',
     department: 'Kesekretariatan',
-    initials: 'MR',
-    avatarColor: 'bg-success text-white',
-    badge: 'Sekretaris Pengadilan',
-    permissions: ['view_all', 'receive_disposisi', 'approve_sekretariat', 'reports']
+    initials: 'RM',
+    avatarColor: 'bg-emerald-700 text-white',
+    badge: 'Sekretaris (Admin)',
+    status: 'Aktif',
+    isAdmin: true,
+    permissions: ['all_menus', 'create', 'read', 'update', 'delete'],
+    accessSummary: 'Seluruh Menu Aplikasi (Admin CRUD Penuh)'
   },
-  panitera: {
-    id: 'usr-3',
-    name: 'Ibu Dra. Hj. Nurjanah, M.H.',
-    role: 'Panitera',
+  {
+    id: 'usr-kasubag-umum',
+    key: 'kasubag_umum',
+    roleKey: 'kasubag_umum',
+    jabatan: 'Kasubag Umum',
+    role: 'Kasubag Umum (Admin)',
+    name: 'Nindyra Ayu Sagita, S.Sos.',
+    username: 'bendahara',
+    email: 'kasubag.umum@peradilan.go.id',
+    password: 'password123',
+    nip: '19820719 200801 2 005',
+    department: 'Subbag Umum & Keuangan (Tata Usaha)',
+    initials: 'NS',
+    avatarColor: 'bg-teal-700 text-white',
+    badge: 'Kasubag Umum (Admin)',
+    status: 'Aktif',
+    isAdmin: true,
+    permissions: ['all_menus', 'create', 'read', 'update', 'delete'],
+    accessSummary: 'Seluruh Menu Aplikasi (Admin CRUD Penuh)'
+  },
+  {
+    id: 'usr-petugas',
+    key: 'petugas',
+    roleKey: 'petugas',
+    jabatan: 'Petugas Surat',
+    role: 'Petugas Surat',
+    name: 'Ahmad Fauzi, S.H.',
+    username: 'petugas',
+    email: 'ahmad.fauzi@peradilan.go.id',
+    password: 'password123',
+    nip: '19880412 201101 1 003',
+    department: 'Subbag Umum & Tata Usaha (Persuratan)',
+    initials: 'AF',
+    avatarColor: 'bg-primary text-white',
+    badge: 'Petugas Surat',
+    status: 'Aktif',
+    isAdmin: false,
+    permissions: ['dashboard', 'surat-masuk', 'surat-keluar', 'distribusi', 'pelacakan', 'arsip'],
+    accessSummary: 'Dashboard, Surat Masuk, Surat Keluar, Distribusi, Pelacakan, Arsip'
+  },
+  {
+    id: 'usr-ketua',
+    key: 'ketua',
+    roleKey: 'ketua',
+    jabatan: 'Ketua',
+    role: 'Ketua Pengadilan Agama',
+    name: 'Abdul Kodir, S.Ag., M.M.',
+    username: 'ketua',
+    email: 'ketua@peradilan.go.id',
+    password: 'password123',
+    nip: '19690110 199403 1 002',
+    department: 'Pimpinan Pengadilan',
+    initials: 'AK',
+    avatarColor: 'bg-emerald-800 text-white',
+    badge: 'Ketua Pengadilan Agama',
+    status: 'Aktif',
+    isAdmin: false,
+    permissions: ['dashboard', 'surat-masuk', 'pimpinan', 'arsip'],
+    accessSummary: 'Dashboard, Surat Masuk, Halaman Pimpinan, Arsip Surat'
+  },
+  {
+    id: 'usr-wakil-ketua',
+    key: 'wakil_ketua',
+    roleKey: 'wakil_ketua',
+    jabatan: 'Wakil Ketua',
+    role: 'Wakil Ketua (Pembina)',
+    name: 'Fatkur Rosyad, S.Ag., M.H., M.HES.',
+    username: 'pembina',
+    email: 'wakil.ketua@peradilan.go.id',
+    password: 'password123',
+    nip: '19720516 199803 1 004',
+    department: 'Pimpinan & Pengawasan',
+    initials: 'FR',
+    avatarColor: 'bg-amber-700 text-white',
+    badge: 'Wakil Ketua',
+    status: 'Aktif',
+    isAdmin: false,
+    permissions: ['dashboard', 'surat-masuk', 'pimpinan', 'arsip'],
+    accessSummary: 'Dashboard, Surat Masuk, Halaman Pimpinan, Arsip Surat'
+  },
+  {
+    id: 'usr-plh-ketua',
+    key: 'hakim_senior',
+    roleKey: 'hakim_senior',
+    jabatan: 'Plh. Ketua',
+    role: 'Plh. Ketua / Pengawas',
+    name: 'Samsul Bahri, S.H.I., M.H.',
+    username: 'pengawas',
+    email: 'plh.ketua@peradilan.go.id',
+    password: 'password123',
+    nip: '19700612 199603 1 001',
+    department: 'Kepaniteraan & Hakim Peradilan',
+    initials: 'SB',
+    avatarColor: 'bg-indigo-700 text-white',
+    badge: 'Plh. Ketua / Hakim Pengawas',
+    status: 'Aktif',
+    isAdmin: false,
+    permissions: ['dashboard', 'surat-masuk', 'pimpinan', 'arsip'],
+    accessSummary: 'Dashboard, Surat Masuk, Halaman Pimpinan, Arsip Surat'
+  },
+  {
+    id: 'usr-panitera',
+    key: 'panitera',
     roleKey: 'panitera',
+    jabatan: 'Panitera',
+    role: 'Panitera Pengadilan',
+    name: 'Ibu Dra. Hj. Nurjanah, M.H.',
+    username: 'panitera',
+    email: 'nurjanah.panitera@peradilan.go.id',
+    password: 'password123',
     nip: '19780315 200501 2 002',
     department: 'Kepaniteraan Perkara',
     initials: 'NJ',
     avatarColor: 'bg-accent-dark text-white',
     badge: 'Panitera Pengadilan',
-    permissions: ['view_all', 'receive_disposisi', 'approve_kepaniteraan', 'reports']
-  },
-  ketua: {
-    id: 'usr-4',
-    name: 'Dr. H. Ahmad Zainuddin, S.H., M.H.',
-    role: 'Ketua',
-    roleKey: 'ketua',
-    nip: '19690110 199403 1 002',
-    department: 'Pimpinan Pengadilan',
-    initials: 'AZ',
-    avatarColor: 'bg-primary-dark text-white',
-    badge: 'Ketua Pengadilan Agama',
-    permissions: ['view_all', 'disposisi', 'final_approval', 'pimpinan_dashboard', 'reports']
-  },
-  wakil_ketua: {
-    id: 'usr-5',
-    name: 'Drs. H. Syamsul Hadi, M.H.',
-    role: 'Wakil Ketua',
-    roleKey: 'wakil_ketua',
-    nip: '19720516 199803 1 004',
-    department: 'Pimpinan & Pengawasan',
-    initials: 'SH',
-    avatarColor: 'bg-warning-dark text-white',
-    badge: 'Wakil Ketua Pengadilan Agama',
-    permissions: ['view_all', 'disposisi', 'final_approval', 'pimpinan_dashboard', 'reports']
-  },
-  hakim_senior: {
-    id: 'usr-6',
-    name: 'Drs. H. M. Arifin, S.H., M.Hum.',
-    role: 'Hakim Senior / Hakim Pengawas',
-    roleKey: 'hakim_senior',
-    nip: '19700612 199603 1 001',
-    department: 'Kepaniteraan & Hakim Peradilan',
-    initials: 'MA',
-    avatarColor: 'bg-indigo-700 text-white',
-    badge: 'Hakim yang Ditunjuk',
-    permissions: ['view_all', 'disposisi', 'receive_disposisi', 'final_approval', 'pimpinan_dashboard', 'reports']
-  },
-  kasubag_umum: {
-    id: 'usr-7',
-    name: 'Budi Santoso, S.Kom.',
-    role: 'Kepala Subbagian Umum dan Keuangan',
-    roleKey: 'kasubag_umum',
-    nip: '19820719 200801 1 005',
-    department: 'Subbag Umum & Keuangan (Tata Usaha & Kearsipan)',
-    initials: 'BS',
-    avatarColor: 'bg-teal-700 text-white',
-    badge: 'Kasubag Umum & Keuangan',
-    permissions: ['view_all', 'receive_disposisi', 'archive', 'reports']
+    status: 'Aktif',
+    isAdmin: false,
+    permissions: ['dashboard', 'surat-masuk', 'disposisi'],
+    accessSummary: 'Dashboard, Surat Masuk, Disposisi Surat'
   }
-};
+];
+
+export const USERS = INITIAL_USERS_LIST.reduce((acc, u) => {
+  acc[u.key || u.roleKey] = u;
+  return acc;
+}, {});
 
 const INITIAL_SURAT_MASUK = [
   {
@@ -458,12 +576,26 @@ const INITIAL_PLH_CONFIG = {
 };
 
 export function SuratProvider({ children }) {
+  // Dynamic Users List State (persisted in localStorage)
+  const [usersList, setUsersList] = useState(() => {
+    const saved = localStorage.getItem('surat_users_list');
+    return saved ? JSON.parse(saved) : INITIAL_USERS_LIST;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('surat_users_list', JSON.stringify(usersList));
+  }, [usersList]);
+
   // Current user & authentication state
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('surat_current_user');
-    return saved ? JSON.parse(saved) : USERS.petugas;
+    return saved ? JSON.parse(saved) : USERS.sekretaris;
   });
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  useEffect(() => {
+    localStorage.setItem('surat_current_user', JSON.stringify(currentUser));
+  }, [currentUser]);
 
   // Active navigation view
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -740,14 +872,21 @@ export function SuratProvider({ children }) {
   };
 
   // Actions User & Navigasi
-  const switchUser = (roleKey) => {
-    if (USERS[roleKey]) {
-      setCurrentUser(USERS[roleKey]);
-      showToast(`Beralih peran sebagai: ${USERS[roleKey].name} (${USERS[roleKey].role})`, 'info');
+  const switchUser = (roleKeyOrId) => {
+    const found =
+      usersList.find((u) => u.key === roleKeyOrId || u.roleKey === roleKeyOrId || u.id === roleKeyOrId || u.username === roleKeyOrId) ||
+      USERS[roleKeyOrId];
+    if (found) {
+      setCurrentUser(found);
+      const allowed = getAllowedMenusForRole(found.roleKey);
+      if (!allowed.includes(currentPage)) {
+        setCurrentPage('dashboard');
+      }
+      showToast(`Beralih peran sebagai: ${found.name} (${found.role})`, 'info');
     }
   };
 
-  const login = (roleKey = 'petugas') => {
+  const login = (roleKey = 'sekretaris') => {
     setIsLoggedIn(true);
     switchUser(roleKey);
     setCurrentPage('dashboard');
@@ -759,6 +898,12 @@ export function SuratProvider({ children }) {
   };
 
   const navigateTo = (page, letterId = null) => {
+    const allowed = getAllowedMenusForRole(currentUser.roleKey);
+    if (!allowed.includes(page) && !isAdmin) {
+      showToast(`Akses menu "${page}" dibatasi untuk peran ${currentUser.role}.`, 'warning');
+      setCurrentPage('dashboard');
+      return;
+    }
     setCurrentPage(page);
     if (letterId) {
       setActiveLetterId(letterId);
@@ -1206,18 +1351,107 @@ export function SuratProvider({ children }) {
     }
   };
 
-  // Hak Akses Admin Pengelolaan Klasifikasi & Sistem
+  // Hak Akses Admin (Kasubag Umum dan Sekretaris menjadi Admin dapat melihat seluruh menu aplikasi, menambah, edit, hapus data)
   const isAdmin =
-    currentUser.roleKey === 'petugas' ||
-    currentUser.roleKey === 'sekretaris' ||
-    currentUser.roleKey === 'panitera' ||
-    currentUser.roleKey === 'ketua' ||
-    currentUser.roleKey === 'wakil_ketua' ||
     currentUser.roleKey === 'kasubag_umum' ||
-    currentUser.roleKey === 'hakim_senior' ||
-    currentUser.roleKey === 'admin' ||
-    Boolean(currentUser.permissions?.includes('settings')) ||
-    Boolean(currentUser.permissions?.includes('all_letters'));
+    currentUser.roleKey === 'sekretaris' ||
+    currentUser.roleKey === 'admin';
+
+  // CRUD Akun Pengelola (Fitur Manajemen Akun seperti Referensi)
+  const addUser = (userData) => {
+    const newId = `usr-${Date.now()}`;
+    const roleKey = userData.roleKey || 'petugas';
+    const initials = (userData.name || 'User')
+      .split(' ')
+      .map((n) => n[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+
+    const created = {
+      id: newId,
+      key: roleKey,
+      roleKey: roleKey,
+      jabatan: userData.jabatan || 'Staf Persuratan',
+      role: userData.role || userData.jabatan || 'Staf Persuratan',
+      name: userData.name,
+      username: userData.username?.toLowerCase().replace(/\s+/g, '') || `user${Date.now().toString().slice(-4)}`,
+      email: userData.email || `${userData.name.toLowerCase().replace(/[\s,.]+/g, '')}@peradilan.go.id`,
+      password: userData.password || 'password123',
+      nip: userData.nip || '-',
+      department: userData.department || 'Tata Usaha',
+      initials: initials || 'ST',
+      avatarColor: 'bg-teal-700 text-white',
+      badge: userData.jabatan || 'Staf',
+      status: userData.status || 'Aktif',
+      isAdmin: roleKey === 'kasubag_umum' || roleKey === 'sekretaris' || roleKey === 'admin',
+      permissions: getAllowedMenusForRole(roleKey),
+      accessSummary:
+        roleKey === 'kasubag_umum' || roleKey === 'sekretaris'
+          ? 'Seluruh Menu Aplikasi (Admin CRUD Penuh)'
+          : roleKey === 'petugas'
+          ? 'Dashboard, Surat Masuk, Surat Keluar, Distribusi, Pelacakan, Arsip'
+          : roleKey === 'panitera'
+          ? 'Dashboard, Surat Masuk, Disposisi Surat'
+          : 'Dashboard, Surat Masuk, Halaman Pimpinan, Arsip Surat',
+    };
+
+    setUsersList((prev) => [created, ...prev]);
+    showToast(`Akun pengelola "${created.name}" (${created.jabatan}) berhasil didaftarkan.`, 'success');
+    return true;
+  };
+
+  const updateUser = (userId, updatedData) => {
+    setUsersList((prev) =>
+      prev.map((u) => {
+        if (u.id === userId) {
+          const roleKey = updatedData.roleKey || u.roleKey;
+          const updated = {
+            ...u,
+            ...updatedData,
+            roleKey,
+            isAdmin: roleKey === 'kasubag_umum' || roleKey === 'sekretaris' || roleKey === 'admin',
+            permissions: getAllowedMenusForRole(roleKey),
+            accessSummary:
+              roleKey === 'kasubag_umum' || roleKey === 'sekretaris'
+                ? 'Seluruh Menu Aplikasi (Admin CRUD Penuh)'
+                : roleKey === 'petugas'
+                ? 'Dashboard, Surat Masuk, Surat Keluar, Distribusi, Pelacakan, Arsip'
+                : roleKey === 'panitera'
+                ? 'Dashboard, Surat Masuk, Disposisi Surat'
+                : 'Dashboard, Surat Masuk, Halaman Pimpinan, Arsip Surat',
+          };
+          if (currentUser.id === userId) {
+            setCurrentUser(updated);
+          }
+          return updated;
+        }
+        return u;
+      })
+    );
+    showToast('Data akun pengelola & kredensial berhasil diperbarui.', 'success');
+    return true;
+  };
+
+  const deleteUser = (userId) => {
+    const target = usersList.find((u) => u.id === userId);
+    if (!target) return false;
+
+    if (currentUser.id === userId) {
+      showToast('Tidak dapat menghapus akun yang sedang Anda gunakan saat ini.', 'warning');
+      return false;
+    }
+
+    if (usersList.length <= 1) {
+      showToast('Minimal harus ada satu akun pengelola aktif dalam sistem.', 'warning');
+      return false;
+    }
+
+    setUsersList((prev) => prev.filter((u) => u.id !== userId));
+    showToast(`Akun pengelola "${target.name}" berhasil dihapus.`, 'info');
+    return true;
+  };
 
   const addKlasifikasi = (item) => {
     const code = item.kode?.toUpperCase().trim();
@@ -1285,8 +1519,13 @@ export function SuratProvider({ children }) {
     <SuratContext.Provider
       value={{
         USERS,
+        usersList,
         currentUser,
         isAdmin,
+        getAllowedMenusForRole,
+        addUser,
+        updateUser,
+        deleteUser,
         switchUser,
         isLoggedIn,
         login,

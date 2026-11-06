@@ -1,11 +1,13 @@
 import React from 'react';
-import { useSurat } from '../context/SuratContext';
+import { useSurat, getAllowedMenusForRole } from '../context/SuratContext';
 import logoAplikasi from '../assets/logo-aplikasi.png';
 
 export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
   const { currentPage, navigateTo, currentUser, plhConfig } = useSurat();
 
-  const NAV_ITEMS = [
+  const allowedMenus = getAllowedMenusForRole(currentUser?.roleKey);
+
+  const ALL_NAV_ITEMS = [
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
     { id: 'surat-masuk', label: 'Surat Masuk', icon: 'inbox' },
     { id: 'surat-keluar', label: 'Surat Keluar', icon: 'outbox' },
@@ -25,6 +27,8 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
     { id: 'whatsapp', label: 'Pengaturan WhatsApp', icon: 'chat' },
     { id: 'akun', label: 'Akun dan Hak Akses', icon: 'manage_accounts' },
   ];
+
+  const visibleNavItems = ALL_NAV_ITEMS.filter((item) => allowedMenus.includes(item.id));
 
   const handleNavClick = (id) => {
     navigateTo(id);
@@ -99,7 +103,7 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
 
             {/* Navigation List */}
             <nav className="flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-270px)] pr-1 mt-1 text-sm">
-              {NAV_ITEMS.map((item) => {
+              {visibleNavItems.map((item) => {
                 const isActive = currentPage === item.id;
                 return (
                   <button
@@ -137,13 +141,15 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
 
           {/* Sidebar Footer */}
           <div className="pt-3 border-t border-white/15 flex flex-col gap-2">
-            <button
-              onClick={() => handleNavClick('whatsapp')}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-stone-200 hover:text-white hover:bg-white/10 text-sm transition-colors text-left"
-            >
-              <span className="material-symbols-outlined text-[18px]">help</span>
-              <span>Bantuan Teknis Fonnte</span>
-            </button>
+            {allowedMenus.includes('whatsapp') && (
+              <button
+                onClick={() => handleNavClick('whatsapp')}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg text-stone-200 hover:text-white hover:bg-white/10 text-sm transition-colors text-left"
+              >
+                <span className="material-symbols-outlined text-[18px]">help</span>
+                <span>Bantuan Teknis Fonnte</span>
+              </button>
+            )}
 
             <div className="px-3 py-2 bg-black/20 border border-white/10 rounded-lg flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">

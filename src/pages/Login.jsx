@@ -4,9 +4,9 @@ import logoAplikasi from '../assets/logo-aplikasi.png';
 
 export default function Login() {
   const { login } = useSurat();
-  const [username, setUsername] = useState('ahmad.fauzi@peradilan.go.id');
+  const [username, setUsername] = useState('sekretaris@peradilan.go.id');
   const [password, setPassword] = useState('••••••••••••');
-  const [selectedRole, setSelectedRole] = useState('petugas');
+  const [selectedRole, setSelectedRole] = useState('sekretaris');
 
   useEffect(() => {
     const prevBg = document.body.style.backgroundColor;
@@ -64,7 +64,7 @@ export default function Login() {
         <div className="p-3 bg-surface rounded-lg border border-outline-subtle space-y-2">
           <div className="text-[11px] font-bold text-on-surface-variant flex items-center justify-between">
             <span>PILIH AKUN LOGIN CEPAT (DEMO):</span>
-            <span className="text-[10px] text-[#334426] font-bold">5 Pejabat</span>
+            <span className="text-[10px] text-[#334426] font-bold">{Object.keys(USERS).length} Pengelola & Pejabat</span>
           </div>
           <div className="grid grid-cols-2 gap-1.5 text-xs">
             {Object.keys(USERS).map((key) => {

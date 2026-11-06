@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSurat } from './context/SuratContext';
+import { useSurat, getAllowedMenusForRole } from './context/SuratContext';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Toast from './components/Toast';
@@ -21,7 +21,7 @@ import Akun from './pages/Akun';
 import WhatsApp from './pages/WhatsApp';
 
 export default function App() {
-  const { isLoggedIn, currentPage } = useSurat();
+  const { isLoggedIn, currentPage, currentUser } = useSurat();
   const [isOpenMobile, setIsOpenMobile] = useState(false);
 
   // If user is logged out or navigating to login page, show Login screen
@@ -34,8 +34,11 @@ export default function App() {
     );
   }
 
+  const allowedMenus = getAllowedMenusForRole(currentUser?.roleKey);
+  const activePage = allowedMenus.includes(currentPage) ? currentPage : 'dashboard';
+
   const renderCurrentPage = () => {
-    switch (currentPage) {
+    switch (activePage) {
       case 'dashboard':
         return <Dashboard />;
       case 'surat-masuk':

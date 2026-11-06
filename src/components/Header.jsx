@@ -1,11 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useSurat, USERS } from '../context/SuratContext';
+import { useSurat, USERS, getAllowedMenusForRole } from '../context/SuratContext';
 
 export default function Header({ onOpenMobileMenu }) {
-  const { currentUser, switchUser, logout, navigateTo, waSettings, suratMasuk, plhConfig } = useSurat();
+  const {
+    currentUser,
+    switchUser,
+    logout,
+    navigateTo,
+    waSettings,
+    suratMasuk,
+    plhConfig,
+    usersList,
+    isAdmin,
+  } = useSurat();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const allowedMenus = getAllowedMenusForRole(currentUser?.roleKey);
 
   const roleMenuRef = useRef(null);
   const notifMenuRef = useRef(null);
@@ -198,18 +210,18 @@ export default function Header({ onOpenMobileMenu }) {
                 <div className="text-[10px] text-outline font-code mt-0.5">NIP: {currentUser.nip}</div>
               </div>
 
-              <div className="py-1">
-                <div className="text-[11px] font-bold text-outline uppercase tracking-wider px-2 py-1">
-                  Ganti Peran Pejabat (Demo):
+              <div className="py-1 max-h-64 overflow-y-auto">
+                <div className="text-[11px] font-bold text-outline uppercase tracking-wider px-2 py-1 flex items-center justify-between">
+                  <span>Ganti Peran Pejabat:</span>
+                  <span className="text-[10px] text-primary lowercase">{usersList?.length || 7} akun</span>
                 </div>
-                {Object.keys(USERS).map((key) => {
-                  const user = USERS[key];
-                  const isSelected = currentUser.roleKey === key;
+                {(usersList || Object.values(USERS)).map((user) => {
+                  const isSelected = currentUser.id === user.id || currentUser.roleKey === user.roleKey;
                   return (
                     <button
-                      key={key}
+                      key={user.id || user.roleKey}
                       onClick={() => {
-                        switchUser(key);
+                        switchUser(user.id || user.roleKey);
                         setShowRoleMenu(false);
                       }}
                       className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs text-left transition-colors ${
@@ -219,16 +231,21 @@ export default function Header({ onOpenMobileMenu }) {
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <span className={`w-6 h-6 rounded-full ${user.avatarColor} text-[10px] flex items-center justify-center font-bold`}>
-                          {user.initials}
+                        <span className={`w-6 h-6 rounded-full ${user.avatarColor || 'bg-primary text-white'} text-[10px] flex items-center justify-center font-bold shrink-0`}>
+                          {user.initials || 'U'}
                         </span>
-                        <div>
-                          <div>{user.name}</div>
-                          <div className="text-[10px] text-outline">{user.role}</div>
+                        <div className="truncate">
+                          <div className="truncate font-semibold">{user.name}</div>
+                          <div className="text-[10px] text-outline flex items-center gap-1">
+                            <span>{user.role || user.jabatan}</span>
+                            {user.isAdmin && (
+                              <span className="text-[9px] px-1 rounded bg-emerald-100 text-emerald-800 font-bold">Admin</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       {isSelected && (
-                        <span className="material-symbols-outlined text-primary text-[16px]">
+                        <span className="material-symbols-outlined text-primary text-[16px] shrink-0">
                           check
                         </span>
                       )}
@@ -238,15 +255,22 @@ export default function Header({ onOpenMobileMenu }) {
               </div>
 
               <div className="pt-2 border-t border-outline-subtle mt-2 flex items-center justify-between">
-                <button
-                  onClick={() => {
-                    navigateTo('akun');
-                    setShowRoleMenu(false);
-                  }}
-                  className="text-xs text-outline hover:text-primary font-medium"
-                >
-                  Kelola Akun
-                </button>
+                {isAdmin ? (
+                  <button
+                    onClick={() => {
+                      navigateTo('akun');
+                      setShowRoleMenu(false);
+                    }}
+                    className="text-xs text-primary font-bold hover:underline flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">manage_accounts</span>
+                    Kelola Akun (Admin)
+                  </button>
+                ) : (
+                  <span className="text-[11px] text-outline font-medium italic">
+                    Izin: {currentUser.role}
+                  </span>
+                )}
                 <button
                   onClick={() => {
                     logout();
