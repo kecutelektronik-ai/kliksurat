@@ -96,6 +96,7 @@ const INITIAL_SURAT_MASUK = [
     asalSurat: 'PTA Surabaya (Pengadilan Tinggi Agama)',
     perihal: 'Undangan Rapat Koordinasi Pembinaan Wilayah Hukum Pengadilan Tinggi Agama Surabaya Semester II',
     jenisSurat: 'Surat Undangan',
+    prioritas: 'Segera',
     tanggalSurat: '2026-10-18',
     tanggalTerima: '2026-10-19T08:30',
     sifat: 'segera',
@@ -113,6 +114,7 @@ const INITIAL_SURAT_MASUK = [
     asalSurat: 'Pengadilan Tinggi Jawa Timur',
     perihal: 'Pemberitahuan Kegiatan Sosialisasi Standar Pelayanan Terpadu Satu Pintu (PTSP) Ramah Disabilitas',
     jenisSurat: 'Surat Dinas',
+    prioritas: 'Sangat Segera',
     tanggalSurat: '2026-10-19',
     tanggalTerima: '2026-10-20T09:15',
     sifat: 'sangat_segera',
@@ -130,6 +132,7 @@ const INITIAL_SURAT_MASUK = [
     asalSurat: 'Biro Kepegawaian & Ortala Mahkamah Agung RI',
     perihal: 'Verifikasi Berkas Usulan Kenaikan Pangkat Hakim & Aparatur Pegawai Negeri Sipil Periode April 2027',
     jenisSurat: 'Surat Dinas',
+    prioritas: 'Segera',
     tanggalSurat: '2026-10-16',
     tanggalTerima: '2026-10-18T11:00',
     sifat: 'segera',
@@ -147,9 +150,10 @@ const INITIAL_SURAT_MASUK = [
     asalSurat: 'Kepaniteraan Mahkamah Agung RI',
     perihal: 'Petunjuk Teknis Audit Kepatuhan Aksesibilitas Layanan Peradilan Elektronik Tahun Anggaran 2026',
     jenisSurat: 'Surat Edaran',
+    prioritas: 'Segera',
     tanggalSurat: '2026-10-14',
     tanggalTerima: '2026-10-16T10:00',
-    sifat: 'biasa',
+    sifat: 'segera',
     status: 'Telah Didisposisi',
     lampiran: '1 Berkas PDF (Pedoman Mutu)',
     fileScan: 'Juknis_Audit_Aksesibilitas_MARI.pdf',
@@ -164,9 +168,10 @@ const INITIAL_SURAT_MASUK = [
     asalSurat: 'Pengadilan Agama Jember Kelas I-A',
     perihal: 'Permohonan Bantuan Delegasi Panggilan Sidang Perkara Nomor 1245/Pdt.G/2026/PA.Jbr',
     jenisSurat: 'Surat Dinas',
+    prioritas: 'Segera',
     tanggalSurat: '2026-10-17',
     tanggalTerima: '2026-10-18T13:45',
-    sifat: 'biasa',
+    sifat: 'segera',
     status: 'Selesai Ditindaklanjuti',
     lampiran: '1 Lembar Relaas Panggilan',
     fileScan: 'Delegasi_Panggilan_PA_Jember.pdf',
@@ -700,23 +705,26 @@ export function SuratProvider({ children }) {
     const newId = `SM-${String(count).padStart(3, '0')}`;
     const agendaNo = formatAgendaSuratMasuk(count, formData.tanggalSurat || formData.tanggalTerima || new Date());
     const currentStatus = formData.status || 'Diregistrasi';
+    const prioritasNorm = formData.prioritas || (formData.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
+    const sifatNorm = prioritasNorm === 'Sangat Segera' ? 'sangat_segera' : (formData.sifat || 'segera');
 
     const newLetter = {
       id: newId,
       nomorSurat: formData.nomorSurat,
       jenisSurat: formData.jenisSurat || 'Surat Dinas',
+      prioritas: prioritasNorm,
       agenda: agendaNo,
       asalSurat: formData.asalSurat,
       perihal: formData.perihal,
       tanggalSurat: formData.tanggalSurat,
       tanggalTerima: formData.tanggalTerima || new Date().toISOString().slice(0, 16),
-      sifat: formData.sifat || 'biasa',
+      sifat: sifatNorm,
       status: currentStatus,
       lampiran: formData.lampiran || '1 Berkas PDF',
       fileScan: formData.fileScan || 'Naskah_Surat_Masuk.pdf',
       fileSize: '2.1 MB',
       tujuanAwal: 'Ketua Pengadilan Agama Lumajang Kelas I-A',
-      prioritasTinggi: formData.sifat === 'sangat_segera' || formData.sifat === 'segera',
+      prioritasTinggi: true,
     };
 
     const initialTrack = [

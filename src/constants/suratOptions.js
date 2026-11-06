@@ -29,6 +29,38 @@ export const STATUS_SURAT_MASUK_OPTIONS = [
   'Diarsipkan',
 ];
 
+/**
+ * Pilihan Prioritas Surat Masuk Resmi:
+ * 1. Sangat Segera (Maksimal 24 Jam)
+ * 2. Segera (24 - 48 Jam)
+ */
+export const PRIORITAS_SURAT_OPTIONS = [
+  'Sangat Segera',
+  'Segera',
+];
+
+export function getPrioritasBadge(prioritas) {
+  const norm = String(prioritas || '').toLowerCase().replace(/_/g, ' ');
+  if (norm.includes('sangat') || norm === 'sangat segera') {
+    return {
+      bg: 'bg-danger text-white border-danger shadow-2xs font-bold',
+      badgeClass: 'bg-danger text-white font-bold',
+      icon: 'bolt',
+      label: 'Sangat Segera',
+      sla: 'Maksimal 24 Jam',
+      desc: 'Wajib ditindaklanjuti segera dalam waktu 24 jam'
+    };
+  }
+  return {
+    bg: 'bg-warning-light text-amber-950 border border-warning/60 font-bold',
+    badgeClass: 'bg-warning-light text-amber-950 border border-warning/60 font-bold',
+    icon: 'schedule',
+    label: 'Segera',
+    sla: '24 - 48 Jam',
+    desc: 'Wajib ditindaklanjuti dalam waktu 24 sampai 48 jam'
+  };
+}
+
 export function getStatusBadge(status) {
   switch (status) {
     case 'Diterima':

@@ -6,6 +6,7 @@
 export function mapRowToSuratMasuk(row) {
   const firstTrack = Array.isArray(row.tracking) && row.tracking[0];
   const jenisSuratFromTrack = firstTrack?.metadata?.jenisSurat;
+  const prioritasFromTrack = firstTrack?.metadata?.prioritas;
 
   return {
     id: row.id,
@@ -14,6 +15,7 @@ export function mapRowToSuratMasuk(row) {
     asalSurat: row.asal_surat || '',
     perihal: row.perihal || '',
     jenisSurat: row.jenis_naskah || jenisSuratFromTrack || 'Surat Dinas',
+    prioritas: row.prioritas || prioritasFromTrack || (row.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera'),
     tanggalSurat: row.tanggal_surat ? String(row.tanggal_surat).slice(0, 10) : '',
     tanggalTerima: row.tanggal_terima ? String(row.tanggal_terima).slice(0, 16) : '',
     sifat: row.sifat || 'biasa',
@@ -51,7 +53,11 @@ export function mapSuratMasukToRow(item, initialTracking = []) {
     if (idx === 0) {
       return {
         ...t,
-        metadata: { ...(t.metadata || {}), jenisSurat: item.jenisSurat || 'Surat Dinas' }
+        metadata: {
+          ...(t.metadata || {}),
+          jenisSurat: item.jenisSurat || 'Surat Dinas',
+          prioritas: item.prioritas || (item.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera'),
+        }
       };
     }
     return t;
@@ -67,12 +73,12 @@ export function mapSuratMasukToRow(item, initialTracking = []) {
     perihal: item.perihal,
     tanggal_surat: item.tanggalSurat,
     tanggal_terima: item.tanggalTerima ? new Date(item.tanggalTerima).toISOString() : new Date().toISOString(),
-    sifat: item.sifat || 'biasa',
+    sifat: item.sifat || (item.prioritas === 'Sangat Segera' ? 'sangat_segera' : 'segera'),
     status: item.status || 'Menunggu Disposisi',
     lampiran: item.lampiran || '1 Berkas PDF',
     file_scan: item.fileScan || 'Naskah_Surat_Masuk.pdf',
     file_size: item.fileSize || '2.1 MB',
-    prioritas_tinggi: Boolean(item.prioritasTinggi),
+    prioritas_tinggi: Boolean(item.prioritasTinggi || item.prioritas === 'Sangat Segera' || item.sifat === 'sangat_segera'),
     tracking: enrichedTracking,
   };
 }

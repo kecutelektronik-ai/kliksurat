@@ -3,7 +3,9 @@ import { useSurat } from '../context/SuratContext';
 import {
   JENIS_SURAT_OPTIONS,
   STATUS_SURAT_MASUK_OPTIONS,
+  PRIORITAS_SURAT_OPTIONS,
   getStatusBadge,
+  getPrioritasBadge,
   formatAgendaSuratMasuk,
 } from '../constants/suratOptions';
 
@@ -14,6 +16,7 @@ export default function SuratMasuk() {
     jenisSurat: 'Surat Dinas',
     jenisSuratLainnya: '',
     status: 'Diregistrasi',
+    prioritas: 'Segera',
     nomorSurat: '',
     asalSurat: '',
     perihal: '',
@@ -27,6 +30,7 @@ export default function SuratMasuk() {
   const [searchFilter, setSearchFilter] = useState('');
   const [filterJenis, setFilterJenis] = useState('semua');
   const [filterStatus, setFilterStatus] = useState('semua');
+  const [filterPrioritas, setFilterPrioritas] = useState('semua');
   const [editingStatusId, setEditingStatusId] = useState(null);
   const [showForm, setShowForm] = useState(true);
 
@@ -46,8 +50,13 @@ export default function SuratMasuk() {
       ? form.jenisSuratLainnya.trim()
       : form.jenisSurat;
 
+    const prioritasFinal = form.prioritas || 'Segera';
+    const sifatFinal = prioritasFinal === 'Sangat Segera' ? 'sangat_segera' : 'segera';
+
     addSuratMasuk({
       ...form,
+      prioritas: prioritasFinal,
+      sifat: sifatFinal,
       jenisSurat: finalJenisSurat,
       status: form.status || 'Diregistrasi'
     });
@@ -56,29 +65,34 @@ export default function SuratMasuk() {
       jenisSurat: 'Surat Dinas',
       jenisSuratLainnya: '',
       status: 'Diregistrasi',
+      prioritas: 'Segera',
       nomorSurat: '',
       asalSurat: '',
       perihal: '',
       tanggalSurat: new Date().toISOString().slice(0, 10),
       tanggalTerima: new Date().toISOString().slice(0, 16),
       lampiran: '1 Berkas PDF',
-      sifat: 'biasa',
+      sifat: 'segera',
       fileScan: 'Scan_Dokumen_Resmi.pdf'
     });
   };
 
   const filteredSurat = suratMasuk.filter(s => {
     const q = searchFilter.toLowerCase();
+    const itemPrioritas = s.prioritas || (s.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
     const matchSearch =
       s.nomorSurat.toLowerCase().includes(q) ||
       s.asalSurat.toLowerCase().includes(q) ||
       s.perihal.toLowerCase().includes(q) ||
       (s.jenisSurat && s.jenisSurat.toLowerCase().includes(q)) ||
-      (s.status && s.status.toLowerCase().includes(q));
+      (s.status && s.status.toLowerCase().includes(q)) ||
+      itemPrioritas.toLowerCase().includes(q);
 
     const matchJenis = filterJenis === 'semua' || (s.jenisSurat || 'Surat Dinas') === filterJenis;
     const matchStatus = filterStatus === 'semua' || s.status === filterStatus;
-    return matchSearch && matchJenis && matchStatus;
+    const matchPrioritas = filterPrioritas === 'semua' || itemPrioritas === filterPrioritas;
+
+    return matchSearch && matchJenis && matchStatus && matchPrioritas;
   });
 
   return (
@@ -343,98 +357,76 @@ export default function SuratMasuk() {
               </div>
             </div>
 
-            {/* Tingkat Kerahasiaan & Prioritas Radio Buttons */}
+            {/* Prioritas Surat Masuk: Sangat Segera vs Segera */}
             <div className="space-y-2 pt-2 border-t border-outline-subtle">
-              <label className="block text-xs font-bold text-on-surface-variant">
-                Sifat / Tingkat Kerahasiaan Surat <span className="text-danger">*</span>
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                {/* Biasa */}
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-on-surface-variant flex items-center gap-1">
+                  <span>Prioritas Surat</span>
+                  <span className="text-danger">*</span>
+                </label>
+                <span className="text-[11px] text-outline font-medium">Batas Waktu Disposisi & Tindak Lanjut</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                {/* 1. Sangat Segera */}
                 <label
-                  className={`p-3 rounded-btn border cursor-pointer flex items-center justify-between transition-all ${
-                    form.sifat === 'biasa'
-                      ? 'border-primary bg-primary-light text-primary font-bold shadow-2xs'
-                      : 'border-outline-subtle bg-white hover:bg-surface text-on-surface'
+                  onClick={() => setForm({ ...form, prioritas: 'Sangat Segera', sifat: 'sangat_segera' })}
+                  className={`p-3.5 rounded-card border-2 cursor-pointer flex items-center justify-between transition-all ${
+                    form.prioritas === 'Sangat Segera'
+                      ? 'border-danger bg-danger-light/40 shadow-xs'
+                      : 'border-outline-subtle bg-white hover:bg-surface'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <input
                       type="radio"
-                      name="sifat"
-                      value="biasa"
-                      checked={form.sifat === 'biasa'}
-                      onChange={() => setForm({ ...form, sifat: 'biasa' })}
-                      className="text-primary focus:ring-primary"
+                      name="prioritas"
+                      value="Sangat Segera"
+                      checked={form.prioritas === 'Sangat Segera'}
+                      onChange={() => setForm({ ...form, prioritas: 'Sangat Segera', sifat: 'sangat_segera' })}
+                      className="text-danger focus:ring-danger w-4 h-4 cursor-pointer"
                     />
-                    <span>Biasa</span>
+                    <div>
+                      <div className="font-bold text-sm text-danger flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[18px]">bolt</span>
+                        <span>Sangat Segera</span>
+                      </div>
+                      <p className="text-[11px] text-outline mt-0.5">Wajib segera ditindaklanjuti pimpinan (Maksimal 24 Jam)</p>
+                    </div>
                   </div>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">Normal</span>
+                  <span className="text-[10px] px-2 py-1 rounded bg-danger text-white font-bold whitespace-nowrap shadow-2xs">
+                    Maks. 24 Jam
+                  </span>
                 </label>
 
-                {/* Segera */}
+                {/* 2. Segera */}
                 <label
-                  className={`p-3 rounded-btn border cursor-pointer flex items-center justify-between transition-all ${
-                    form.sifat === 'segera'
-                      ? 'border-warning bg-warning-light text-amber-900 font-bold shadow-2xs'
-                      : 'border-outline-subtle bg-white hover:bg-surface text-on-surface'
+                  onClick={() => setForm({ ...form, prioritas: 'Segera', sifat: 'segera' })}
+                  className={`p-3.5 rounded-card border-2 cursor-pointer flex items-center justify-between transition-all ${
+                    form.prioritas === 'Segera'
+                      ? 'border-warning bg-warning-light/40 shadow-xs'
+                      : 'border-outline-subtle bg-white hover:bg-surface'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <input
                       type="radio"
-                      name="sifat"
-                      value="segera"
-                      checked={form.sifat === 'segera'}
-                      onChange={() => setForm({ ...form, sifat: 'segera' })}
-                      className="text-warning-dark focus:ring-warning"
+                      name="prioritas"
+                      value="Segera"
+                      checked={form.prioritas === 'Segera'}
+                      onChange={() => setForm({ ...form, prioritas: 'Segera', sifat: 'segera' })}
+                      className="text-warning-dark focus:ring-warning w-4 h-4 cursor-pointer"
                     />
-                    <span>Segera</span>
+                    <div>
+                      <div className="font-bold text-sm text-amber-950 flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[18px]">schedule</span>
+                        <span>Segera</span>
+                      </div>
+                      <p className="text-[11px] text-outline mt-0.5">Disposisi & tindak lanjut standar (24 - 48 Jam)</p>
+                    </div>
                   </div>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-warning text-amber-950 font-bold">24 Jam</span>
-                </label>
-
-                {/* Sangat Segera */}
-                <label
-                  className={`p-3 rounded-btn border cursor-pointer flex items-center justify-between transition-all ${
-                    form.sifat === 'sangat_segera'
-                      ? 'border-danger bg-danger-light text-danger font-bold shadow-2xs'
-                      : 'border-outline-subtle bg-white hover:bg-surface text-on-surface'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="sifat"
-                      value="sangat_segera"
-                      checked={form.sifat === 'sangat_segera'}
-                      onChange={() => setForm({ ...form, sifat: 'sangat_segera' })}
-                      className="text-danger focus:ring-danger"
-                    />
-                    <span>Sangat Segera</span>
-                  </div>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-danger text-white">Prioritas</span>
-                </label>
-
-                {/* Rahasia */}
-                <label
-                  className={`p-3 rounded-btn border cursor-pointer flex items-center justify-between transition-all ${
-                    form.sifat === 'rahasia'
-                      ? 'border-primary bg-primary-light text-primary font-bold shadow-2xs'
-                      : 'border-outline-subtle bg-white hover:bg-surface text-on-surface'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="sifat"
-                      value="rahasia"
-                      checked={form.sifat === 'rahasia'}
-                      onChange={() => setForm({ ...form, sifat: 'rahasia' })}
-                      className="text-primary focus:ring-primary"
-                    />
-                    <span>Rahasia</span>
-                  </div>
-                  <span className="material-symbols-outlined text-[16px]">lock</span>
+                  <span className="text-[10px] px-2 py-1 rounded bg-warning-light text-amber-950 border border-warning/60 font-bold whitespace-nowrap">
+                    24 - 48 Jam
+                  </span>
                 </label>
               </div>
             </div>
@@ -563,6 +555,25 @@ export default function SuratMasuk() {
                 expand_more
               </span>
             </div>
+
+            {/* Filter Dropdown Prioritas Surat (Sangat Segera & Segera) */}
+            <div className="relative">
+              <select
+                value={filterPrioritas}
+                onChange={(e) => setFilterPrioritas(e.target.value)}
+                className="h-9 pl-3 pr-8 rounded-md bg-surface border border-outline-subtle text-xs font-semibold text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer appearance-none"
+              >
+                <option value="semua">Semua Prioritas</option>
+                {PRIORITAS_SURAT_OPTIONS.map((pr) => (
+                  <option key={pr} value={pr}>
+                    {pr}
+                  </option>
+                ))}
+              </select>
+              <span className="material-symbols-outlined absolute right-2 top-2.5 text-[16px] text-outline pointer-events-none">
+                expand_more
+              </span>
+            </div>
             <button
               onClick={() => showToast('Filter tanggal aktif.', 'info')}
               className="h-9 px-3 rounded-md border border-outline-subtle text-on-surface-variant text-xs font-semibold flex items-center gap-1.5 hover:bg-surface transition-colors"
@@ -590,7 +601,7 @@ export default function SuratMasuk() {
                 <th className="py-3 px-4">Asal Surat</th>
                 <th className="py-3 px-4">Perihal</th>
                 <th className="py-3 px-4">Tanggal Diterima</th>
-                <th className="py-3 px-4">Sifat</th>
+                <th className="py-3 px-4">Prioritas</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-right">Aksi</th>
               </tr>
@@ -623,19 +634,19 @@ export default function SuratMasuk() {
                       {item.tanggalTerima ? item.tanggalTerima.replace('T', ' ') : item.tanggalSurat}
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase ${
-                          item.sifat === 'sangat_segera'
-                            ? 'bg-danger text-white'
-                            : item.sifat === 'segera'
-                            ? 'bg-warning-light text-amber-900 border border-warning/40 font-bold'
-                            : item.sifat === 'rahasia'
-                            ? 'bg-primary-light text-primary border border-primary/30'
-                            : 'bg-primary-light text-primary border border-primary/20'
-                        }`}
-                      >
-                        {item.sifat.replace('_', ' ')}
-                      </span>
+                      {(() => {
+                        const prio = item.prioritas || (item.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
+                        const pBadge = getPrioritasBadge(prio);
+                        return (
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs ${pBadge.badgeClass}`}
+                            title={`Prioritas: ${pBadge.label} (${pBadge.sla})`}
+                          >
+                            <span className="material-symbols-outlined text-[15px]">{pBadge.icon}</span>
+                            <span>{pBadge.label}</span>
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       {(() => {
