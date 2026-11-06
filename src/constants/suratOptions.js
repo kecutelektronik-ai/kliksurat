@@ -270,4 +270,15 @@ export const PEJABAT_PENERIMA_DISPOSISI_OPTIONS = [
   'Kepala Subbagian Umum dan Keuangan',
 ];
 
+/**
+ * Pilihan Unit Kerja Pengusul Surat Keluar Resmi:
+ * 1. Kepaniteraan
+ * 2. Kesekretariatan
+ */
+export const UNIT_PENGUSUL_OPTIONS = [
+  'Kepaniteraan',
+  'Kesekretariatan',
+];
+
+
 

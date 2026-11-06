@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSurat } from '../context/SuratContext';
 import { openWarkatPreview } from '../lib/previewWarkat';
-import { formatAgendaSuratKeluar } from '../constants/suratOptions';
+import { formatAgendaSuratKeluar, UNIT_PENGUSUL_OPTIONS } from '../constants/suratOptions';
 
 export default function SuratKeluar() {
   const {
@@ -14,10 +14,14 @@ export default function SuratKeluar() {
     showToast,
   } = useSurat();
 
+  const defaultUnit = currentUser.department?.toLowerCase().includes('kepaniteraan')
+    ? 'Kepaniteraan'
+    : 'Kesekretariatan';
+
   const [form, setForm] = useState({
     tujuanSurat: '',
     perihal: '',
-    unitPengusul: currentUser.department,
+    unitPengusul: defaultUnit,
     kodeKlasifikasi: 'HK.01',
     tanggalSurat: new Date().toISOString().slice(0, 10),
     sifat: 'biasa',
@@ -26,6 +30,7 @@ export default function SuratKeluar() {
 
   const [showForm, setShowForm] = useState(false);
   const [filterQuery, setFilterQuery] = useState('');
+  const [filterUnit, setFilterUnit] = useState('semua');
 
   const handleCreateDraft = (e) => {
     e.preventDefault();
@@ -38,7 +43,7 @@ export default function SuratKeluar() {
     setForm({
       tujuanSurat: '',
       perihal: '',
-      unitPengusul: currentUser.department,
+      unitPengusul: defaultUnit,
       kodeKlasifikasi: 'HK.01',
       tanggalSurat: new Date().toISOString().slice(0, 10),
       sifat: 'biasa',
@@ -54,13 +59,18 @@ export default function SuratKeluar() {
     currentUser.roleKey === 'panitera' ||
     (currentUser.roleKey === 'hakim_senior' && plhConfig?.isActive && plhConfig?.tipePelimpahan === 'hakim_ditunjuk');
 
-  const filteredSurat = suratKeluar.filter(
-    (s) =>
+  const filteredSurat = suratKeluar.filter((s) => {
+    const matchQuery =
       s.nomorSurat.toLowerCase().includes(filterQuery.toLowerCase()) ||
       s.tujuanSurat.toLowerCase().includes(filterQuery.toLowerCase()) ||
       s.perihal.toLowerCase().includes(filterQuery.toLowerCase()) ||
-      s.pembuat.toLowerCase().includes(filterQuery.toLowerCase())
-  );
+      s.pembuat.toLowerCase().includes(filterQuery.toLowerCase()) ||
+      (s.unitPengusul || '').toLowerCase().includes(filterQuery.toLowerCase());
+    const matchUnit =
+      filterUnit === 'semua' ||
+      (s.unitPengusul || '').toLowerCase().includes(filterUnit.toLowerCase());
+    return matchQuery && matchUnit;
+  });
 
   return (
     <div className="space-y-6">
@@ -182,13 +192,45 @@ export default function SuratKeluar() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-on-surface-variant">Unit Kerja Pengusul</label>
-                <input
-                  type="text"
-                  value={form.unitPengusul}
-                  onChange={(e) => setForm({ ...form, unitPengusul: e.target.value })}
-                  className="w-full h-10 px-3 rounded-btn bg-white border border-outline-subtle text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                />
+                <label className="font-bold text-on-surface-variant flex items-center justify-between">
+                  <span>Unit Kerja Pengusul <span className="text-danger">*</span></span>
+                  <span className="text-[11px] font-normal text-outline">Kepaniteraan / Kesekretariatan</span>
+                </label>
+                <div className="relative">
+                  <select
+                    required
+                    value={form.unitPengusul}
+                    onChange={(e) => setForm({ ...form, unitPengusul: e.target.value })}
+                    className="w-full h-10 pl-3 pr-8 rounded-btn bg-white border border-outline-subtle text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none appearance-none cursor-pointer"
+                  >
+                    {UNIT_PENGUSUL_OPTIONS.map((unit) => (
+                      <option key={unit} value={unit}>
+                        {unit}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-outline pointer-events-none">
+                    expand_more
+                  </span>
+                </div>
+                {/* Pilihan Cepat Tombol Unit Pengusul */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  {UNIT_PENGUSUL_OPTIONS.map((unit) => (
+                    <button
+                      key={unit}
+                      type="button"
+                      onClick={() => setForm({ ...form, unitPengusul: unit })}
+                      className={`h-8 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                        form.unitPengusul === unit
+                          ? 'bg-primary text-white shadow-2xs font-bold'
+                          : 'bg-surface text-on-surface hover:bg-primary-light hover:text-primary border border-outline-subtle'
+                      }`}
+                    >
+                      <span>{form.unitPengusul === unit ? '☑' : '☐'}</span>
+                      <span>{unit}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-1">
@@ -254,17 +296,33 @@ export default function SuratKeluar() {
             <p className="text-xs text-outline">Daftar penomoran surat keluar dan status persetujuan pejabat pengesah</p>
           </div>
 
-          <div className="relative w-64">
-            <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-outline">
-              search
-            </span>
-            <input
-              type="text"
-              value={filterQuery}
-              onChange={(e) => setFilterQuery(e.target.value)}
-              placeholder="Cari nomor, perihal, tujuan..."
-              className="w-full h-9 pl-9 pr-3 rounded-md bg-surface border border-outline-subtle text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
-            />
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Filter Unit Kerja Pengusul */}
+            <select
+              value={filterUnit}
+              onChange={(e) => setFilterUnit(e.target.value)}
+              className="h-9 px-3 rounded-md bg-surface border border-outline-subtle text-xs text-on-surface font-semibold focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+            >
+              <option value="semua">Semua Unit Pengusul</option>
+              {UNIT_PENGUSUL_OPTIONS.map((unit) => (
+                <option key={unit} value={unit}>
+                  {unit}
+                </option>
+              ))}
+            </select>
+
+            <div className="relative w-64">
+              <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-outline">
+                search
+              </span>
+              <input
+                type="text"
+                value={filterQuery}
+                onChange={(e) => setFilterQuery(e.target.value)}
+                placeholder="Cari nomor, perihal, tujuan..."
+                className="w-full h-9 pl-9 pr-3 rounded-md bg-surface border border-outline-subtle text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
           </div>
         </div>
 
