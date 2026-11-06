@@ -1,25 +1,127 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSurat } from '../context/SuratContext';
+import { checkFonnteDevice, sendFonnteMessage } from '../lib/fonnte';
 
 export default function WhatsApp() {
   const { waSettings, setWaSettings, showToast } = useSurat();
 
-  const [token, setToken] = useState(waSettings.token);
-  const [senderPhone, setSenderPhone] = useState(waSettings.senderPhone);
+  const [token, setToken] = useState(waSettings?.token || '');
+  const [senderPhone, setSenderPhone] = useState(waSettings?.senderPhone || '');
   const [showPassword, setShowPassword] = useState(false);
   const [activeChatTemplate, setActiveChatTemplate] = useState('surat_masuk'); // surat_masuk, disposisi, tindak_lanjut
 
-  const [testNumber, setTestNumber] = useState('+62 812-3456-7890');
+  const [testNumber, setTestNumber] = useState(waSettings?.senderPhone || '+62 812-3456-7890');
   const [isTesting, setIsTesting] = useState(false);
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [deviceInfo, setDeviceInfo] = useState(waSettings?.deviceInfo || null);
 
-  const handleSave = (e) => {
+  // Sinkronisasi form jika waSettings berubah dari luar
+  useEffect(() => {
+    if (waSettings?.token && !token) {
+      setToken(waSettings.token);
+    }
+    if (waSettings?.senderPhone && !senderPhone) {
+      setSenderPhone(waSettings.senderPhone);
+    }
+    if (waSettings?.deviceInfo) {
+      setDeviceInfo(waSettings.deviceInfo);
+    }
+  }, [waSettings]);
+
+  // Cek otomatis status perangkat saat halaman dibuka (jika token terisi)
+  useEffect(() => {
+    const activeTok = token || waSettings?.token;
+    if (activeTok && !activeTok.startsWith('fn_live_89a7')) {
+      checkFonnteDevice(activeTok).then((res) => {
+        if (res.status) {
+          const isConnect = res.device_status === 'connect';
+          const info = {
+            device: res.device,
+            name: res.name,
+            expired: res.expired,
+            device_status: res.device_status,
+            quota: res.quota,
+            messages: res.messages,
+          };
+          setDeviceInfo(info);
+          setWaSettings((prev) => ({
+            ...prev,
+            status: isConnect ? 'Terhubung & Aktif' : 'Perlu Scan QR (Disconnect)',
+            serverStatus: isConnect ? 'Online' : 'Disconnect',
+            deviceInfo: info,
+          }));
+        } else {
+          setWaSettings((prev) => ({
+            ...prev,
+            status: 'Gagal Terhubung',
+            serverStatus: 'Offline',
+          }));
+        }
+      });
+    }
+  }, []);
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    setWaSettings({
-      ...waSettings,
-      token,
-      senderPhone,
-    });
-    showToast('Konfigurasi Gateway WhatsApp Fonnte.com berhasil disimpan.', 'success');
+    const cleanToken = token.trim();
+    const cleanPhone = senderPhone.trim();
+
+    setWaSettings((prev) => ({
+      ...prev,
+      token: cleanToken,
+      senderPhone: cleanPhone,
+    }));
+
+    showToast('Kredensial disimpan. Sedang memverifikasi ke server Fonnte...', 'info');
+
+    // Langsung jalankan handshake uji koneksi ke Fonnte setelah simpan
+    if (cleanToken && !cleanToken.startsWith('fn_live_89a7')) {
+      setIsTesting(true);
+      const res = await checkFonnteDevice(cleanToken);
+      setIsTesting(false);
+
+      if (res.status) {
+        const isConnect = res.device_status === 'connect';
+        const info = {
+          device: res.device,
+          name: res.name,
+          expired: res.expired,
+          device_status: res.device_status,
+          quota: res.quota,
+          messages: res.messages,
+        };
+        setDeviceInfo(info);
+        setWaSettings((prev) => ({
+          ...prev,
+          token: cleanToken,
+          senderPhone: res.device || cleanPhone,
+          status: isConnect ? 'Terhubung & Aktif' : 'Perlu Scan QR (Disconnect)',
+          serverStatus: isConnect ? 'Online' : 'Disconnect',
+          deviceInfo: info,
+        }));
+
+        if (isConnect) {
+          showToast(
+            `Koneksi Fonnte BERHASIL! Status: CONNECT (Perangkat: ${res.device || cleanPhone} - ${res.name || 'Aktif'})`,
+            'success'
+          );
+        } else {
+          showToast(
+            `Token Valid (${res.name || 'Fonnte'}), namun WhatsApp masih DISCONNECT. Silakan scan QR WhatsApp pada web Fonnte.com.`,
+            'warning'
+          );
+        }
+      } else {
+        setWaSettings((prev) => ({
+          ...prev,
+          status: 'Gagal Terhubung',
+          serverStatus: 'Offline',
+        }));
+        showToast(`Koneksi GAGAL: ${res.reason || 'Token API Fonnte tidak valid'}`, 'error');
+      }
+    } else {
+      showToast('Kredensial disimpan lokal (Token belum diisi).', 'success');
+    }
   };
 
   const toggleTrigger = (triggerName) => {
@@ -33,42 +135,123 @@ export default function WhatsApp() {
     showToast(`Pengaturan pemicu notifikasi ${triggerName} diperbarui.`);
   };
 
-  const handleTestConnection = () => {
+  const handleTestConnection = async () => {
+    const activeTok = token.trim();
+    if (!activeTok || activeTok.startsWith('fn_live_89a7')) {
+      showToast('Harap masukkan Token API Fonnte resmi Anda terlebih dahulu.', 'warning');
+      return;
+    }
+
     setIsTesting(true);
-    setTimeout(() => {
-      setIsTesting(false);
-      showToast('Koneksi ke API Fonnte.com BERHASIL. Gateway merespons status: ONLINE (200 OK)', 'success');
-    }, 1000);
+    const res = await checkFonnteDevice(activeTok);
+    setIsTesting(false);
+
+    if (res.status) {
+      const isConnect = res.device_status === 'connect';
+      const info = {
+        device: res.device,
+        name: res.name,
+        expired: res.expired,
+        device_status: res.device_status,
+        quota: res.quota,
+        messages: res.messages,
+      };
+      setDeviceInfo(info);
+      setWaSettings((prev) => ({
+        ...prev,
+        token: activeTok,
+        senderPhone: res.device || prev.senderPhone,
+        status: isConnect ? 'Terhubung & Aktif' : 'Perlu Scan QR (Disconnect)',
+        serverStatus: isConnect ? 'Online' : 'Disconnect',
+        deviceInfo: info,
+      }));
+
+      if (isConnect) {
+        showToast(
+          `Koneksi API Fonnte BERHASIL! Status: CONNECT. Perangkat: ${res.device || 'Terdaftar'} (${res.name || 'Gateway'})`,
+          'success'
+        );
+      } else {
+        showToast(
+          `Token API Valid (${res.name || 'Perangkat Fonnte'}), tetapi status perangkat: DISCONNECT. Buka fonnte.com untuk scan QR WhatsApp.`,
+          'warning'
+        );
+      }
+    } else {
+      setWaSettings((prev) => ({
+        ...prev,
+        status: 'Gagal Terhubung',
+        serverStatus: 'Offline',
+      }));
+      showToast(`Koneksi ke Fonnte GAGAL: ${res.reason || 'Token API tidak valid'}`, 'error');
+    }
   };
 
-  const handleSendTestMessage = (e) => {
+  const handleSendTestMessage = async (e) => {
     e.preventDefault();
+    const activeTok = token.trim() || waSettings?.token;
+    if (!activeTok || activeTok.startsWith('fn_live_89a7')) {
+      showToast('Harap simpan Token API Fonnte resmi Anda terlebih dahulu sebelum kirim tes.', 'warning');
+      return;
+    }
+
+    if (!testNumber.trim()) {
+      showToast('Masukkan nomor WhatsApp tujuan uji coba.', 'warning');
+      return;
+    }
+
+    setIsSendingTest(true);
+    const timeString = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+    const dateString = new Date().toLocaleDateString('id-ID', { dateStyle: 'full' });
+
+    const msgText = `*[KLIKDISPOS PERSURATAN - UJI COBA GATEWAY]*\n\nAssalamu'alaikum Wr. Wb.\n\nPemberitahuan: Pesan ini merupakan transmisi uji koneksi WhatsApp Gateway resmi aplikasi Sistem Persuratan & Disposisi Elektronik melalui Fonnte.com.\n\n• Status Gateway: *BERHASIL TERHUBUNG (ONLINE)*\n• Waktu Transmisi: *${dateString}, ${timeString}*\n• Perangkat Pengirim: *${senderPhone || 'Aktif'}*\n\nJika pesan ini diterima, seluruh notifikasi surat masuk, disposisi pimpinan, dan peringatan batas waktu telah siap disalurkan secara otomatis.\n\n_Pesan otomatis dikirim oleh Sistem KlikDispos._`;
+
+    const res = await sendFonnteMessage({
+      token: activeTok,
+      target: testNumber.trim(),
+      message: msgText,
+    });
+    setIsSendingTest(false);
+
+    const isSuccess = Boolean(res.status);
+    const statusLabel = isSuccess
+      ? 'Terkirim (Centang Dua)'
+      : `Gagal: ${res.reason || res.detail || 'Koneksi error'}`;
+
     const testLog = {
       id: `log-${Date.now()}`,
-      time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
-      recipient: testNumber,
+      time: timeString,
+      recipient: testNumber.trim(),
       type: 'Uji Coba Pesan',
-      nomorSurat: '012/PA.Lmg/X/2026',
-      text: `[KlikDispos] Notifikasi Persuratan Resmi Pengadilan Agama Lamongan via Fonnte. Gateway WhatsApp berfungsi optimal.`,
-      status: 'Terkirim (Centang Dua)',
+      nomorSurat: 'TEST-GATEWAY-FONNTE',
+      text: msgText,
+      status: statusLabel,
     };
 
     setWaSettings((prev) => ({
       ...prev,
       dailyQuota: {
         ...prev.dailyQuota,
-        used: prev.dailyQuota.used + 1,
+        used: isSuccess ? prev.dailyQuota.used + 1 : prev.dailyQuota.used,
       },
-      messageLogs: [testLog, ...prev.messageLogs],
+      messageLogs: [testLog, ...(prev.messageLogs || [])],
     }));
 
-    showToast(`Pesan uji coba WhatsApp berhasil dikirim ke ${testNumber}`, 'success');
+    if (isSuccess) {
+      showToast(`Pesan uji coba WhatsApp berhasil dikirim ke ${testNumber} via Fonnte!`, 'success');
+    } else {
+      showToast(`Pengiriman pesan gagal: ${res.reason || 'Periksa status perangkat Anda di Fonnte'}`, 'error');
+    }
   };
 
   const copyToken = () => {
+    if (!token) return;
     navigator.clipboard.writeText(token);
     showToast('Token API disalin ke clipboard.');
   };
+
+  const isServerOnline = waSettings?.serverStatus === 'Online';
+  const isServerDisconnect = waSettings?.serverStatus === 'Disconnect';
 
   return (
     <div className="space-y-6">
@@ -84,13 +267,30 @@ export default function WhatsApp() {
           </div>
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold text-on-surface tracking-tight">Pengaturan WhatsApp</h2>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-success-light text-success border border-success/30 flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px]">verified</span>
-              <span>Integrasi Aktif</span>
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border flex items-center gap-1 ${
+                isServerOnline
+                  ? 'bg-success-light text-success border-success/30'
+                  : isServerDisconnect
+                  ? 'bg-warning-light text-amber-900 border-warning/40'
+                  : 'bg-surface-low text-outline border-outline-subtle'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[14px]">
+                {isServerOnline ? 'verified' : isServerDisconnect ? 'qr_code_scanner' : 'sensors_off'}
+              </span>
+              <span>
+                {isServerOnline
+                  ? 'Integrasi Terhubung (Connect)'
+                  : isServerDisconnect
+                  ? 'Perlu Scan QR WhatsApp'
+                  : 'Belum Terhubung'}
+              </span>
             </span>
           </div>
           <p className="text-xs md:text-sm text-outline mt-0.5">
-            Konfigurasi gateway pengiriman pesan notifikasi otomatis dan berkas naskah dinas melalui <span className="font-semibold text-primary">Fonnte.com</span>.
+            Konfigurasi gateway pengiriman pesan notifikasi otomatis dan berkas naskah dinas melalui{' '}
+            <span className="font-semibold text-primary">Fonnte.com</span>.
           </p>
         </div>
 
@@ -102,17 +302,17 @@ export default function WhatsApp() {
             className="h-10 px-3.5 rounded-btn border border-outline-subtle bg-white text-on-surface hover:bg-surface text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
           >
             <span className="material-symbols-outlined text-[16px] text-primary">menu_book</span>
-            <span>Dokumentasi API Fonnte</span>
+            <span>Dasbor Fonnte</span>
           </a>
           <button
             onClick={handleTestConnection}
             disabled={isTesting}
             className="h-10 px-4 rounded-btn bg-success hover:bg-success-dark text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-all active:scale-[0.99] disabled:opacity-60"
           >
-            <span className="material-symbols-outlined text-[18px]">
+            <span className={`material-symbols-outlined text-[18px] ${isTesting ? 'animate-spin' : ''}`}>
               {isTesting ? 'sync' : 'network_check'}
             </span>
-            <span>{isTesting ? 'Menguji...' : 'Uji Koneksi WhatsApp'}</span>
+            <span>{isTesting ? 'Memeriksa ke Fonnte...' : 'Uji Koneksi WhatsApp'}</span>
           </button>
         </div>
       </div>
@@ -146,6 +346,12 @@ export default function WhatsApp() {
                 <span className="material-symbols-outlined text-[14px]">speed</span>
                 <span>Rata-rata Waktu Kirim: ~1.2 Detik</span>
               </span>
+              {deviceInfo?.name && (
+                <span className="flex items-center gap-1 px-3 py-1 rounded-md bg-blue-50 text-blue-800 font-bold border border-blue-200">
+                  <span className="material-symbols-outlined text-[14px]">smartphone</span>
+                  <span>Perangkat: {deviceInfo.name}</span>
+                </span>
+              )}
             </div>
           </div>
 
@@ -153,24 +359,56 @@ export default function WhatsApp() {
             <div className="bg-white p-3.5 rounded-lg border border-outline-subtle flex flex-col justify-between shadow-2xs">
               <div className="flex items-center justify-between text-xs text-outline">
                 <span>Status Server</span>
-                <span className="w-2.5 h-2.5 rounded-full bg-success animate-pulse"></span>
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    isServerOnline
+                      ? 'bg-success animate-pulse'
+                      : isServerDisconnect
+                      ? 'bg-amber-500 animate-pulse'
+                      : 'bg-danger'
+                  }`}
+                ></span>
               </div>
-              <div className="text-xl font-bold text-success mt-2">Terhubung</div>
-              <span className="text-[11px] text-outline mt-0.5">Fonnte Cloud: Online</span>
+              <div
+                className={`text-xl font-bold mt-2 ${
+                  isServerOnline
+                    ? 'text-success'
+                    : isServerDisconnect
+                    ? 'text-amber-700'
+                    : 'text-outline'
+                }`}
+              >
+                {isServerOnline
+                  ? 'Terhubung'
+                  : isServerDisconnect
+                  ? 'Perlu Scan QR'
+                  : 'Offline'}
+              </div>
+              <span className="text-[11px] text-outline mt-0.5 truncate">
+                {deviceInfo?.device
+                  ? `Device: ${deviceInfo.device}`
+                  : senderPhone
+                  ? `Pengirim: ${senderPhone}`
+                  : 'Fonnte Cloud: Standby'}
+              </span>
             </div>
 
             <div className="bg-white p-3.5 rounded-lg border border-outline-subtle flex flex-col justify-between shadow-2xs">
               <div className="flex items-center justify-between text-xs text-outline">
                 <span>Kuota Pesan</span>
                 <span className="text-[10px] font-bold bg-warning-light text-amber-900 border border-warning/40 px-1.5 py-0.5 rounded">
-                  96.4%
+                  {deviceInfo?.quota !== undefined && deviceInfo?.quota !== null
+                    ? `${deviceInfo.quota} Sisa`
+                    : 'Aktif'}
                 </span>
               </div>
               <div className="text-xl font-bold text-on-surface mt-2">
-                {waSettings.dailyQuota.total - waSettings.dailyQuota.used}
+                {deviceInfo?.quota !== undefined && deviceInfo?.quota !== null
+                  ? deviceInfo.quota
+                  : waSettings.dailyQuota.total - waSettings.dailyQuota.used}
               </div>
               <span className="text-[11px] text-outline mt-0.5">
-                dari {waSettings.dailyQuota.total} pesan harian
+                {deviceInfo?.expired ? `Berlaku s/d: ${deviceInfo.expired}` : 'Kapasitas Fonnte'}
               </span>
             </div>
 
@@ -181,16 +419,36 @@ export default function WhatsApp() {
                 </div>
                 <div>
                   <div className="font-bold text-on-surface">
-                    {waSettings.dailyQuota.used} Notifikasi Terkirim Hari Ini
+                    {waSettings.dailyQuota.used} Transmisi Pesan Tercatat
                   </div>
-                  <div className="text-[11px] text-outline">Tingkat keberhasilan: 100%</div>
+                  <div className="text-[11px] text-outline">
+                    {isServerOnline ? 'Jalur API Fonnte Online' : 'Siap kirim saat terhubung'}
+                  </div>
                 </div>
               </div>
-              <span className="text-xs font-bold text-primary">Sukses 100%</span>
+              <span className={`text-xs font-bold ${isServerOnline ? 'text-success' : 'text-outline'}`}>
+                {isServerOnline ? 'Siap Digunakan' : 'Perlu Kredensial'}
+              </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Warning Notice jika status Disconnect */}
+      {isServerDisconnect && (
+        <div className="p-4 rounded-card bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900 text-xs">
+          <span className="material-symbols-outlined text-amber-600 text-[22px] shrink-0">
+            warning
+          </span>
+          <div className="space-y-1">
+            <div className="font-bold">Token API Terdaftar, namun WhatsApp Berstatus DISCONNECT</div>
+            <p className="leading-relaxed">
+              Akun Fonnte Anda aktif, tetapi WhatsApp Web pada perangkat pengirim belum terhubung atau sesi WhatsApp habis.
+              Silakan login ke <a href="https://fonnte.com" target="_blank" rel="noopener noreferrer" className="underline font-bold">fonnte.com</a>, masuk ke menu <strong>Device</strong>, dan lakukan <strong>Scan QR WhatsApp</strong> pada perangkat Anda.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Grid: Form Kredensial & Pemicu (Left) + WhatsApp Simulator Live (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -203,8 +461,20 @@ export default function WhatsApp() {
                 <span className="material-symbols-outlined text-primary text-[20px]">key</span>
                 <h3 className="text-base font-bold text-on-surface">Kredensial Akun Gateway Fonnte</h3>
               </div>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded bg-success-light text-success border border-success/30 font-bold">
-                Terhubung
+              <span
+                className={`text-xs font-semibold px-2 py-0.5 rounded border font-bold ${
+                  isServerOnline
+                    ? 'bg-success-light text-success border-success/30'
+                    : isServerDisconnect
+                    ? 'bg-warning-light text-amber-900 border-warning/40'
+                    : 'bg-surface-low text-outline border-outline-subtle'
+                }`}
+              >
+                {isServerOnline
+                  ? 'Terhubung'
+                  : isServerDisconnect
+                  ? 'Perlu Scan QR'
+                  : 'Belum Terhubung'}
               </span>
             </div>
 
@@ -225,7 +495,7 @@ export default function WhatsApp() {
                     required
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
-                    placeholder="fn_live_..."
+                    placeholder="Masukkan token dari fonnte.com..."
                     className="w-full h-10 pl-3.5 pr-20 rounded-btn border border-outline-subtle bg-surface font-code text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-outline">
@@ -250,7 +520,10 @@ export default function WhatsApp() {
                   </div>
                 </div>
                 <p className="text-[11px] text-outline">
-                  Dapatkan token resmi API Anda melalui dasbor perangkat akun <a href="https://fonnte.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">Fonnte.com</a>.
+                  Dapatkan token resmi API Anda melalui dasbor perangkat akun{' '}
+                  <a href="https://fonnte.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">
+                    Fonnte.com
+                  </a>.
                 </p>
               </div>
 
@@ -267,22 +540,25 @@ export default function WhatsApp() {
                     required
                     value={senderPhone}
                     onChange={(e) => setSenderPhone(e.target.value)}
-                    placeholder="+62 812-xxxx-xxxx"
+                    placeholder="Contoh: 08123456789 atau 628123456789"
                     className="w-full h-10 pl-10 pr-4 rounded-btn border border-outline-subtle bg-surface font-code text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
                   />
                 </div>
                 <p className="text-[11px] text-outline">
-                  Nomor resmi terdaftar pada Meja Tata Usaha Kepaniteraan Pengadilan.
+                  Nomor WhatsApp resmi terdaftar pada perangkat Fonnte yang digunakan untuk broadcast persuratan.
                 </p>
               </div>
 
-              <div className="pt-2 flex justify-end">
+              <div className="pt-2 flex justify-end gap-2">
                 <button
                   type="submit"
-                  className="h-9 px-5 rounded-btn bg-success hover:bg-success-dark text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-colors"
+                  disabled={isTesting}
+                  className="h-9 px-5 rounded-btn bg-success hover:bg-success-dark text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-colors disabled:opacity-60"
                 >
-                  <span className="material-symbols-outlined text-[16px]">save</span>
-                  <span>Simpan Kredensial</span>
+                  <span className={`material-symbols-outlined text-[16px] ${isTesting ? 'animate-spin' : ''}`}>
+                    {isTesting ? 'sync' : 'save'}
+                  </span>
+                  <span>{isTesting ? 'Menyimpan & Memverifikasi...' : 'Simpan Kredensial'}</span>
                 </button>
               </div>
             </form>
@@ -320,7 +596,7 @@ export default function WhatsApp() {
                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
                     type="checkbox"
-                    checked={waSettings.triggers.suratMasuk}
+                    checked={Boolean(waSettings.triggers?.suratMasuk)}
                     onChange={() => toggleTrigger('suratMasuk')}
                     className="sr-only peer"
                   />
@@ -347,7 +623,7 @@ export default function WhatsApp() {
                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
                     type="checkbox"
-                    checked={waSettings.triggers.distribusi}
+                    checked={Boolean(waSettings.triggers?.distribusi)}
                     onChange={() => toggleTrigger('distribusi')}
                     className="sr-only peer"
                   />
@@ -374,7 +650,7 @@ export default function WhatsApp() {
                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
                     type="checkbox"
-                    checked={waSettings.triggers.disposisi}
+                    checked={Boolean(waSettings.triggers?.disposisi)}
                     onChange={() => toggleTrigger('disposisi')}
                     className="sr-only peer"
                   />
@@ -401,7 +677,7 @@ export default function WhatsApp() {
                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
                     type="checkbox"
-                    checked={waSettings.triggers.tindakLanjut}
+                    checked={Boolean(waSettings.triggers?.tindakLanjut)}
                     onChange={() => toggleTrigger('tindakLanjut')}
                     className="sr-only peer"
                   />
@@ -560,14 +836,18 @@ export default function WhatsApp() {
                   required
                   value={testNumber}
                   onChange={(e) => setTestNumber(e.target.value)}
-                  placeholder="+62 812-xxxx-xxxx"
+                  placeholder="Contoh: 08123456789 atau +628123456789"
                   className="flex-1 h-9 px-3 rounded-btn border border-outline-subtle bg-surface text-xs font-code outline-none focus:border-primary"
                 />
                 <button
                   type="submit"
-                  className="h-9 px-4 rounded-btn bg-primary hover:bg-primary-dark text-white text-xs font-bold shrink-0 shadow-2xs"
+                  disabled={isSendingTest}
+                  className="h-9 px-4 rounded-btn bg-primary hover:bg-primary-dark text-white text-xs font-bold shrink-0 shadow-2xs flex items-center gap-1.5 disabled:opacity-60"
                 >
-                  Kirim Tes
+                  <span className={`material-symbols-outlined text-[16px] ${isSendingTest ? 'animate-spin' : ''}`}>
+                    {isSendingTest ? 'sync' : 'send'}
+                  </span>
+                  <span>{isSendingTest ? 'Mengirim...' : 'Kirim Tes'}</span>
                 </button>
               </form>
             </div>
@@ -576,29 +856,53 @@ export default function WhatsApp() {
           {/* Log Riwayat Transmisi Pesan WhatsApp */}
           <div className="bg-white rounded-card border border-outline-subtle p-5 shadow-2xs space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-outline-subtle text-xs">
-              <span className="font-bold text-on-surface">Riwayat Pesan Terkirim</span>
-              <span className="text-outline">{waSettings.messageLogs.length} Log Terakhir</span>
+              <span className="font-bold text-on-surface">Riwayat Transmisi Gateway</span>
+              <span className="text-outline">{(waSettings.messageLogs || []).length} Log Terakhir</span>
             </div>
 
             <div className="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs">
-              {waSettings.messageLogs.map((log) => (
-                <div key={log.id} className="p-2.5 rounded-lg bg-surface border border-outline-subtle space-y-1">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-primary">{log.type}</span>
-                    <span className="text-outline">{log.time}</span>
-                  </div>
-                  <div className="text-on-surface font-semibold text-xs">
-                    Ke: {log.recipient} ({log.nomorSurat})
-                  </div>
-                  <p className="text-[11px] text-outline line-clamp-2 leading-relaxed">
-                    {log.text}
-                  </p>
-                  <div className="text-[10px] text-success font-bold flex items-center justify-end gap-1">
-                    <span className="material-symbols-outlined text-[13px]">done_all</span>
-                    <span>{log.status}</span>
-                  </div>
+              {(waSettings.messageLogs || []).length === 0 ? (
+                <div className="py-6 text-center text-outline">
+                  <span className="material-symbols-outlined text-[28px] text-outline mb-1 block">
+                    chat_bubble_outline
+                  </span>
+                  Belum ada log pesan terkirim. Klik &ldquo;Kirim Tes&rdquo; untuk memulai uji coba.
                 </div>
-              ))}
+              ) : (
+                waSettings.messageLogs.map((log) => {
+                  const isFailed = log.status?.startsWith('Gagal');
+                  const isSending = log.status?.startsWith('Mengirim');
+
+                  return (
+                    <div key={log.id} className="p-2.5 rounded-lg bg-surface border border-outline-subtle space-y-1">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-bold text-primary">{log.type}</span>
+                        <span className="text-outline">{log.time}</span>
+                      </div>
+                      <div className="text-on-surface font-semibold text-xs">
+                        Ke: {log.recipient} ({log.nomorSurat})
+                      </div>
+                      <p className="text-[11px] text-outline line-clamp-2 leading-relaxed">
+                        {log.text}
+                      </p>
+                      <div
+                        className={`text-[10px] font-bold flex items-center justify-end gap-1 ${
+                          isFailed
+                            ? 'text-danger'
+                            : isSending
+                            ? 'text-amber-600'
+                            : 'text-success'
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[13px]">
+                          {isFailed ? 'error' : isSending ? 'hourglass_empty' : 'done_all'}
+                        </span>
+                        <span>{log.status}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>

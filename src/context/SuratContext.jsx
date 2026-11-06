@@ -10,6 +10,7 @@ import {
   formatAgendaSuratMasuk,
   formatAgendaSuratKeluar,
 } from '../constants/suratOptions';
+import { sendFonnteMessage } from '../lib/fonnte';
 
 const SuratContext = createContext();
 
@@ -443,14 +444,31 @@ export function SuratProvider({ children }) {
     return saved ? JSON.parse(saved) : INITIAL_PLH_CONFIG;
   });
 
-  // WhatsApp Gateway Settings
+  // WhatsApp Gateway Settings (Fonnte API)
   const [waSettings, setWaSettings] = useState(() => {
+    const defaultToken = import.meta.env.VITE_FONNTE_TOKEN || '';
+    const defaultSender = import.meta.env.VITE_FONNTE_SENDER_PHONE || '';
     const saved = localStorage.getItem('surat_wa_settings');
-    return saved ? JSON.parse(saved) : {
-      token: 'fn_live_89a7f3429188bc89471abdfc9320e81b',
-      senderPhone: '+62 812-3456-7890',
-      status: 'Terhubung & Aktif',
-      serverStatus: 'Online',
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.token === 'fn_live_89a7f3429188bc89471abdfc9320e81b' && defaultToken) {
+          parsed.token = defaultToken;
+        }
+        return {
+          ...parsed,
+          token: parsed.token || defaultToken,
+          senderPhone: parsed.senderPhone || defaultSender,
+        };
+      } catch (e) {
+        console.error('Error parsing surat_wa_settings from localStorage:', e);
+      }
+    }
+    return {
+      token: defaultToken,
+      senderPhone: defaultSender,
+      status: defaultToken ? 'Siap Terhubung' : 'Belum Dikonfigurasi',
+      serverStatus: 'Offline',
       dailyQuota: { used: 0, total: 5000 },
       triggers: {
         suratMasuk: true,
@@ -688,25 +706,87 @@ export function SuratProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Helper to send WhatsApp notification
-  const triggerWhatsApp = (type, recipientName, nomorSurat, customText) => {
+  // Helper to send WhatsApp notification via Fonnte
+  const triggerWhatsApp = (type, recipientName, nomorSurat, customText, recipientPhone = null) => {
+    const logId = `log-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+    const currentTime =
+      new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+
+    let targetPhone = recipientPhone;
+    if (!targetPhone) {
+      const matched = (usersList || []).find(
+        (u) =>
+          u.name === recipientName ||
+          u.jabatan === recipientName ||
+          (recipientName && (recipientName.includes(u.name) || recipientName.includes(u.jabatan)))
+      );
+      if (matched && matched.phone) {
+        targetPhone = matched.phone;
+      } else if (waSettings?.senderPhone) {
+        targetPhone = waSettings.senderPhone;
+      }
+    }
+
+    const activeToken = waSettings?.token || import.meta.env.VITE_FONNTE_TOKEN || '';
+    const isTokenConfigured = Boolean(
+      activeToken && !activeToken.startsWith('fn_live_89a7')
+    );
+
+    const initialStatus = isTokenConfigured
+      ? (targetPhone ? 'Mengirim via Fonnte...' : 'Tercatat (Target Kosong)')
+      : 'Simulasi (Token Belum Diisi)';
+
     const newLog = {
-      id: `log-${Date.now()}`,
-      time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
-      recipient: recipientName,
+      id: logId,
+      time: currentTime,
+      recipient: targetPhone ? `${recipientName} (${targetPhone})` : recipientName,
       type,
       nomorSurat,
       text: customText,
-      status: 'Terkirim (Centang Dua)'
+      status: initialStatus,
     };
-    setWaSettings(prev => ({
+
+    setWaSettings((prev) => ({
       ...prev,
       dailyQuota: {
         ...prev.dailyQuota,
-        used: prev.dailyQuota.used + 1
+        used: prev.dailyQuota.used + 1,
       },
-      messageLogs: [newLog, ...prev.messageLogs]
+      messageLogs: [newLog, ...(prev.messageLogs || [])],
     }));
+
+    if (isTokenConfigured && targetPhone) {
+      sendFonnteMessage({
+        token: activeToken,
+        target: targetPhone,
+        message: customText,
+      })
+        .then((res) => {
+          setWaSettings((prev) => ({
+            ...prev,
+            messageLogs: (prev.messageLogs || []).map((l) =>
+              l.id === logId
+                ? {
+                    ...l,
+                    status: res.status
+                      ? 'Terkirim (Centang Dua)'
+                      : `Gagal: ${res.reason || 'Koneksi error'}`,
+                  }
+                : l
+            ),
+          }));
+        })
+        .catch((err) => {
+          setWaSettings((prev) => ({
+            ...prev,
+            messageLogs: (prev.messageLogs || []).map((l) =>
+              l.id === logId
+                ? { ...l, status: `Gagal: ${err.message || 'Network error'}` }
+                : l
+            ),
+          }));
+        });
+    }
   };
 
   // Add new Surat Masuk -> Simpan ke Supabase
