@@ -930,6 +930,77 @@ export default function Disposisi() {
                 </div>
               </div>
 
+              {/* Rincian Kisi Alur Proses & Penerimaan (4 Kotak Bawah Form Disposisi PA) */}
+              <details className="border border-outline-subtle rounded-lg p-2.5 bg-surface/40">
+                <summary className="text-[11px] font-bold text-on-surface cursor-pointer select-none flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+                    <span>Isian 4 Kotak Bawah (Alur Proses & Penerimaan)</span>
+                  </span>
+                  <span className="text-[10px] text-outline font-normal">Klik untuk ubah</span>
+                </summary>
+                <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-outline-subtle text-[11px]">
+                  <div>
+                    <label className="text-outline block mb-0.5">Tanggal Kirim untuk Proses:</label>
+                    <input
+                      type="text"
+                      value={form.tanggalKirim}
+                      onChange={(e) => setForm({ ...form, tanggalKirim: e.target.value })}
+                      className="w-full h-7 px-2 text-xs rounded border border-outline-subtle bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-outline block mb-0.5">Diterima Oleh:</label>
+                    <input
+                      type="text"
+                      value={form.diterimaOleh}
+                      onChange={(e) => setForm({ ...form, diterimaOleh: e.target.value })}
+                      className="w-full h-7 px-2 text-xs rounded border border-outline-subtle bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-outline block mb-0.5">Diajukan Kembali Tanggal:</label>
+                    <input
+                      type="text"
+                      value={form.diajukanKembali}
+                      placeholder="dd/mm/yyyy"
+                      onChange={(e) => setForm({ ...form, diajukanKembali: e.target.value })}
+                      className="w-full h-7 px-2 text-xs rounded border border-outline-subtle bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-outline block mb-0.5">Diterima Tanggal:</label>
+                    <input
+                      type="text"
+                      value={form.diterimaTanggal}
+                      placeholder="dd/mm/yyyy"
+                      onChange={(e) => setForm({ ...form, diterimaTanggal: e.target.value })}
+                      className="w-full h-7 px-2 text-xs rounded border border-outline-subtle bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-outline block mb-0.5">Tanggal Kembali untuk Proses:</label>
+                    <input
+                      type="text"
+                      value={form.tanggalKembali}
+                      placeholder="dd/mm/yyyy"
+                      onChange={(e) => setForm({ ...form, tanggalKembali: e.target.value })}
+                      className="w-full h-7 px-2 text-xs rounded border border-outline-subtle bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-outline block mb-0.5">Diterima Kembali Oleh:</label>
+                    <input
+                      type="text"
+                      value={form.diterimaKembaliOleh}
+                      placeholder="Nama / Jabatan"
+                      onChange={(e) => setForm({ ...form, diterimaKembaliOleh: e.target.value })}
+                      className="w-full h-7 px-2 text-xs rounded border border-outline-subtle bg-white"
+                    />
+                  </div>
+                </div>
+              </details>
+
               {/* Tombol Simpan & Tanda Tangani Tahap 3 */}
               <div className="pt-2">
                 <button
@@ -1316,57 +1387,62 @@ export default function Disposisi() {
               </div>
             </div>
 
-            {/* 7. KISI ALUR PROSES & PENERIMAAN (4 Kotak Bawah Sesuai Gambar 26 SEKMA) */}
-            {/* Baris Bawah 1: Kirim Petugas ke Sekretaris & Diajukan ke Ketua */}
+            {/* 7. KISI ALUR PROSES & PENERIMAAN (4 Kotak Bawah Format Baku Gambar 27 Form Disposisi Pengadilan Agama) */}
+            {/* Baris Bawah 1: Tanggal Kirim untuk Proses & Diajukan Kembali Tanggal */}
             <div className="grid grid-cols-2 border-b border-black font-sans text-[10.5px]">
               <div className="p-2 border-r border-black space-y-1">
                 <div>
-                  Tanggal Kirim Petugas ke Sekretaris :{' '}
-                  <span className="font-semibold">{currentSurat?.tanggalTerima?.slice(0, 10) || form.tanggalKirim || '-'}</span>
+                  Tanggal Kirim untuk Proses :{' '}
+                  <span className="font-semibold">
+                    {form.tanggalKirim || currentSurat?.tanggalTerima?.slice(0, 10) || '...........................'}
+                  </span>
                 </div>
                 <div>
                   Diterima Oleh :{' '}
-                  <span className="font-semibold">Sekretaris (Penanggung Jawab Surat)</span>
+                  <span className="font-semibold">
+                    {form.diterimaOleh || 'Staf Bagian Umum / TU'}
+                  </span>
                 </div>
               </div>
+
               <div className="p-2 space-y-1">
                 <div>
-                  Diajukan ke Ketua / Pimpinan Tanggal :{' '}
-                  <span className="font-semibold">{form.tanggalTelaahSekretaris || form.tanggalKirim}</span>
+                  Diajukan Kembali Tanggal :{' '}
+                  <span className="font-semibold">
+                    {form.diajukanKembali || form.tanggalTelaahSekretaris || '...........................'}
+                  </span>
                 </div>
                 <div>
                   Diterima Tanggal :{' '}
-                  <span className="font-semibold">{form.tanggalTelaahSekretaris || form.tanggalKirim}</span>
+                  <span className="font-semibold">
+                    {form.diterimaTanggal || form.tanggalTelaahSekretaris || '...........................'}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Baris Bawah 2: Tanggal Perintah Pimpinan & Tanggal Disposisi Pengarsipan */}
+            {/* Baris Bawah 2: Tanggal Kembali untuk Proses & Tanggal Selesai dari Pejabat yang Memberi Disposisi */}
             <div className="grid grid-cols-2 font-sans text-[10.5px]">
               <div className="p-2 border-r border-black space-y-1">
                 <div>
-                  Tanggal Perintah dari {plhConfig?.isActive ? 'Plh. Ketua' : 'Ketua'} :{' '}
+                  Tanggal Kembali untuk Proses :{' '}
                   <span className="font-semibold">
-                    {existingDisposisi?.tanggalDisposisi?.slice(0, 10) || form.tanggalKirim}
+                    {form.tanggalKembali || (form.alurTahap >= 3 ? form.tanggalDisposisi?.slice(0, 10) || form.tanggalKirim : '...........................')}
                   </span>
                 </div>
                 <div>
-                  Diterima untuk Tindak Lanjut :{' '}
-                  <span className="font-semibold">{form.diteruskanKepada.join(' & ')}</span>
+                  Diterima Oleh :{' '}
+                  <span className="font-semibold">
+                    {form.diterimaKembaliOleh || (form.diteruskanKepada && form.diteruskanKepada.length > 0 ? form.diteruskanKepada.join(' & ') : '...........................')}
+                  </span>
                 </div>
               </div>
 
               <div className="p-2 space-y-1">
                 <div>
-                  Tanggal Disposisi Pengarsipan :{' '}
+                  Tanggal selesai dari Pejabat yang memberi disposisi :{' '}
                   <span className="font-semibold">
-                    {form.isArchived ? form.tanggalArsip || form.tanggalKirim : '...........................'}
-                  </span>
-                </div>
-                <div>
-                  Diterima untuk Arsip Oleh :{' '}
-                  <span className="font-semibold">
-                    {form.isArchived ? 'Kasubag Umum & Keuangan' : '...........................'}
+                    {existingDisposisi?.tanggalDisposisi?.slice(0, 10) || (form.alurTahap >= 3 ? form.tanggalKirim : '...........................')}
                   </span>
                 </div>
               </div>
