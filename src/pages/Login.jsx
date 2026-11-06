@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSurat, USERS } from '../context/SuratContext';
 import logoAplikasi from '../assets/logo-aplikasi.png';
 
@@ -8,19 +8,39 @@ export default function Login() {
   const [password, setPassword] = useState('••••••••••••');
   const [selectedRole, setSelectedRole] = useState('petugas');
 
+  useEffect(() => {
+    const prevBg = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = '#26331C';
+    return () => {
+      document.body.style.backgroundColor = prevBg;
+    };
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     login(selectedRole);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#3E4F2E] via-[#334426] to-[#1E2916] flex flex-col justify-center items-center p-4 relative overflow-hidden selection:bg-[#334426]/30">
+    <div
+      className="min-h-screen w-full flex flex-col justify-center items-center p-4 relative overflow-hidden selection:bg-[#334426]/30"
+      style={{
+        backgroundColor: '#26331C',
+        background: 'linear-gradient(135deg, #3A4C28 0%, #26331C 50%, #151D0F 100%)',
+      }}
+    >
       {/* Aksen Latar Belakang Green Olive */}
-      <div className="absolute -top-36 -left-36 w-96 h-96 rounded-full bg-[#546C3E]/30 blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-36 -right-36 w-96 h-96 rounded-full bg-[#1A2313]/60 blur-3xl pointer-events-none"></div>
+      <div
+        className="absolute -top-36 -left-36 w-96 h-96 rounded-full blur-3xl pointer-events-none"
+        style={{ backgroundColor: 'rgba(84, 108, 62, 0.35)' }}
+      />
+      <div
+        className="absolute -bottom-36 -right-36 w-96 h-96 rounded-full blur-3xl pointer-events-none"
+        style={{ backgroundColor: 'rgba(26, 35, 19, 0.6)' }}
+      />
 
       {/* Container Card */}
-      <div className="w-full max-w-md bg-white rounded-card shadow-2xl border border-white/30 p-6 md:p-8 space-y-6 relative z-10">
+      <div className="w-full max-w-md bg-white rounded-card shadow-2xl border border-[#334426]/20 p-6 md:p-8 space-y-6 relative z-10">
         {/* Emblem & Branding */}
         <div className="text-center space-y-2">
           <div className="w-20 h-20 rounded-2xl border border-outline-subtle mx-auto overflow-hidden shadow-md">
@@ -60,9 +80,10 @@ export default function Login() {
                   }}
                   className={`p-2 rounded-md text-left transition-all flex items-center gap-1.5 ${
                     isSelected
-                      ? 'bg-[#334426] text-white font-semibold shadow-2xs'
+                      ? 'text-white font-semibold shadow-xs'
                       : 'bg-white hover:bg-[#EFF4EC] text-on-surface border border-outline-subtle'
                   }`}
+                  style={isSelected ? { backgroundColor: '#334426', borderColor: '#334426' } : {}}
                 >
                   <span className="material-symbols-outlined text-[16px]">person</span>
                   <span className="truncate">{u.role}</span>
@@ -127,7 +148,8 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full h-11 rounded-btn bg-[#334426] hover:bg-[#24311A] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99]"
+            className="w-full h-11 rounded-btn text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99] hover:brightness-110"
+            style={{ backgroundColor: '#334426' }}
           >
             <span className="material-symbols-outlined text-[20px]">login</span>
             <span>Masuk ke Aplikasi KlikDispos</span>
