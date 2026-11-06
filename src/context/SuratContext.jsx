@@ -1210,7 +1210,11 @@ export function SuratProvider({ children }) {
   const isAdmin =
     currentUser.roleKey === 'petugas' ||
     currentUser.roleKey === 'sekretaris' ||
+    currentUser.roleKey === 'panitera' ||
+    currentUser.roleKey === 'ketua' ||
+    currentUser.roleKey === 'wakil_ketua' ||
     currentUser.roleKey === 'kasubag_umum' ||
+    currentUser.roleKey === 'hakim_senior' ||
     currentUser.roleKey === 'admin' ||
     Boolean(currentUser.permissions?.includes('settings')) ||
     Boolean(currentUser.permissions?.includes('all_letters'));

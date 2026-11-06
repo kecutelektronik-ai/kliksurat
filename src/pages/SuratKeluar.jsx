@@ -342,6 +342,7 @@ export default function SuratKeluar() {
 
           <form onSubmit={handleCreateDraft} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm">
+              {/* Kolom 1: Instansi Tujuan */}
               <div className="space-y-1">
                 <label className="font-bold text-on-surface-variant">
                   Instansi / Pihak Tujuan Surat <span className="text-danger">*</span>
@@ -356,76 +357,161 @@ export default function SuratKeluar() {
                 />
               </div>
 
+              {/* Kolom 2: Unit Kerja Pengusul */}
               <div className="space-y-1">
+                <label className="font-bold text-on-surface-variant flex items-center justify-between">
+                  <span>Unit Kerja Pengusul <span className="text-danger">*</span></span>
+                  <span className="text-[11px] font-normal text-outline">Kepaniteraan / Kesekretariatan</span>
+                </label>
+                <div className="relative">
+                  <select
+                    required
+                    value={form.unitPengusul}
+                    onChange={(e) => setForm({ ...form, unitPengusul: e.target.value })}
+                    className="w-full h-10 pl-3 pr-8 rounded-btn bg-white border border-outline-subtle text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none appearance-none cursor-pointer"
+                  >
+                    {UNIT_PENGUSUL_OPTIONS.map((unit) => (
+                      <option key={unit} value={unit}>
+                        {unit}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3 top-2.5 text-[18px] text-outline pointer-events-none">
+                    expand_more
+                  </span>
+                </div>
+                {/* Pilihan Cepat Tombol Unit Pengusul */}
+                <div className="grid grid-cols-2 gap-2 pt-0.5">
+                  {UNIT_PENGUSUL_OPTIONS.map((unit) => (
+                    <button
+                      key={unit}
+                      type="button"
+                      onClick={() => setForm({ ...form, unitPengusul: unit })}
+                      className={`h-7 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                        form.unitPengusul === unit
+                          ? 'bg-primary text-white shadow-2xs font-bold'
+                          : 'bg-surface text-on-surface hover:bg-primary-light hover:text-primary border border-outline-subtle'
+                      }`}
+                    >
+                      <span>{form.unitPengusul === unit ? '☑' : '☐'}</span>
+                      <span>{unit}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Kolom 1 (Kiri): Kode Klasifikasi Tata Persuratan & Tombol Aksi Admin */}
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="font-bold text-on-surface-variant">
                     Kode Klasifikasi Tata Persuratan <span className="text-danger">*</span>
                   </label>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={handleOpenAddKlasifikasi}
-                      className="text-[11px] text-primary hover:underline font-bold flex items-center gap-1"
-                      title="Hak Akses Admin: Tambah, Edit, Hapus Kode Klasifikasi"
-                    >
-                      <span className="material-symbols-outlined text-[14px]">admin_panel_settings</span>
-                      <span>+ Tambah / Kelola Kode (Admin)</span>
-                    </button>
-                  )}
+                  <span className="text-[10px] font-bold text-primary px-2 py-0.5 rounded bg-primary-light border border-primary/20 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[13px]">admin_panel_settings</span>
+                    Hak Akses Admin
+                  </span>
                 </div>
-                <select
-                  value={form.kodeKlasifikasi}
-                  onChange={(e) => setForm({ ...form, kodeKlasifikasi: e.target.value })}
-                  className="w-full h-10 px-3 rounded-btn bg-white border border-outline-subtle text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-medium"
-                >
-                  {nomorConfig.klasifikasi.map((k) => (
-                    <option key={k.kode} value={k.kode}>
-                      {k.kode} - {k.nama} (No. Terakhir: {k.counter})
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={form.kodeKlasifikasi}
+                    onChange={(e) => setForm({ ...form, kodeKlasifikasi: e.target.value })}
+                    className="w-full h-11 pl-3 pr-8 rounded-btn bg-white border-2 border-primary/30 text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-bold text-xs md:text-sm shadow-2xs cursor-pointer"
+                  >
+                    {nomorConfig.klasifikasi.map((k) => (
+                      <option key={k.kode} value={k.kode}>
+                        {k.kode} - {k.nama} (No. Terakhir: {k.counter})
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3 top-3 text-[20px] text-primary pointer-events-none">
+                    expand_more
+                  </span>
+                </div>
+
+                {/* Tombol Hak Akses Admin untuk Tambah, Edit, Hapus Kode Klasifikasi */}
+                <div className="p-2 rounded-lg bg-surface border border-outline-subtle flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-bold text-primary flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[14px]">tune</span>
+                    Aksi Admin:
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleOpenAddKlasifikasi}
+                    className="px-2.5 py-1 rounded bg-primary text-white hover:bg-primary-dark text-xs font-bold shadow-2xs flex items-center gap-1 transition-all active:scale-95"
+                    title="Tambah kode klasifikasi tata persuratan baru"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">add_circle</span>
+                    <span>Tambah Kode</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => selectedKlasifikasi && handleOpenEditKlasifikasi(selectedKlasifikasi)}
+                    className="px-2.5 py-1 rounded bg-white hover:bg-primary-light hover:text-primary text-on-surface text-xs font-bold border border-outline-subtle flex items-center gap-1 transition-all active:scale-95"
+                    title="Edit kode klasifikasi dan penjelasan peruntukan kode yang sedang dipilih"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">edit</span>
+                    <span>Edit ({form.kodeKlasifikasi})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteItem(form.kodeKlasifikasi)}
+                    className="px-2.5 py-1 rounded bg-rose-50 hover:bg-danger hover:text-white text-danger text-xs font-bold border border-rose-200 flex items-center gap-1 transition-all active:scale-95"
+                    title="Hapus kode klasifikasi yang sedang dipilih"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">delete</span>
+                    <span>Hapus ({form.kodeKlasifikasi})</span>
+                  </button>
+                </div>
               </div>
 
-              {/* KOLOM PENJELASAN SINGKAT KODE KLASIFIKASI SURAT */}
-              <div className="space-y-1 md:col-span-2">
-                <div className="p-3.5 rounded-card bg-primary-light/40 border border-primary/30 flex flex-col sm:flex-row items-start gap-3 transition-all">
-                  <div className="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0 shadow-2xs font-bold font-code text-xs">
-                    {selectedKlasifikasi?.kode || form.kodeKlasifikasi}
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="font-bold text-primary text-xs flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-[16px]">verified</span>
-                        <span>Ruang Lingkup & Penjelasan Kode: {selectedKlasifikasi?.nama}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white text-primary border border-primary/20">
-                          Nomor Berikutnya: {(selectedKlasifikasi?.counter || 0) + 1}
+              {/* Kolom 2 (Kanan - "KOLOM LAIN"): Penjelasan Singkat Kode Klasifikasi (Cek Kesesuaian Kode) */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-on-surface-variant flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-primary text-[16px]">info</span>
+                    <span>Penjelasan Singkat Kode Klasifikasi ({selectedKlasifikasi?.kode || form.kodeKlasifikasi})</span>
+                  </label>
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[12px]">sync</span>
+                    Otomatis Menyesuaikan
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-card bg-primary-light/40 border-2 border-primary/30 flex flex-col justify-between shadow-2xs space-y-2">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 border-b border-primary/20 pb-1.5 mb-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 rounded bg-primary text-white font-mono font-bold text-xs">
+                          {selectedKlasifikasi?.kode || form.kodeKlasifikasi}
                         </span>
-                        {isAdmin && selectedKlasifikasi && (
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditKlasifikasi(selectedKlasifikasi)}
-                            className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
-                            title="Edit kode klasifikasi ini"
-                          >
-                            <span className="material-symbols-outlined text-[13px]">edit</span>
-                            <span>Edit Penjelasan</span>
-                          </button>
-                        )}
+                        <span className="font-bold text-xs text-primary font-mono truncate max-w-[200px] sm:max-w-none">
+                          {selectedKlasifikasi?.nama}
+                        </span>
                       </div>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white border border-primary/20 text-primary font-bold whitespace-nowrap">
+                        No. Terakhir: <strong>{selectedKlasifikasi?.counter ?? 0}</strong>
+                      </span>
                     </div>
                     <p className="text-xs text-on-surface leading-relaxed font-medium">
-                      {selectedKlasifikasi?.penjelasan || `Naskah dinas resmi terkait bidang ${selectedKlasifikasi?.nama}.`}
+                      {selectedKlasifikasi?.penjelasan || (
+                        <span className="text-outline italic">
+                          Naskah dinas resmi terkait bidang administrasi {selectedKlasifikasi?.nama}.
+                        </span>
+                      )}
                     </p>
-                    <div className="text-[11px] text-outline flex items-center gap-1 pt-0.5">
-                      <span className="material-symbols-outlined text-[14px] text-amber-600">help_outline</span>
-                      <span><strong>Tujuan Penjelasan:</strong> Pastikan perihal naskah dinas Anda sesuai dengan ruang lingkup klasifikasi di atas sebelum diajukan.</span>
-                    </div>
+                  </div>
+
+                  {/* Indikator Verifikasi Kesesuaian Kode dengan Penjelasan */}
+                  <div className="pt-1.5 border-t border-primary/20 flex items-center gap-1.5 text-[11px] text-amber-900 bg-amber-50/90 px-2.5 py-1.5 rounded-btn border border-amber-200 font-medium">
+                    <span className="material-symbols-outlined text-[15px] text-amber-700 shrink-0">verified</span>
+                    <span>
+                      <strong>Tujuan Penjelasan:</strong> Pastikan perihal surat Anda sudah sesuai dengan ruang lingkup penjelasan kode di atas sebelum diajukan.
+                    </span>
                   </div>
                 </div>
               </div>
 
+              {/* Row 3: Perihal Naskah Dinas Keluar */}
               <div className="space-y-1 md:col-span-2">
                 <label className="font-bold text-on-surface-variant">
                   Perihal Naskah Dinas Keluar <span className="text-danger">*</span>
