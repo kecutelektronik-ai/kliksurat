@@ -980,7 +980,7 @@ export function SuratProvider({ children }) {
     if (tahapSaatIni === 2) {
       // Tahap 2: Sekretaris/Plh memberi catatan & meneruskan ke Ketua/Wakil Ketua/Plh
       targetStatus = 'Telah Didisposisi';
-      tahapTrackLabel = 'Telaah & Catatan Pengelolaan Surat';
+      tahapTrackLabel = 'Telaah & Catatan Pengelola Surat';
       const tujuan = formDisposisi.tujuanPimpinan || 'Ketua Pengadilan';
       trackStatusMsg = `Sekretaris menelaah dan meneruskan lembar disposisi ke ${tujuan}. Catatan: "${(formDisposisi.catatanSekretaris || '').slice(0, 100)}"`;
       trackIcon = 'rate_review';

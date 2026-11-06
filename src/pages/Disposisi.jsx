@@ -505,7 +505,7 @@ export default function Disposisi() {
                 2. Catatan Sekretaris/Plh
               </div>
               <div className="text-[11px] text-outline mt-0.5">
-                Penanggung jawab pengelolaan surat memberi catatan & teruskan ke <strong>Ketua</strong>.
+                Penanggung jawab pengelola surat memberi catatan & teruskan ke <strong>Ketua</strong>.
               </div>
             </div>
             <div className="mt-2 text-[10px] text-primary font-semibold flex items-center gap-1">
@@ -655,7 +655,7 @@ export default function Disposisi() {
               {/* Pejabat Penelaah */}
               <div>
                 <label className="font-bold text-on-surface block mb-1">
-                  Penanggung Jawab Pengelolaan Surat:
+                  Penanggung Jawab Pengelola Surat:
                 </label>
                 <input
                   type="text"
@@ -1314,10 +1314,10 @@ export default function Disposisi() {
                 <div className="border-t border-black p-2.5 min-h-[160px] flex-1 flex flex-col space-y-2">
                   <div className="font-bold underline text-xs mb-1">CATATAN:</div>
 
-                  {/* 1. Catatan Sekretaris/Plh (Penanggung Jawab Pengelolaan Surat) */}
+                  {/* 1. Catatan Sekretaris/Plh (Penanggung Jawab Pengelola Surat) */}
                   <div className="border-l-2 border-black pl-2 py-0.5">
                     <div className="font-bold text-[10px] uppercase">
-                      Catatan Sekretaris/Plh (Pengelolaan Surat):
+                      Catatan Sekretaris/Plh (Pengelola Surat):
                     </div>
                     <div className="whitespace-pre-line text-[10.5px] italic text-black leading-snug">
                       {form.catatanSekretaris || '-'}
