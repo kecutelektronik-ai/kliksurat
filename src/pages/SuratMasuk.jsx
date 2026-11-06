@@ -751,16 +751,19 @@ export default function SuratMasuk() {
           <table className="w-full text-left border-collapse text-xs md:text-sm">
             <thead>
               <tr className="bg-surface border-b border-outline-subtle text-on-surface-variant text-xs uppercase tracking-wider font-semibold">
-                <th className="py-3 px-4">Nomor & Agenda</th>
-                <th className="py-3 px-3">Jenis Surat</th>
-                <th className="py-3 px-3">Asal Surat</th>
-                <th className="py-3 px-3">Penerima Disposisi</th>
-                <th className="py-3 px-4">Perihal</th>
-                <th className="py-3 px-4">Tanggal Diterima</th>
-                <th className="py-3 px-3">Prioritas</th>
-                <th className="py-3 px-3">Sifat</th>
-                <th className="py-3 px-3">Status</th>
-                <th className="py-3 px-4 text-right">Aksi</th>
+                <th className="py-3 px-3.5 whitespace-nowrap">Nomor Surat Dinas</th>
+                <th className="py-3 px-3 whitespace-nowrap">Tanggal Surat Dinas</th>
+                <th className="py-3 px-3 whitespace-nowrap">Lampiran</th>
+                <th className="py-3 px-3 whitespace-nowrap">Status</th>
+                <th className="py-3 px-3 whitespace-nowrap">Sifat</th>
+                <th className="py-3 px-3 whitespace-nowrap">Jenis</th>
+                <th className="py-3 px-3 whitespace-nowrap">Diterima Tanggal</th>
+                <th className="py-3 px-3 whitespace-nowrap">Nomor Agenda</th>
+                <th className="py-3 px-3 whitespace-nowrap">Dari / Asal Surat</th>
+                <th className="py-3 px-4 min-w-[200px]">Hal / Perihal</th>
+                <th className="py-3 px-3 whitespace-nowrap">Prioritas Surat</th>
+                <th className="py-3 px-3 whitespace-nowrap">Disposisi Kepada</th>
+                <th className="py-3 px-4 text-right whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-subtle text-on-surface">
@@ -768,63 +771,25 @@ export default function SuratMasuk() {
                 const isMenunggu = item.status === 'Menunggu Disposisi';
                 return (
                   <tr key={item.id} className="hover:bg-surface/60 transition-colors">
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <div className="font-bold text-on-surface font-code text-xs">{item.nomorSurat}</div>
-                      <div className="text-[11px] text-outline font-code">{item.agenda}</div>
+                    {/* 1. Nomor Surat Dinas */}
+                    <td className="py-3.5 px-3.5 whitespace-nowrap font-bold text-on-surface font-code text-xs">
+                      {item.nomorSurat}
                     </td>
-                    <td className="py-3.5 px-3 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-primary-light text-primary border border-primary/20">
-                        <span className="material-symbols-outlined text-[15px]">article</span>
-                        <span>{item.jenisSurat || 'Surat Dinas'}</span>
+
+                    {/* 2. Tanggal Surat Dinas */}
+                    <td className="py-3.5 px-3 whitespace-nowrap text-on-surface font-medium text-xs">
+                      {item.tanggalSurat || '-'}
+                    </td>
+
+                    {/* 3. Lampiran */}
+                    <td className="py-3.5 px-3 whitespace-nowrap text-xs text-on-surface-variant font-medium">
+                      <span className="inline-flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[15px] text-outline">attach_file</span>
+                        <span>{item.lampiran || '-'}</span>
                       </span>
                     </td>
-                    <td className="py-3.5 px-3 whitespace-nowrap">
-                      <div className="font-semibold text-on-surface">{item.asalSurat}</div>
-                    </td>
-                    <td className="py-3.5 px-3 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-900 border border-indigo-200">
-                        <span className="material-symbols-outlined text-[15px] text-indigo-700">account_circle</span>
-                        <span>{item.pejabatPenerima || item.tujuanAwal || 'Ketua Pengadilan'}</span>
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 max-w-xs">
-                      <p className="truncate font-medium text-on-surface" title={item.perihal}>
-                        {item.perihal}
-                      </p>
-                      <span className="text-[11px] text-outline">{item.lampiran}</span>
-                    </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-medium">
-                      {item.tanggalTerima ? item.tanggalTerima.replace('T', ' ') : item.tanggalSurat}
-                    </td>
-                    <td className="py-3.5 px-3 whitespace-nowrap">
-                      {(() => {
-                        const prio = item.prioritas || (item.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
-                        const pBadge = getPrioritasBadge(prio);
-                        return (
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs ${pBadge.badgeClass}`}
-                            title={`Prioritas: ${pBadge.label} (${pBadge.sla})`}
-                          >
-                            <span className="material-symbols-outlined text-[15px]">{pBadge.icon}</span>
-                            <span>{pBadge.label}</span>
-                          </span>
-                        );
-                      })()}
-                    </td>
-                    <td className="py-3.5 px-3 whitespace-nowrap">
-                      {(() => {
-                        const sBadge = getSifatBadge(item.sifatSurat || item.sifat);
-                        return (
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border ${sBadge.badgeClass}`}
-                            title={`Sifat: ${sBadge.label} (${sBadge.desc})`}
-                          >
-                            <span className="material-symbols-outlined text-[14px]">{sBadge.icon}</span>
-                            <span>{sBadge.label}</span>
-                          </span>
-                        );
-                      })()}
-                    </td>
+
+                    {/* 4. Status */}
                     <td className="py-3.5 px-3 whitespace-nowrap">
                       {(() => {
                         const badge = getStatusBadge(item.status);
@@ -882,6 +847,81 @@ export default function SuratMasuk() {
                         );
                       })()}
                     </td>
+
+                    {/* 5. Sifat */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      {(() => {
+                        const sBadge = getSifatBadge(item.sifatSurat || item.sifat);
+                        return (
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border ${sBadge.badgeClass}`}
+                            title={`Sifat: ${sBadge.label} (${sBadge.desc})`}
+                          >
+                            <span className="material-symbols-outlined text-[14px]">{sBadge.icon}</span>
+                            <span>{sBadge.label}</span>
+                          </span>
+                        );
+                      })()}
+                    </td>
+
+                    {/* 6. Jenis */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-primary-light text-primary border border-primary/20">
+                        <span className="material-symbols-outlined text-[15px]">article</span>
+                        <span>{item.jenisSurat || 'Surat Dinas'}</span>
+                      </span>
+                    </td>
+
+                    {/* 7. Diterima Tanggal */}
+                    <td className="py-3.5 px-3 whitespace-nowrap text-on-surface-variant font-medium text-xs">
+                      {item.tanggalTerima ? item.tanggalTerima.replace('T', ' ') : item.tanggalSurat}
+                    </td>
+
+                    {/* 8. Nomor Agenda */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      <span className="font-code font-bold text-xs text-primary bg-primary-light/60 px-2 py-0.5 rounded border border-primary/20">
+                        {item.agenda}
+                      </span>
+                    </td>
+
+                    {/* 9. Dari / Asal Surat */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      <div className="font-semibold text-xs text-on-surface">{item.asalSurat}</div>
+                    </td>
+
+                    {/* 10. Hal / Perihal */}
+                    <td className="py-3.5 px-4 max-w-xs">
+                      <p className="truncate font-medium text-xs text-on-surface" title={item.perihal}>
+                        {item.perihal}
+                      </p>
+                    </td>
+
+                    {/* 11. Prioritas Surat */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      {(() => {
+                        const prio = item.prioritas || (item.sifat === 'sangat_segera' ? 'Sangat Segera' : 'Segera');
+                        const pBadge = getPrioritasBadge(prio);
+                        return (
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs ${pBadge.badgeClass}`}
+                            title={`Prioritas: ${pBadge.label} (${pBadge.sla})`}
+                          >
+                            <span className="material-symbols-outlined text-[15px]">{pBadge.icon}</span>
+                            <span>{pBadge.label}</span>
+                          </span>
+                        );
+                      })()}
+                    </td>
+
+                    {/* 12. Disposisi Kepada */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-900 border border-indigo-200">
+                        <span className="material-symbols-outlined text-[15px] text-indigo-700">account_circle</span>
+                        <span>{item.pejabatPenerima || item.tujuanAwal || 'Ketua Pengadilan'}</span>
+                      </span>
+                    </td>
+
+                    {/* 13. Aksi */}
                     <td className="py-3.5 px-4 whitespace-nowrap text-right">
                       <div className="inline-flex items-center gap-1.5">
                         <button
