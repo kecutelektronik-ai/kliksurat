@@ -10,7 +10,7 @@ export default function Login() {
 
   useEffect(() => {
     const prevBg = document.body.style.backgroundColor;
-    document.body.style.backgroundColor = '#26331C';
+    document.body.style.backgroundColor = '#340D19';
     return () => {
       document.body.style.backgroundColor = prevBg;
     };
@@ -45,27 +45,27 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen w-full flex flex-col justify-center items-center p-4 relative overflow-hidden selection:bg-[#334426]/30"
+      className="min-h-screen w-full flex flex-col justify-center items-center p-4 relative overflow-hidden selection:bg-primary/30"
       style={{
-        backgroundColor: '#26331C',
-        background: 'linear-gradient(135deg, #3A4C28 0%, #26331C 50%, #151D0F 100%)',
+        backgroundColor: '#340D19',
+        background: 'linear-gradient(135deg, #4A1525 0%, #340D19 50%, #1A070D 100%)',
       }}
     >
-      {/* Aksen Latar Belakang Green Olive */}
+      {/* Aksen Latar Belakang Burgundy Silk & Glow */}
       <div
         className="absolute -top-36 -left-36 w-96 h-96 rounded-full blur-3xl pointer-events-none"
-        style={{ backgroundColor: 'rgba(84, 108, 62, 0.35)' }}
+        style={{ backgroundColor: 'rgba(94, 27, 48, 0.45)' }}
       />
       <div
         className="absolute -bottom-36 -right-36 w-96 h-96 rounded-full blur-3xl pointer-events-none"
-        style={{ backgroundColor: 'rgba(26, 35, 19, 0.6)' }}
+        style={{ backgroundColor: 'rgba(74, 21, 37, 0.55)' }}
       />
 
       {/* Container Card */}
-      <div className="w-full max-w-md bg-white rounded-card shadow-2xl border border-[#334426]/20 p-6 md:p-8 space-y-6 relative z-10">
+      <div className="w-full max-w-md bg-white rounded-card shadow-2xl border border-primary/20 p-6 md:p-8 space-y-6 relative z-10">
         {/* Emblem & Branding */}
         <div className="text-center space-y-2">
-          <div className="w-20 h-20 rounded-2xl border border-outline-subtle mx-auto overflow-hidden shadow-md">
+          <div className="w-20 h-20 rounded-2xl border border-primary/20 mx-auto overflow-hidden shadow-md ring-4 ring-primary/5">
             <img
               src={logoAplikasi}
               alt="Logo KlikDispos"
@@ -97,7 +97,7 @@ export default function Login() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full h-10 pl-9 pr-3 rounded-btn bg-surface border border-outline-subtle text-sm text-on-surface focus:border-[#334426] focus:ring-2 focus:ring-[#334426]/20 outline-none transition-all"
+                className="w-full h-10 pl-9 pr-3 rounded-btn bg-surface border border-outline-subtle text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 placeholder="Masukkan username"
               />
             </div>
@@ -108,7 +108,7 @@ export default function Login() {
               <label className="block text-xs font-semibold text-on-surface-variant">
                 Kata Sandi
               </label>
-              <a href="#" className="text-[11px] text-[#334426] hover:underline font-semibold">
+              <a href="#" className="text-[11px] text-primary hover:text-primary-dark hover:underline font-semibold">
                 Lupa Sandi?
               </a>
             </div>
@@ -121,13 +121,13 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-10 pl-9 pr-10 rounded-btn bg-surface border border-outline-subtle text-sm text-on-surface focus:border-[#334426] focus:ring-2 focus:ring-[#334426]/20 outline-none transition-all"
+                className="w-full h-10 pl-9 pr-10 rounded-btn bg-surface border border-outline-subtle text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 placeholder="Masukkan kata sandi"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-[#334426] transition-colors p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors p-1"
                 title={showPassword ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
               >
                 <span className="material-symbols-outlined text-[18px]">
@@ -139,7 +139,7 @@ export default function Login() {
 
           <div className="flex items-center justify-between text-xs pt-1">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" defaultChecked className="rounded text-[#334426] focus:ring-[#334426]" />
+              <input type="checkbox" defaultChecked className="rounded text-primary focus:ring-primary" />
               <span className="text-on-surface-variant font-medium">Ingat perangkat ini</span>
             </label>
             <span className="text-[11px] text-outline font-medium">Zona Waktu: WIB</span>
@@ -148,7 +148,7 @@ export default function Login() {
           <button
             type="submit"
             className="w-full h-11 rounded-btn text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99] hover:brightness-110"
-            style={{ backgroundColor: '#334426' }}
+            style={{ backgroundColor: '#4A1525' }}
           >
             <span className="material-symbols-outlined text-[20px]">login</span>
             <span>Masuk ke Aplikasi KlikDispos</span>
@@ -157,7 +157,7 @@ export default function Login() {
 
         {/* Security Footer */}
         <div className="pt-4 border-t border-outline-subtle text-center space-y-1 text-xs text-outline">
-          <div className="flex items-center justify-center gap-1.5 text-success font-semibold">
+          <div className="flex items-center justify-center gap-1.5 text-primary font-semibold">
             <span className="material-symbols-outlined text-[16px]">verified_user</span>
             <span>Terenkripsi Digital BSSN Republik Indonesia</span>
           </div>
