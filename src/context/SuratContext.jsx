@@ -50,6 +50,7 @@ export function getAllowedMenusForRole(roleKey) {
         'distribusi',
         'pelacakan',
         'arsip',
+        'kewenangan-plh',
       ];
     case 'ketua':
     case 'wakil_ketua':
@@ -130,8 +131,8 @@ export const INITIAL_USERS_LIST = [
     badge: 'Petugas Surat',
     status: 'Aktif',
     isAdmin: false,
-    permissions: ['dashboard', 'surat-masuk', 'surat-keluar', 'distribusi', 'pelacakan', 'arsip'],
-    accessSummary: 'Dashboard, Surat Masuk, Surat Keluar, Distribusi, Pelacakan, Arsip'
+    permissions: ['dashboard', 'surat-masuk', 'surat-keluar', 'distribusi', 'pelacakan', 'arsip', 'kewenangan-plh'],
+    accessSummary: 'Dashboard, Surat Masuk, Surat Keluar, Distribusi, Pelacakan, Arsip, Kewenangan Plh Ketua'
   },
   {
     id: 'usr-ketua',
@@ -1275,7 +1276,7 @@ export function SuratProvider({ children }) {
               roleKey === 'kasubag_umum' || roleKey === 'sekretaris'
                 ? 'Seluruh Menu Aplikasi (Admin CRUD Penuh)'
                 : roleKey === 'petugas'
-                ? 'Dashboard, Surat Masuk, Surat Keluar, Distribusi, Pelacakan, Arsip'
+                ? 'Dashboard, Surat Masuk, Surat Keluar, Distribusi, Pelacakan, Arsip, Kewenangan Plh Ketua'
                 : roleKey === 'panitera'
                 ? 'Dashboard, Surat Masuk, Disposisi Surat'
                 : 'Dashboard, Surat Masuk, Halaman Pimpinan, Arsip Surat',

@@ -175,7 +175,7 @@ export default function Akun() {
       case 'admin':
         return 'Seluruh Menu Aplikasi (Admin: Lihat, Tambah, Edit, Hapus Data Penuh)';
       case 'petugas':
-        return 'Dashboard, Surat Masuk, Surat Keluar, Distribusi Surat, Pelacakan Surat, Arsip Surat';
+        return 'Dashboard, Surat Masuk, Surat Keluar, Distribusi Surat, Pelacakan Surat, Arsip Surat, Kewenangan Plh Ketua';
       case 'ketua':
       case 'wakil_ketua':
       case 'hakim_senior':
@@ -239,10 +239,10 @@ export default function Akun() {
               <span className="material-symbols-outlined text-[16px]">outgoing_mail</span>
               Petugas Surat
             </span>
-            <span className="px-1.5 py-0.5 rounded text-[10px] bg-teal-700 text-white font-bold">6 Menu</span>
+            <span className="px-1.5 py-0.5 rounded text-[10px] bg-teal-700 text-white font-bold">7 Menu</span>
           </div>
           <p className="text-teal-950 font-medium text-[11px] leading-tight">
-            Dashboard, Surat Masuk, Surat Keluar, Distribusi Surat, Pelacakan Surat, dan Arsip Surat.
+            Dashboard, Surat Masuk, Surat Keluar, Distribusi Surat, Pelacakan Surat, Arsip Surat, dan Kewenangan Plh Ketua.
           </p>
         </div>
 
