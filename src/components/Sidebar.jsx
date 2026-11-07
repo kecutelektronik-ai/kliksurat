@@ -32,11 +32,7 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
   const visibleNavItems = ALL_NAV_ITEMS.filter((item) => allowedMenus.includes(item.id));
 
   const handleNavClick = (id) => {
-    if (id === 'bantuan-fonnte') {
-      navigateTo('whatsapp');
-    } else {
-      navigateTo(id);
-    }
+    navigateTo(id);
     if (setIsOpenMobile) setIsOpenMobile(false);
   };
 

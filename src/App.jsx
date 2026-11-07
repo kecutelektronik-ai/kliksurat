@@ -62,6 +62,7 @@ export default function App() {
       case 'kewenangan-plh':
         return <PelimpahanKewenangan />;
       case 'whatsapp':
+      case 'bantuan-fonnte':
         return <WhatsApp />;
       case 'akun':
         return <Akun />;
