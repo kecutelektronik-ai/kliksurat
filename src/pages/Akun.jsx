@@ -106,7 +106,7 @@ export default function Akun() {
   const handleAddSubmit = (e) => {
     e.preventDefault();
     if (!addForm.name.trim() || !addForm.username.trim()) {
-      showToast('Nama pengurus dan username wajib diisi', 'warning');
+      showToast('Nama pegawai dan username wajib diisi', 'warning');
       return;
     }
 
@@ -143,7 +143,7 @@ export default function Akun() {
   const handleEditSubmit = (e) => {
     e.preventDefault();
     if (!editForm.name.trim() || !editForm.username.trim()) {
-      showToast('Nama pengurus dan username wajib diisi', 'warning');
+      showToast('Nama pegawai dan username wajib diisi', 'warning');
       return;
     }
 
@@ -330,7 +330,7 @@ export default function Akun() {
             <thead>
               <tr className="bg-[#0B3B24] text-white text-[11px] font-bold tracking-wider uppercase">
                 <th className="py-3 px-4 w-36">JABATAN</th>
-                <th className="py-3 px-4">NAMA PENGURUS</th>
+                <th className="py-3 px-4">NAMA PEGAWAI</th>
                 <th className="py-3 px-4">USERNAME LOGIN</th>
                 <th className="py-3 px-4 w-36">KATA SANDI</th>
                 <th className="py-3 px-4 text-center w-24">STATUS</th>
@@ -371,7 +371,7 @@ export default function Akun() {
                         </span>
                       </td>
 
-                      {/* Kolom NAMA PENGURUS */}
+                      {/* Kolom NAMA PEGAWAI */}
                       <td className="py-3.5 px-4 align-middle">
                         <div className="flex flex-wrap items-center gap-1.5">
                           <span className="font-extrabold text-slate-900 text-sm">
@@ -393,12 +393,30 @@ export default function Akun() {
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-outline mt-0.5 flex items-center gap-2">
-                          <span>{user.department || user.dept || 'Pengadilan Agama'}</span>
-                          {user.nip && user.nip !== '-' && (
-                            <span className="font-code">NIP: {user.nip}</span>
-                          )}
-                        </div>
+                        {(() => {
+                          let deptText = (user.department || user.dept || '').trim();
+                          // Hilangkan seluruh kata "Tata Usaha" dan variasinya
+                          deptText = deptText
+                            .replace(/\(?\s*Tata Usaha\s*\)?/gi, '')
+                            .replace(/&\s*\(\s*\)/g, '')
+                            .replace(/Subbag Umum &\s*\(Persuratan\)/gi, 'Subbag Umum Persuratan')
+                            .replace(/&\s*Persuratan/gi, 'Persuratan')
+                            .replace(/\s{2,}/g, ' ')
+                            .trim();
+                          if (deptText === 'Pengadilan Agama' || deptText === '-' || deptText === '&' || !deptText) {
+                            deptText = '';
+                          }
+
+                          const showNip = user.nip && user.nip !== '-';
+                          if (!deptText && !showNip) return null;
+
+                          return (
+                            <div className="text-[11px] text-outline mt-0.5 flex items-center gap-2">
+                              {deptText ? <span>{deptText}</span> : null}
+                              {showNip ? <span className="font-code">NIP: {user.nip}</span> : null}
+                            </div>
+                          );
+                        })()}
                       </td>
 
                       {/* Kolom USERNAME LOGIN */}
