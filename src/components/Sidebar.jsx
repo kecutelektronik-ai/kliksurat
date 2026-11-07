@@ -26,12 +26,17 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
     },
     { id: 'whatsapp', label: 'Pengaturan WhatsApp', icon: 'chat' },
     { id: 'akun', label: 'Akun dan Hak Akses', icon: 'manage_accounts' },
+    { id: 'bantuan-fonnte', label: 'Bantuan Teknis Fonnte', icon: 'help' },
   ];
 
   const visibleNavItems = ALL_NAV_ITEMS.filter((item) => allowedMenus.includes(item.id));
 
   const handleNavClick = (id) => {
-    navigateTo(id);
+    if (id === 'bantuan-fonnte') {
+      navigateTo('whatsapp');
+    } else {
+      navigateTo(id);
+    }
     if (setIsOpenMobile) setIsOpenMobile(false);
   };
 
@@ -140,19 +145,9 @@ export default function Sidebar({ isOpenMobile, setIsOpenMobile }) {
           </div>
 
           {/* Sidebar Footer */}
-          <div className="pt-3 border-t border-white/15 flex flex-col gap-2">
-            {allowedMenus.includes('whatsapp') && (
-              <button
-                onClick={() => handleNavClick('whatsapp')}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-stone-200 hover:text-white hover:bg-white/10 text-sm transition-colors text-left"
-              >
-                <span className="material-symbols-outlined text-[18px]">help</span>
-                <span>Bantuan Teknis Fonnte</span>
-              </button>
-            )}
-
+          <div className="pt-3 border-t border-white/15">
             {/* Copyright */}
-            <div className="text-center pt-2 text-[11px] leading-tight">
+            <div className="text-center text-[11px] leading-tight">
               <p className="font-semibold text-white/90">
                 <span className="text-warning font-bold">KlikDispos</span> &copy; MASKOD-2026. Hak Cipta
               </p>

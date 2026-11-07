@@ -40,6 +40,7 @@ export function getAllowedMenusForRole(roleKey) {
         'kewenangan-plh',
         'whatsapp',
         'akun',
+        'bantuan-fonnte',
       ];
     case 'petugas':
       return [
